@@ -1,5 +1,5 @@
 # yiigo-example
-一个yiigo的小例子，方便上手
+一个 yiigo 的小例子，方便上手
 
 ## 使用：
 1. 下载后放到 GOPATH 下的 src 目录下
