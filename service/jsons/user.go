@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type AdminJson struct {
+type UserJson struct {
 	ID        int       `json:"id"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
@@ -16,8 +16,8 @@ type AdminJson struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func FormatAdmin2Json(data *models.AdminModel) *AdminJson {
-	result := &AdminJson{}
+func FormatUser2Json(data *models.UserModel) *UserJson {
+	result := &UserJson{}
 
 	result.ID = data.ID
 	result.Name = data.Name
@@ -31,11 +31,11 @@ func FormatAdmin2Json(data *models.AdminModel) *AdminJson {
 	return result
 }
 
-func FormatAdminList2Json(data []models.AdminModel) []AdminJson {
-	result := []AdminJson{}
+func FormatUserList2Json(data []models.UserModel) []UserJson {
+	result := []UserJson{}
 
 	for _, model := range data {
-		temp := AdminJson{}
+		temp := UserJson{}
 
 		temp.ID = model.ID
 		temp.Name = model.Name

@@ -8,21 +8,21 @@ import (
 	"github.com/iiinsomnia/yiigo"
 )
 
-type AdminDao struct {
+type UserDao struct {
 	yiigo.MysqlBase
 }
 
-func NewAdminDao() *AdminDao {
-	return &AdminDao{yiigo.MysqlBase{Table: "admin"}}
+func NewUserDao() *UserDao {
+	return &UserDao{yiigo.MysqlBase{Table: "user"}}
 }
 
-func (a *AdminDao) GetAdminById(id int) (*models.AdminModel, error) {
-	model := &models.AdminModel{}
+func (a *UserDao) GetUserById(id int) (*models.UserModel, error) {
+	model := &models.UserModel{}
 
-	cache := cache.NewAdminCache()
+	cache := cache.NewUserCache()
 
 	cacheField := strconv.Itoa(id)
-	ok := cache.GetAdminDetailCache(cacheField, model)
+	ok := cache.GetUserDetailCache(cacheField, model)
 
 	if ok {
 		return model, nil
@@ -36,14 +36,14 @@ func (a *AdminDao) GetAdminById(id int) (*models.AdminModel, error) {
 	err := a.MysqlBase.FindOne(query, model)
 
 	if err == nil {
-		cache.SetAdminDetailCache(cacheField, model)
+		cache.SetUserDetailCache(cacheField, model)
 	}
 
 	return model, err
 }
 
-func (a *AdminDao) GetAdminList() ([]models.AdminModel, int, error) {
-	modelArr := []models.AdminModel{}
+func (a *UserDao) GetUserList() ([]models.UserModel, int, error) {
+	modelArr := []models.UserModel{}
 
 	count := 0
 	query := map[string]interface{}{"count": &count}

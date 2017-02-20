@@ -27,7 +27,7 @@ func main() {
 
 // load routes
 func loadRoutes(router *gin.Engine) {
-	routes.LoadAdminRoutes(router)
+	routes.LoadUserRoutes(router)
 }
 
 func run() {

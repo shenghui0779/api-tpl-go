@@ -9,7 +9,7 @@ import (
 	"github.com/iiinsomnia/yiigo"
 )
 
-func GetAdminDetail(c *gin.Context) {
+func GetUserDetail(c *gin.Context) {
 	id := c.Query("id")
 
 	if strings.TrimSpace(id) == "" {
@@ -24,7 +24,7 @@ func GetAdminDetail(c *gin.Context) {
 		return
 	}
 
-	data, err := service.GetAdminById(_id)
+	data, err := service.GetUserById(_id)
 
 	if err != nil {
 		yiigo.ReturnJson(c, -1, "服务器内部错误")
@@ -34,8 +34,8 @@ func GetAdminDetail(c *gin.Context) {
 	yiigo.ReturnJson(c, 0, "请求成功", data)
 }
 
-func GetAdminList(c *gin.Context) {
-	data, count, err := service.GetAdminList()
+func GetUserList(c *gin.Context) {
+	data, count, err := service.GetUserList()
 
 	if err != nil {
 		yiigo.ReturnJson(c, -1, "服务器内部错误")

@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type AdminModel struct {
+type UserModel struct {
 	ID        int       `sql:"AUTO_INCREMENT" gorm:"column:id;primary_key"`
 	Name      string    `gorm:"column:name"`
 	Email     string    `gorm:"column:email"`
