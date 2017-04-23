@@ -16,8 +16,8 @@ func main() {
 	yiigo.LoadEnvConfig()
 	yiigo.InitLogger()
 	yiigo.InitDB()
-	// yiigo.InitRedis()
-	// yiigo.InitMongo()
+	yiigo.InitRedis()
+	yiigo.InitMongo()
 
 	version := yiigo.GetEnvString("app", "version", "1.0")
 	fmt.Println("server started, api version", version)
@@ -27,7 +27,9 @@ func main() {
 
 // load routes
 func loadRoutes(router *gin.Engine) {
-	routes.LoadUserRoutes(router)
+	routes.LoadWelcomeRoutes(router)
+	routes.LoadArticleRoutes(router)
+	routes.LoadBookRoutes(router)
 }
 
 func run() {
