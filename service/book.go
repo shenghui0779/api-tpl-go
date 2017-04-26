@@ -24,7 +24,7 @@ func GetBookById(id int) (yiigo.X, error) {
 	book := &Book{}
 
 	bookDao := mongo.NewBookDao()
-	err := bookDao.GetBookById(id, book)
+	err := bookDao.FindById(id, book)
 
 	if err != nil {
 		if msg := err.Error(); msg != "sql: no rows in result set" {
@@ -52,7 +52,7 @@ func GetAllBooks() ([]yiigo.X, error) {
 	books := []Book{}
 
 	bookDao := mongo.NewBookDao()
-	err := bookDao.GetAllBooks(&books)
+	err := bookDao.FindAll(&books)
 
 	if err != nil {
 		if msg := err.Error(); msg != "sql: no rows in result set" {
@@ -69,21 +69,21 @@ func GetAllBooks() ([]yiigo.X, error) {
 
 func AddNewBook(data bson.M) (int, error) {
 	bookDao := mongo.NewBookDao()
-	id, err := bookDao.AddNewBook(data)
+	id, err := bookDao.Add(data)
 
 	return id, err
 }
 
 func UpdateBookById(id int, data bson.M) error {
 	bookDao := mongo.NewBookDao()
-	err := bookDao.UpdateBookById(id, data)
+	err := bookDao.UpdateById(id, data)
 
 	return err
 }
 
 func DeleteBookById(id int) error {
 	bookDao := mongo.NewBookDao()
-	err := bookDao.DeleteBookById(id)
+	err := bookDao.DeleteById(id)
 
 	return err
 }

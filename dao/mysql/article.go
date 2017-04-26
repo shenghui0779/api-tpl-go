@@ -14,7 +14,7 @@ func NewArticleDao() *ArticleDao {
 	}
 }
 
-func (a *ArticleDao) GetArticleById(id int, data interface{}) error {
+func (a *ArticleDao) FindById(id int, data interface{}) error {
 	query := yiigo.X{
 		"where": "id = ?",
 		"binds": []interface{}{id},
@@ -25,19 +25,19 @@ func (a *ArticleDao) GetArticleById(id int, data interface{}) error {
 	return err
 }
 
-func (a *ArticleDao) GetAllArticles(data interface{}) error {
+func (a *ArticleDao) FindAll(data interface{}) error {
 	err := a.MySQL.FindAll(data)
 
 	return err
 }
 
-func (a *ArticleDao) AddNewArticle(data yiigo.X) (int64, error) {
+func (a *ArticleDao) Add(data yiigo.X) (int64, error) {
 	id, err := a.MySQL.Insert(data)
 
 	return id, err
 }
 
-func (a *ArticleDao) UpdateArticleById(id int, data yiigo.X) error {
+func (a *ArticleDao) UpdateById(id int, data yiigo.X) error {
 	query := yiigo.X{
 		"where": "id = ?",
 		"binds": []interface{}{id},
@@ -48,7 +48,7 @@ func (a *ArticleDao) UpdateArticleById(id int, data yiigo.X) error {
 	return err
 }
 
-func (a *ArticleDao) DeleteArticleById(id int) error {
+func (a *ArticleDao) DeleteById(id int) error {
 	query := yiigo.X{
 		"where": "id = ?",
 		"binds": []interface{}{id},

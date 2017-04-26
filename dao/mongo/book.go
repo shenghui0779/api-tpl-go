@@ -18,33 +18,33 @@ func NewBookDao() *BookDao {
 	}
 }
 
-func (b *BookDao) GetBookById(id int, data interface{}) error {
+func (b *BookDao) FindById(id int, data interface{}) error {
 	query := bson.M{"_id": id}
 	err := b.Mongo.FindOne(query, data)
 
 	return err
 }
 
-func (b *BookDao) GetAllBooks(data interface{}) error {
+func (b *BookDao) FindAll(data interface{}) error {
 	err := b.Mongo.FindAll(data)
 
 	return err
 }
 
-func (b *BookDao) AddNewBook(data bson.M) (int, error) {
+func (b *BookDao) Add(data bson.M) (int, error) {
 	id, err := b.Mongo.Insert(data)
 
 	return id, err
 }
 
-func (b *BookDao) UpdateBookById(id int, data bson.M) error {
+func (b *BookDao) UpdateById(id int, data bson.M) error {
 	query := bson.M{"_id": id}
 	err := b.Mongo.Update(query, data)
 
 	return err
 }
 
-func (b *BookDao) DeleteBookById(id int) error {
+func (b *BookDao) DeleteById(id int) error {
 	query := bson.M{"_id": id}
 	err := b.Mongo.Delete(query)
 

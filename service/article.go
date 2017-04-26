@@ -25,11 +25,11 @@ func GetArticleById(id int) (yiigo.X, error) {
 	cache := cache.NewArticleCache()
 
 	cacheField := strconv.Itoa(id)
-	ok := cache.GetArticleDetail(cacheField, article)
+	ok := cache.GetArticle(cacheField, article)
 
 	if !ok {
 		articleDao := mysql.NewArticleDao()
-		err := articleDao.GetArticleById(id, article)
+		err := articleDao.FindById(id, article)
 
 		if err != nil {
 			if msg := err.Error(); msg != "sql: no rows in result set" {
@@ -39,7 +39,7 @@ func GetArticleById(id int) (yiigo.X, error) {
 			return yiigo.X{}, nil
 		}
 
-		cache.SetArticleDetail(cacheField, article)
+		cache.SetArticle(cacheField, article)
 	}
 
 	data := yiigo.X{
@@ -56,7 +56,7 @@ func GetAllArticles() ([]yiigo.X, error) {
 	articles := []Article{}
 
 	articleDao := mysql.NewArticleDao()
-	err := articleDao.GetAllArticles(&articles)
+	err := articleDao.FindAll(&articles)
 
 	if err != nil {
 		if msg := err.Error(); msg != "sql: no rows in result set" {
@@ -73,21 +73,21 @@ func GetAllArticles() ([]yiigo.X, error) {
 
 func AddNewArticle(data yiigo.X) (int64, error) {
 	articleDao := mysql.NewArticleDao()
-	id, err := articleDao.AddNewArticle(data)
+	id, err := articleDao.Add(data)
 
 	return id, err
 }
 
 func UpdateArticleById(id int, data yiigo.X) error {
 	articleDao := mysql.NewArticleDao()
-	err := articleDao.UpdateArticleById(id, data)
+	err := articleDao.UpdateById(id, data)
 
 	return err
 }
 
 func DeleteArticleById(id int) error {
 	articleDao := mysql.NewArticleDao()
-	err := articleDao.DeleteArticleById(id)
+	err := articleDao.DeleteById(id)
 
 	return err
 }
