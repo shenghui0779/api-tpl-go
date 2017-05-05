@@ -68,7 +68,7 @@ func GetAllArticles() ([]yiigo.X, error) {
 
 	data := formatArticleList(articles)
 
-	return data, err
+	return data, nil
 }
 
 func AddNewArticle(data yiigo.X) (int64, error) {
