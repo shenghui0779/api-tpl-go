@@ -1,8 +1,8 @@
 package main
 
 import (
+	"demo/routes"
 	"fmt"
-	"routes"
 	"runtime"
 
 	"github.com/gin-gonic/gin"
@@ -13,28 +13,31 @@ func main() {
 	numCPU := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPU)
 
-	yiigo.LoadEnvConfig()
-	yiigo.InitLogger()
-	yiigo.InitDB()
-	yiigo.InitRedis()
-	yiigo.InitMongo()
+	runYiigo()
 
-	version := yiigo.GetEnvString("app", "version", "1.0")
-	fmt.Println("server started, api version", version)
+	version := yiigo.GetEnvString("app", "version", "1.0.0")
+	fmt.Println("app start, version", version)
 
-	run()
+	runServer()
 }
 
 // load routes
-func loadRoutes(router *gin.Engine) {
-	routes.LoadWelcomeRoutes(router)
-	routes.LoadArticleRoutes(router)
-	routes.LoadBookRoutes(router)
+func loadRoutes(r *gin.Engine) {
+	routes.LoadWelcomeRoutes(r)
+	routes.LoadBookRoutes(r)
+	routes.LoadStudentRoutes(r)
 }
 
-func run() {
+func runYiigo() {
+	b := yiigo.New()
+	b.EnableMongo()
+	b.EnableRedis()
+	b.Run()
+}
+
+func runServer() {
 	gin.SetMode(gin.ReleaseMode)
-	router := gin.New()
-	loadRoutes(router)
-	router.Run(":8000")
+	r := gin.New()
+	loadRoutes(r)
+	r.Run(":8000")
 }

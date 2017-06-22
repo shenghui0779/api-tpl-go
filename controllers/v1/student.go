@@ -1,28 +1,26 @@
 package v1
 
 import (
-	"service"
+	"demo/service"
 	"strconv"
+
+	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gin-gonic/gin"
 	"github.com/iiinsomnia/yiigo"
 )
 
-type ArticleAddForm struct {
-	Title    string `form:"title" binding:"required"`
-	AuthorID int    `form:"author_id" binding:"required"`
-	Content  string `form:"content" binding:"required"`
+type StudentForm struct {
+	Name   string `form:"name" binding:"required"`
+	Sex    string `form:"sex" binding:"required"`
+	Age    int    `form:"age" binding:"required"`
+	School string `form:"school" binding:"required"`
+	Grade  string `form:"grade" binding:"required"`
+	Class  string `form:"class" binding:"required"`
 }
 
-type ArticleUpdateForm struct {
-	Title    string `form:"title" binding:"required"`
-	AuthorID int    `form:"author_id" binding:"required"`
-	Content  string `form:"content" binding:"required"`
-	Status   int    `form:"status" binding:"required"`
-}
-
-func GetArticleList(c *gin.Context) {
-	data, err := service.GetAllArticles()
+func GetStudentList(c *gin.Context) {
+	data, err := service.GetAllStudents()
 
 	if err != nil {
 		yiigo.ReturnJson(c, -1, "server internal error")
@@ -32,7 +30,7 @@ func GetArticleList(c *gin.Context) {
 	yiigo.ReturnSuccess(c, data)
 }
 
-func GetArticleDetail(c *gin.Context) {
+func GetStudentDetail(c *gin.Context) {
 	id := c.Param("id")
 
 	_id, err := strconv.Atoi(id)
@@ -42,7 +40,7 @@ func GetArticleDetail(c *gin.Context) {
 		return
 	}
 
-	data, err := service.GetArticleById(_id)
+	data, err := service.GetStudentByID(_id)
 
 	if err != nil {
 		yiigo.ReturnJson(c, -1, "server internal error")
@@ -52,21 +50,24 @@ func GetArticleDetail(c *gin.Context) {
 	yiigo.ReturnSuccess(c, data)
 }
 
-func AddNewArticle(c *gin.Context) {
-	var form ArticleAddForm
+func AddNewStudent(c *gin.Context) {
+	var form StudentForm
 
 	if validate := c.Bind(&form); validate != nil {
 		yiigo.ReturnJson(c, -1, validate.Error())
 		return
 	}
 
-	data := yiigo.X{
-		"title":     c.PostForm("title"),
-		"author_id": c.PostForm("author_id"),
-		"content":   c.PostForm("content"),
+	data := bson.M{
+		"name":   form.Name,
+		"sex":    form.Sex,
+		"age":    form.Age,
+		"school": form.School,
+		"grade":  form.Grade,
+		"class":  form.Class,
 	}
 
-	id, err := service.AddNewArticle(data)
+	id, err := service.AddNewStudent(data)
 
 	if err != nil {
 		yiigo.ReturnJson(c, -1, "server internal error")
@@ -76,7 +77,7 @@ func AddNewArticle(c *gin.Context) {
 	yiigo.ReturnSuccess(c, id)
 }
 
-func UpdateArticle(c *gin.Context) {
+func UpdateStudent(c *gin.Context) {
 	id := c.Param("id")
 
 	_id, err := strconv.Atoi(id)
@@ -86,21 +87,23 @@ func UpdateArticle(c *gin.Context) {
 		return
 	}
 
-	var form ArticleUpdateForm
+	var form StudentForm
 
 	if validate := c.Bind(&form); validate != nil {
 		yiigo.ReturnJson(c, -1, validate.Error())
 		return
 	}
 
-	data := yiigo.X{
-		"title":     c.PostForm("title"),
-		"author_id": c.PostForm("author_id"),
-		"content":   c.PostForm("content"),
-		"status":    c.PostForm("status"),
+	data := bson.M{
+		"name":   form.Name,
+		"sex":    form.Sex,
+		"age":    form.Age,
+		"school": form.School,
+		"grade":  form.Grade,
+		"class":  form.Class,
 	}
 
-	err = service.UpdateArticleById(_id, data)
+	err = service.UpdateStudentByID(_id, data)
 
 	if err != nil {
 		yiigo.ReturnJson(c, -1, "server internal error")
@@ -110,7 +113,7 @@ func UpdateArticle(c *gin.Context) {
 	yiigo.ReturnSuccess(c)
 }
 
-func DeleteArticle(c *gin.Context) {
+func DeleteStudent(c *gin.Context) {
 	id := c.Param("id")
 
 	_id, err := strconv.Atoi(id)
@@ -120,7 +123,7 @@ func DeleteArticle(c *gin.Context) {
 		return
 	}
 
-	err = service.DeleteArticleById(_id)
+	err = service.DeleteStudentByID(_id)
 
 	if err != nil {
 		yiigo.ReturnJson(c, -1, "server internal error")

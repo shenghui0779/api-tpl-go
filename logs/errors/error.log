@@ -1,0 +1,37 @@
+[2017-06-22 15:27:23] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/redis.go:86] [Redis] redis is not initialized
+[2017-06-22 15:27:23] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/redis.go:86] [Redis] redis is not initialized
+[2017-06-22 15:28:15] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/redis.go:86] [Redis] redis is not initialized
+[2017-06-22 15:28:25] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:232] [MySQL] [FindOne] sql: database is closed, sql: SELECT * FROM book WHERE id = ? LIMIT 1, args: [1]
+[2017-06-22 15:28:30] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:232] [MySQL] [FindOne] sql: database is closed, sql: SELECT * FROM book WHERE id = ? LIMIT 1, args: [1]
+[2017-06-22 15:28:31] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:232] [MySQL] [FindOne] sql: database is closed, sql: SELECT * FROM book WHERE id = ? LIMIT 1, args: [1]
+[2017-06-22 15:30:38] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:232] [MySQL] [FindOne] sql: database is closed, sql: SELECT * FROM book WHERE id = ? LIMIT 1, args: [1]
+[2017-06-22 15:30:39] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:232] [MySQL] [FindOne] sql: database is closed, sql: SELECT * FROM book WHERE id = ? LIMIT 1, args: [1]
+[2017-06-22 15:30:39] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:232] [MySQL] [FindOne] sql: database is closed, sql: SELECT * FROM book WHERE id = ? LIMIT 1, args: [1]
+[2017-06-22 15:30:39] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:232] [MySQL] [FindOne] sql: database is closed, sql: SELECT * FROM book WHERE id = ? LIMIT 1, args: [1]
+[2017-06-22 15:30:39] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:232] [MySQL] [FindOne] sql: database is closed, sql: SELECT * FROM book WHERE id = ? LIMIT 1, args: [1]
+[2017-06-22 15:30:39] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:232] [MySQL] [FindOne] sql: database is closed, sql: SELECT * FROM book WHERE id = ? LIMIT 1, args: [1]
+[2017-06-22 15:30:40] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:232] [MySQL] [FindOne] sql: database is closed, sql: SELECT * FROM book WHERE id = ? LIMIT 1, args: [1]
+[2017-06-22 15:30:40] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:232] [MySQL] [FindOne] sql: database is closed, sql: SELECT * FROM book WHERE id = ? LIMIT 1, args: [1]
+[2017-06-22 15:30:40] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:232] [MySQL] [FindOne] sql: database is closed, sql: SELECT * FROM book WHERE id = ? LIMIT 1, args: [1]
+[2017-06-22 15:30:40] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:232] [MySQL] [FindOne] sql: database is closed, sql: SELECT * FROM book WHERE id = ? LIMIT 1, args: [1]
+[2017-06-22 15:31:07] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:32:04] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:32:05] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:32:05] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:32:05] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:32:06] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:32:06] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:32:06] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:32:27] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:32:27] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:32:27] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:32:27] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:32:28] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:34:19] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:75] [MySQL]  is not initialized
+[2017-06-22 15:35:55] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:295] [MySQL] [FindAll] sql: database is closed, sql: SELECT * FROM book, args: []
+[2017-06-22 15:40:52] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:54] [MySQL] Error 1045: Access denied for user 'root'@'localhost' (using password: NO)
+[2017-06-22 15:58:52] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:55] [MySQL] Error 1045: Access denied for user 'root'@'localhost' (using password: NO)
+[2017-06-22 15:59:16] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:54] [MySQL] Error 1045: Access denied for user 'root'@'localhost' (using password: NO)
+[2017-06-22 16:02:44] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:54] [MySQL] Error 1045: Access denied for user 'root'@'localhost' (using password: NO)
+[2017-06-22 16:04:27] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:54] [MySQL] Error 1045: Access denied for user 'root'@'localhost' (using password: NO)
+[2017-06-22 16:05:05] [ERR] [/data/code/go/src/github.com/iiinsomnia/yiigo/mysql.go:54] [MySQL] Error 1045: Access denied for user 'root'@'localhost' (using password: NO)

@@ -1,10 +1,8 @@
 package v1
 
 import (
-	"service"
+	"demo/service"
 	"strconv"
-
-	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gin-gonic/gin"
 	"github.com/iiinsomnia/yiigo"
@@ -12,10 +10,12 @@ import (
 
 type BookForm struct {
 	Title       string `form:"title" binding:"required"`
+	SubTitle    string `form:"subtitle" binding:"required"`
 	Author      string `form:"author" binding:"required"`
 	Version     string `form:"version" binding:"required"`
+	Price       string `form:"price" binding:"required"`
 	Publisher   string `form:"publisher" binding:"required"`
-	Publishtime string `form:"publishtime" binding:"required"`
+	PublishDate string `form:"publish_date" binding:"required"`
 }
 
 func GetBookList(c *gin.Context) {
@@ -57,12 +57,14 @@ func AddNewBook(c *gin.Context) {
 		return
 	}
 
-	data := bson.M{
-		"title":       c.PostForm("title"),
-		"author":      c.PostForm("author"),
-		"version":     c.PostForm("version"),
-		"publisher":   c.PostForm("publisher"),
-		"publishtime": c.PostForm("publishtime"),
+	data := yiigo.X{
+		"title":        form.Title,
+		"subtitle":     form.SubTitle,
+		"author":       form.Author,
+		"version":      form.Version,
+		"price":        form.Price,
+		"publisher":    form.Publisher,
+		"publish_date": form.PublishDate,
 	}
 
 	id, err := service.AddNewBook(data)
@@ -92,12 +94,14 @@ func UpdateBook(c *gin.Context) {
 		return
 	}
 
-	data := bson.M{
-		"title":       c.PostForm("title"),
-		"author":      c.PostForm("author"),
-		"version":     c.PostForm("version"),
-		"publisher":   c.PostForm("publisher"),
-		"publishtime": c.PostForm("publishtime"),
+	data := yiigo.X{
+		"title":        form.Title,
+		"subtitle":     form.SubTitle,
+		"author":       form.Author,
+		"version":      form.Version,
+		"price":        form.Price,
+		"publisher":    form.Publisher,
+		"publish_date": form.PublishDate,
 	}
 
 	err = service.UpdateBookById(_id, data)

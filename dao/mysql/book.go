@@ -2,19 +2,19 @@ package mysql
 
 import "github.com/iiinsomnia/yiigo"
 
-type ArticleDao struct {
+type BookDao struct {
 	yiigo.MySQL
 }
 
-func NewArticleDao() *ArticleDao {
-	return &ArticleDao{
+func NewBookDao() *BookDao {
+	return &BookDao{
 		yiigo.MySQL{
-			Table: "article",
+			Table: "book",
 		},
 	}
 }
 
-func (a *ArticleDao) FindById(id int, data interface{}) error {
+func (a *BookDao) GetById(id int, data interface{}) error {
 	query := yiigo.X{
 		"where": "id = ?",
 		"binds": []interface{}{id},
@@ -25,19 +25,19 @@ func (a *ArticleDao) FindById(id int, data interface{}) error {
 	return err
 }
 
-func (a *ArticleDao) FindAll(data interface{}) error {
+func (a *BookDao) GetAll(data interface{}) error {
 	err := a.MySQL.FindAll(data)
 
 	return err
 }
 
-func (a *ArticleDao) Add(data yiigo.X) (int64, error) {
+func (a *BookDao) AddNewRecord(data yiigo.X) (int64, error) {
 	id, err := a.MySQL.Insert(data)
 
 	return id, err
 }
 
-func (a *ArticleDao) UpdateById(id int, data yiigo.X) error {
+func (a *BookDao) UpdateById(id int, data yiigo.X) error {
 	query := yiigo.X{
 		"where": "id = ?",
 		"binds": []interface{}{id},
@@ -48,7 +48,7 @@ func (a *ArticleDao) UpdateById(id int, data yiigo.X) error {
 	return err
 }
 
-func (a *ArticleDao) DeleteById(id int) error {
+func (a *BookDao) DeleteById(id int) error {
 	query := yiigo.X{
 		"where": "id = ?",
 		"binds": []interface{}{id},
