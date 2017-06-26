@@ -30,13 +30,27 @@ func loadRoutes(r *gin.Engine) {
 
 func runYiigo() {
 	b := yiigo.New()
+
 	b.EnableMongo()
 	b.EnableRedis()
-	b.Run()
+
+	err := b.Run()
+
+	if err != nil {
+		yiigo.LogError(err.Error())
+	}
 }
 
 func runServer() {
-	gin.SetMode(gin.ReleaseMode)
+	debug := yiigo.GetEnvBool("app", "debug", false)
+	mode := gin.ReleaseMode
+
+	if debug {
+		mode = gin.DebugMode
+	}
+
+	gin.SetMode(mode)
+
 	r := gin.New()
 	loadRoutes(r)
 	r.Run(":8000")

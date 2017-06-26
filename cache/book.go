@@ -14,14 +14,41 @@ func NewBookCache() *BookCache {
 	}
 }
 
+// GetBook 获取缓存
 func (a *BookCache) GetBook(field string, data interface{}) bool {
-	return a.Redis.HGet("detail", field, data)
+	err := a.Redis.HGet("detail", field, data)
+
+	if err != nil {
+		if err.Error() != "not found" {
+			yiigo.LogError(err.Error())
+		}
+
+		return false
+	}
+
+	return true
 }
 
+// SetBook 设置缓存
 func (a *BookCache) SetBook(field string, data interface{}) bool {
-	return a.Redis.HSet("detail", field, data)
+	err := a.Redis.HSet("detail", field, data)
+
+	if err != nil {
+		yiigo.LogError(err.Error())
+		return false
+	}
+
+	return true
 }
 
+// DelBook 删除缓存
 func (a *BookCache) DelBook(field string) bool {
-	return a.Redis.HDel("detail", field)
+	err := a.Redis.HDel("detail", field)
+
+	if err != nil {
+		yiigo.LogError(err.Error())
+		return false
+	}
+
+	return true
 }

@@ -14,47 +14,75 @@ func NewBookDao() *BookDao {
 	}
 }
 
-func (a *BookDao) GetById(id int, data interface{}) error {
+func (b *BookDao) GetById(id int, data interface{}) error {
 	query := yiigo.X{
 		"where": "id = ?",
 		"binds": []interface{}{id},
 	}
 
-	err := a.MySQL.FindOne(query, data)
+	err := b.MySQL.FindOne(query, data)
 
-	return err
+	if err != nil {
+		if err.Error() != "not found" {
+			yiigo.LogError(err.Error())
+		}
+
+		return err
+	}
+
+	return nil
 }
 
-func (a *BookDao) GetAll(data interface{}) error {
-	err := a.MySQL.FindAll(data)
+func (b *BookDao) GetAll(data interface{}) error {
+	err := b.MySQL.FindAll(data)
 
-	return err
+	if err != nil {
+		yiigo.LogError(err.Error())
+		return err
+	}
+
+	return nil
 }
 
-func (a *BookDao) AddNewRecord(data yiigo.X) (int64, error) {
-	id, err := a.MySQL.Insert(data)
+func (b *BookDao) AddNewRecord(data yiigo.X) (int64, error) {
+	id, err := b.MySQL.Insert(data)
 
-	return id, err
+	if err != nil {
+		yiigo.LogError(err.Error())
+		return 0, err
+	}
+
+	return id, nil
 }
 
-func (a *BookDao) UpdateById(id int, data yiigo.X) error {
+func (b *BookDao) UpdateById(id int, data yiigo.X) error {
 	query := yiigo.X{
 		"where": "id = ?",
 		"binds": []interface{}{id},
 	}
 
-	_, err := a.MySQL.Update(query, data)
+	_, err := b.MySQL.Update(query, data)
 
-	return err
+	if err != nil {
+		yiigo.LogError(err.Error())
+		return err
+	}
+
+	return nil
 }
 
-func (a *BookDao) DeleteById(id int) error {
+func (b *BookDao) DeleteById(id int) error {
 	query := yiigo.X{
 		"where": "id = ?",
 		"binds": []interface{}{id},
 	}
 
-	_, err := a.MySQL.Delete(query)
+	_, err := b.MySQL.Delete(query)
 
-	return err
+	if err != nil {
+		yiigo.LogError(err.Error())
+		return err
+	}
+
+	return nil
 }

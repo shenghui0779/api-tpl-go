@@ -35,7 +35,7 @@ func GetBookById(id int) (yiigo.X, error) {
 		err := bookDao.GetById(id, book)
 
 		if err != nil {
-			if msg := err.Error(); msg != "sql: no rows in result set" {
+			if err.Error() != "not found" {
 				return nil, err
 			}
 
@@ -66,10 +66,6 @@ func GetAllBooks() ([]yiigo.X, error) {
 	err := bookDao.GetAll(&books)
 
 	if err != nil {
-		if msg := err.Error(); msg != "sql: no rows in result set" {
-			return nil, err
-		}
-
 		return []yiigo.X{}, nil
 	}
 

@@ -18,35 +18,60 @@ func NewStudentDao() *StudentDao {
 	}
 }
 
-func (b *StudentDao) GetById(id int, data interface{}) error {
+func (s *StudentDao) GetById(id int, data interface{}) error {
 	query := bson.M{"_id": id}
-	err := b.Mongo.FindOne(query, data)
+	err := s.Mongo.FindOne(query, data)
 
-	return err
+	if err != nil {
+		yiigo.LogError(err.Error())
+		return err
+	}
+
+	return nil
 }
 
-func (b *StudentDao) GetAll(data interface{}) error {
-	err := b.Mongo.FindAll(data)
+func (s *StudentDao) GetAll(data interface{}) error {
+	err := s.Mongo.FindAll(data)
 
-	return err
+	if err != nil {
+		yiigo.LogError(err.Error())
+		return err
+	}
+
+	return nil
 }
 
-func (b *StudentDao) AddNewRecord(data bson.M) (int, error) {
-	id, err := b.Mongo.Insert(data)
+func (s *StudentDao) AddNewRecord(data bson.M) (int, error) {
+	id, err := s.Mongo.Insert(data)
 
-	return id, err
+	if err != nil {
+		yiigo.LogError(err.Error())
+		return 0, err
+	}
+
+	return id, nil
 }
 
-func (b *StudentDao) UpdateById(id int, data bson.M) error {
+func (s *StudentDao) UpdateById(id int, data bson.M) error {
 	query := bson.M{"_id": id}
-	err := b.Mongo.Update(query, data)
+	err := s.Mongo.Update(query, data)
 
-	return err
+	if err != nil {
+		yiigo.LogError(err.Error())
+		return err
+	}
+
+	return nil
 }
 
-func (b *StudentDao) DeleteById(id int) error {
+func (s *StudentDao) DeleteById(id int) error {
 	query := bson.M{"_id": id}
-	err := b.Mongo.Delete(query)
+	err := s.Mongo.Delete(query)
 
-	return err
+	if err != nil {
+		yiigo.LogError(err.Error())
+		return err
+	}
+
+	return nil
 }
