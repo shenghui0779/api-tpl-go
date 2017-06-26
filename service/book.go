@@ -66,7 +66,7 @@ func GetAllBooks() ([]yiigo.X, error) {
 	err := bookDao.GetAll(&books)
 
 	if err != nil {
-		return []yiigo.X{}, nil
+		return nil, err
 	}
 
 	data := formatBookList(books)
