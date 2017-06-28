@@ -19,7 +19,7 @@ type StudentForm struct {
 	Class  string `form:"class" binding:"required"`
 }
 
-func GetStudentList(c *gin.Context) {
+func StudentIndex(c *gin.Context) {
 	data, err := service.GetAllStudents()
 
 	if err != nil {
@@ -30,7 +30,7 @@ func GetStudentList(c *gin.Context) {
 	yiigo.ReturnSuccess(c, data)
 }
 
-func GetStudentDetail(c *gin.Context) {
+func StudentView(c *gin.Context) {
 	id := c.Param("id")
 
 	_id, err := strconv.Atoi(id)
@@ -50,7 +50,7 @@ func GetStudentDetail(c *gin.Context) {
 	yiigo.ReturnSuccess(c, data)
 }
 
-func AddNewStudent(c *gin.Context) {
+func StudentAdd(c *gin.Context) {
 	var form StudentForm
 
 	if validate := c.Bind(&form); validate != nil {
@@ -77,7 +77,7 @@ func AddNewStudent(c *gin.Context) {
 	yiigo.ReturnSuccess(c, id)
 }
 
-func UpdateStudent(c *gin.Context) {
+func StudentEdit(c *gin.Context) {
 	id := c.Param("id")
 
 	_id, err := strconv.Atoi(id)
@@ -113,7 +113,7 @@ func UpdateStudent(c *gin.Context) {
 	yiigo.ReturnSuccess(c)
 }
 
-func DeleteStudent(c *gin.Context) {
+func StudentDelete(c *gin.Context) {
 	id := c.Param("id")
 
 	_id, err := strconv.Atoi(id)

@@ -18,7 +18,7 @@ type BookForm struct {
 	PublishDate string `form:"publish_date" binding:"required"`
 }
 
-func GetBookList(c *gin.Context) {
+func BookIndex(c *gin.Context) {
 	data, err := service.GetAllBooks()
 
 	if err != nil {
@@ -29,7 +29,7 @@ func GetBookList(c *gin.Context) {
 	yiigo.ReturnSuccess(c, data)
 }
 
-func GetBookDetail(c *gin.Context) {
+func BookView(c *gin.Context) {
 	id := c.Param("id")
 
 	_id, err := strconv.Atoi(id)
@@ -49,7 +49,7 @@ func GetBookDetail(c *gin.Context) {
 	yiigo.ReturnSuccess(c, data)
 }
 
-func AddNewBook(c *gin.Context) {
+func BookAdd(c *gin.Context) {
 	var form BookForm
 
 	if validate := c.Bind(&form); validate != nil {
@@ -77,7 +77,7 @@ func AddNewBook(c *gin.Context) {
 	yiigo.ReturnSuccess(c, id)
 }
 
-func UpdateBook(c *gin.Context) {
+func BookEdit(c *gin.Context) {
 	id := c.Param("id")
 
 	_id, err := strconv.Atoi(id)
@@ -114,7 +114,7 @@ func UpdateBook(c *gin.Context) {
 	yiigo.ReturnSuccess(c)
 }
 
-func DeleteBook(c *gin.Context) {
+func BookDelete(c *gin.Context) {
 	id := c.Param("id")
 
 	_id, err := strconv.Atoi(id)
