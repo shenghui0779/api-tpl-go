@@ -13,12 +13,12 @@ func main() {
 	numCPU := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPU)
 
-	runYiigo()
+	bootstrap()
 
 	version := yiigo.GetEnvString("app", "version", "1.0.0")
 	fmt.Println("app start, version", version)
 
-	runServer()
+	run()
 }
 
 // load routes
@@ -28,7 +28,7 @@ func loadRoutes(r *gin.Engine) {
 	routes.LoadStudentRoutes(r)
 }
 
-func runYiigo() {
+func bootstrap() {
 	b := yiigo.New()
 
 	b.EnableMongo()
@@ -41,7 +41,7 @@ func runYiigo() {
 	}
 }
 
-func runServer() {
+func run() {
 	debug := yiigo.GetEnvBool("app", "debug", false)
 	mode := gin.ReleaseMode
 
