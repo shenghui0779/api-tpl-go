@@ -34,7 +34,7 @@ func runYiigo() {
 	b.EnableMongo()
 	b.EnableRedis()
 
-	err := b.Run()
+	err := b.Bootstrap()
 
 	if err != nil {
 		yiigo.LogError(err.Error())
