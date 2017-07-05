@@ -31,8 +31,8 @@ func loadRoutes(r *gin.Engine) {
 func bootstrap() {
 	b := yiigo.New()
 
-	b.EnableMongo()
-	b.EnableRedis()
+	// b.EnableMongo()
+	// b.EnableRedis()
 
 	err := b.Bootstrap()
 
