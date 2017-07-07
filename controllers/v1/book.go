@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"demo/service"
+	service "demo/service/v1"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
