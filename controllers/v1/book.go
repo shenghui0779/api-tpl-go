@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/iiinsomnia/yiigo"
 )
 
@@ -50,9 +51,9 @@ func BookView(c *gin.Context) {
 }
 
 func BookAdd(c *gin.Context) {
-	var form BookForm
+	form := &BookForm{}
 
-	if validate := c.Bind(&form); validate != nil {
+	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
 		yiigo.ReturnJson(c, -1, validate.Error())
 		return
 	}
@@ -87,9 +88,9 @@ func BookEdit(c *gin.Context) {
 		return
 	}
 
-	var form BookForm
+	form := &BookForm{}
 
-	if validate := c.Bind(&form); validate != nil {
+	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
 		yiigo.ReturnJson(c, -1, validate.Error())
 		return
 	}

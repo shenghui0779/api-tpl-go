@@ -7,6 +7,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/iiinsomnia/yiigo"
 )
 
@@ -51,9 +52,9 @@ func StudentView(c *gin.Context) {
 }
 
 func StudentAdd(c *gin.Context) {
-	var form StudentForm
+	form := &StudentForm{}
 
-	if validate := c.Bind(&form); validate != nil {
+	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
 		yiigo.ReturnJson(c, -1, validate.Error())
 		return
 	}
@@ -87,9 +88,9 @@ func StudentEdit(c *gin.Context) {
 		return
 	}
 
-	var form StudentForm
+	form := &StudentForm{}
 
-	if validate := c.Bind(&form); validate != nil {
+	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
 		yiigo.ReturnJson(c, -1, validate.Error())
 		return
 	}
