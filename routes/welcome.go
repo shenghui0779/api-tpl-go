@@ -7,6 +7,6 @@ import (
 
 func LoadWelcomeRoutes(router *gin.Engine) {
 	router.GET("/", func(c *gin.Context) {
-		yiigo.ReturnJson(c, 0, "welcome to golang app!")
+		yiigo.ReturnJSON(c, 0, "welcome to golang app!")
 	})
 }

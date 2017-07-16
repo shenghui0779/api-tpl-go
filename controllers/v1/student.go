@@ -24,7 +24,7 @@ func StudentIndex(c *gin.Context) {
 	data, err := service.GetAllStudents()
 
 	if err != nil {
-		yiigo.ReturnJson(c, -1, "server internal error")
+		yiigo.ReturnJSON(c, -1, "server internal error")
 		return
 	}
 
@@ -37,14 +37,14 @@ func StudentView(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.ReturnJson(c, -1, "param error")
+		yiigo.ReturnJSON(c, -1, "param error")
 		return
 	}
 
 	data, err := service.GetStudentByID(_id)
 
 	if err != nil {
-		yiigo.ReturnJson(c, -1, "server internal error")
+		yiigo.ReturnJSON(c, -1, "server internal error")
 		return
 	}
 
@@ -55,7 +55,7 @@ func StudentAdd(c *gin.Context) {
 	form := &StudentForm{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.ReturnJson(c, -1, validate.Error())
+		yiigo.ReturnJSON(c, -1, validate.Error())
 		return
 	}
 
@@ -71,7 +71,7 @@ func StudentAdd(c *gin.Context) {
 	id, err := service.AddNewStudent(data)
 
 	if err != nil {
-		yiigo.ReturnJson(c, -1, "server internal error")
+		yiigo.ReturnJSON(c, -1, "server internal error")
 		return
 	}
 
@@ -84,14 +84,14 @@ func StudentEdit(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.ReturnJson(c, -1, "param error")
+		yiigo.ReturnJSON(c, -1, "param error")
 		return
 	}
 
 	form := &StudentForm{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.ReturnJson(c, -1, validate.Error())
+		yiigo.ReturnJSON(c, -1, validate.Error())
 		return
 	}
 
@@ -107,7 +107,7 @@ func StudentEdit(c *gin.Context) {
 	err = service.UpdateStudentByID(_id, data)
 
 	if err != nil {
-		yiigo.ReturnJson(c, -1, "server internal error")
+		yiigo.ReturnJSON(c, -1, "server internal error")
 		return
 	}
 
@@ -120,14 +120,14 @@ func StudentDelete(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.ReturnJson(c, -1, "param error")
+		yiigo.ReturnJSON(c, -1, "param error")
 		return
 	}
 
 	err = service.DeleteStudentByID(_id)
 
 	if err != nil {
-		yiigo.ReturnJson(c, -1, "server internal error")
+		yiigo.ReturnJSON(c, -1, "server internal error")
 		return
 	}
 
