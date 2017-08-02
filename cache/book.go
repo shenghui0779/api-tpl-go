@@ -1,6 +1,10 @@
 package cache
 
-import "github.com/iiinsomnia/yiigo"
+import (
+	"encoding/json"
+
+	"github.com/iiinsomnia/yiigo"
+)
 
 type BookCache struct {
 	yiigo.Redis
@@ -8,21 +12,27 @@ type BookCache struct {
 
 func NewBookCache() *BookCache {
 	return &BookCache{
-		yiigo.Redis{
-			CacheName: "book",
-		},
+		yiigo.Redis{},
 	}
 }
 
 // GetBook 获取缓存
-func (a *BookCache) GetBook(field string, data interface{}) bool {
-	err := a.Redis.HGet("detail", field, data)
+func (a *BookCache) GetBook(id int, data interface{}) bool {
+	reply, err := a.Redis.Do("HGET", "slim:book:detail", id)
 
 	if err != nil {
-		if err.Error() != "not found" {
-			yiigo.LogError(err.Error())
-		}
+		yiigo.LogError(err.Error())
+		return false
+	}
 
+	if reply == nil {
+		return false
+	}
+
+	err = a.Redis.ScanJSON(reply, data)
+
+	if err != nil {
+		yiigo.LogError(err.Error())
 		return false
 	}
 
@@ -30,8 +40,15 @@ func (a *BookCache) GetBook(field string, data interface{}) bool {
 }
 
 // SetBook 设置缓存
-func (a *BookCache) SetBook(field string, data interface{}) bool {
-	err := a.Redis.HSet("detail", field, data)
+func (a *BookCache) SetBook(id int, data interface{}) bool {
+	cache, err := json.Marshal(data)
+
+	if err != nil {
+		yiigo.LogError(err.Error())
+		return false
+	}
+
+	_, err = a.Redis.Do("HSET", "slim:book:detail", id, cache)
 
 	if err != nil {
 		yiigo.LogError(err.Error())
@@ -42,8 +59,8 @@ func (a *BookCache) SetBook(field string, data interface{}) bool {
 }
 
 // DelBook 删除缓存
-func (a *BookCache) DelBook(field string) bool {
-	err := a.Redis.HDel("detail", field)
+func (a *BookCache) DelBook(id int) bool {
+	_, err := a.Redis.Do("HDEL", "slim:book:detail", id)
 
 	if err != nil {
 		yiigo.LogError(err.Error())

@@ -32,7 +32,7 @@ func bootstrap() {
 	b := yiigo.New()
 
 	// b.EnableMongo()
-	// b.EnableRedis()
+	b.EnableRedis()
 
 	err := b.Bootstrap()
 

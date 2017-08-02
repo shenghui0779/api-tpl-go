@@ -3,7 +3,6 @@ package service
 import (
 	"demo/cache"
 	"demo/dao/mysql"
-	"strconv"
 	"time"
 
 	"github.com/iiinsomnia/yiigo"
@@ -26,9 +25,7 @@ func GetBookById(id int) (yiigo.X, error) {
 	book := &Book{}
 
 	cache := cache.NewBookCache()
-
-	cacheField := strconv.Itoa(id)
-	ok := cache.GetBook(cacheField, book)
+	ok := cache.GetBook(id, book)
 
 	if !ok {
 		bookDao := mysql.NewBookDao()
@@ -42,7 +39,7 @@ func GetBookById(id int) (yiigo.X, error) {
 			return yiigo.X{}, nil
 		}
 
-		cache.SetBook(cacheField, book)
+		cache.SetBook(id, book)
 	}
 
 	data := yiigo.X{
