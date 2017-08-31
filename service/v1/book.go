@@ -1,45 +1,36 @@
 package service
 
 import (
+	"database/sql"
 	"demo/cache"
 	"demo/dao/mysql"
-	"time"
+	"demo/models"
 
 	"github.com/iiinsomnia/yiigo"
 )
 
-type Book struct {
-	ID          int       `db:"id" json:"id"`
-	Title       string    `db:"title" json:"title"`
-	SubTitle    string    `db:"subtitle" json:"subtitle"`
-	Author      string    `db:"author" json:"author"`
-	Version     string    `db:"version" json:"version"`
-	Price       string    `db:"price" json:"price"`
-	Publisher   string    `db:"publisher" json:"publisher"`
-	PublishDate string    `db:"publish_date" json:"publish_date"`
-	CreatedAt   time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
-}
-
 func GetBookById(id int) (yiigo.X, error) {
-	book := &Book{}
+	defer yiigo.Flush()
 
-	cache := cache.NewBookCache()
-	ok := cache.GetBook(id, book)
+	book := &models.Book{}
+
+	ok := cache.GetBookCache(id, book)
 
 	if !ok {
-		bookDao := mysql.NewBookDao()
-		err := bookDao.GetById(id, book)
+		query := "SELECT * FROM yii_book WHERE id = ?"
+		err := yiigo.DB.Get(book, query, id)
 
 		if err != nil {
-			if err.Error() != "not found" {
+			if err != sql.ErrNoRows {
+				yiigo.Errf("%s, SQL: %s, Args: [%d]", err.Error(), query, id)
+
 				return nil, err
 			}
 
 			return yiigo.X{}, nil
 		}
 
-		cache.SetBook(id, book)
+		cache.SetBookCache(id, book)
 	}
 
 	data := yiigo.X{
@@ -57,12 +48,16 @@ func GetBookById(id int) (yiigo.X, error) {
 }
 
 func GetAllBooks() ([]yiigo.X, error) {
+	defer yiigo.Flush()
+
 	books := []Book{}
 
-	bookDao := mysql.NewBookDao()
-	err := bookDao.GetAll(&books)
+	query := "SELECT * FROM yii_book"
+	err := yiigo.DB.Get(book, query, id)
 
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
+		yiigo.Errf("%s, SQL: %s, Args: [%d]", err.Error(), query, id)
+
 		return nil, err
 	}
 
@@ -72,6 +67,8 @@ func GetAllBooks() ([]yiigo.X, error) {
 }
 
 func AddNewBook(data yiigo.X) (int64, error) {
+	defer yiigo.Flush()
+
 	bookDao := mysql.NewBookDao()
 	id, err := bookDao.AddNewRecord(data)
 
@@ -79,6 +76,8 @@ func AddNewBook(data yiigo.X) (int64, error) {
 }
 
 func UpdateBookById(id int, data yiigo.X) error {
+	defer yiigo.Flush()
+
 	bookDao := mysql.NewBookDao()
 	err := bookDao.UpdateById(id, data)
 
@@ -86,6 +85,8 @@ func UpdateBookById(id int, data yiigo.X) error {
 }
 
 func DeleteBookById(id int) error {
+	defer yiigo.Flush()
+
 	bookDao := mysql.NewBookDao()
 	err := bookDao.DeleteById(id)
 

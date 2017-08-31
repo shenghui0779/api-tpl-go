@@ -1,33 +1,30 @@
 package service
 
 import (
-	"demo/dao/mongo"
+	"demo/models"
 	"time"
+
+	"gopkg.in/mgo.v2"
 
 	"github.com/iiinsomnia/yiigo"
 	"gopkg.in/mgo.v2/bson"
 )
 
-type Student struct {
-	ID        int       `bson:"_id"`
-	Name      string    `bson:"name"`
-	Sex       string    `bson:"sex"`
-	Age       int       `bson:"age"`
-	School    string    `bson:"school"`
-	Grade     string    `bson:"grade"`
-	Class     string    `bson:"class"`
-	CreatedAt time.Time `bson:"created_at"`
-	UpdatedAt time.Time `bson:"updated_at"`
-}
-
 func GetStudentByID(id int) (yiigo.X, error) {
-	Student := &Student{}
+	defer yiigo.Flush()
 
-	StudentDao := mongo.NewStudentDao()
-	err := StudentDao.GetById(id, Student)
+	student := &models.Student{}
+
+	mongo := yiigo.Mongo()
+
+	err := mongo.DB("demo").C("student").FindId(id).One(student)
+
+	mongo.Close()
 
 	if err != nil {
-		if msg := err.Error(); msg != "not found" {
+		if err != mgo.ErrNotFound {
+			yiigo.Err(err.Error())
+
 			return nil, err
 		}
 
@@ -35,60 +32,108 @@ func GetStudentByID(id int) (yiigo.X, error) {
 	}
 
 	data := yiigo.X{
-		"id":     Student.ID,
-		"name":   Student.Name,
-		"sex":    Student.Sex,
-		"age":    Student.Age,
-		"school": Student.School,
-		"grade":  Student.Grade,
-		"class":  Student.Class,
+		"id":     student.ID,
+		"name":   student.Name,
+		"sex":    student.Sex,
+		"age":    student.Age,
+		"school": student.School,
+		"grade":  student.Grade,
+		"class":  student.Class,
 	}
 
 	return data, nil
 }
 
 func GetAllStudents() ([]yiigo.X, error) {
-	Students := []Student{}
+	defer yiigo.Flush()
 
-	StudentDao := mongo.NewStudentDao()
-	err := StudentDao.GetAll(&Students)
+	students := []models.Student{}
+
+	mongo := yiigo.Mongo()
+
+	err := mongo.DB("demo").C("student").All(&students)
+
+	mongo.Close()
 
 	if err != nil {
-		if msg := err.Error(); msg != "not found" {
+		if err != mgo.ErrNotFound {
 			return nil, err
 		}
 
 		return []yiigo.X{}, nil
 	}
 
-	data := formatStudentList(Students)
+	data := formatStudentList(students)
 
-	return data, err
+	return data, nil
 }
 
 func AddNewStudent(data bson.M) (int, error) {
-	StudentDao := mongo.NewStudentDao()
+	defer yiigo.Flush()
 
+	id, err := yiigo.Seq("demo", "student")
+
+	if err != nil {
+		yiigo.Err(err.Error())
+
+		return 0, err
+	}
+
+	data["_id"] = id
 	data["created_at"] = time.Now()
 	data["updated_at"] = time.Now()
 
-	id, err := StudentDao.AddNewRecord(data)
+	mongo := yiigo.Mongo()
 
-	return id, err
+	err := mongo.DB("demo").C("student").Insert(data)
+
+	if err != nil {
+		yiigo.Err(err.Error())
+
+		return 0, err
+	}
+
+	mongo.Close()
+
+	return id, nil
 }
 
 func UpdateStudentByID(id int, data bson.M) error {
-	StudentDao := mongo.NewStudentDao()
-	err := StudentDao.UpdateById(id, data)
+	defer yiigo.Flush()
 
-	return err
+	data["updated_at"] = time.Now()
+
+	mongo := yiigo.Mongo()
+
+	err := mongo.DB("demo").C("student").UpdateId(id, bson.M{"$set": data})
+
+	if err != nil {
+		yiigo.Err(err.Error())
+
+		return err
+	}
+
+	mongo.Close()
+
+	return nil
 }
 
 func DeleteStudentByID(id int) error {
-	StudentDao := mongo.NewStudentDao()
-	err := StudentDao.DeleteById(id)
+	defer yiigo.Flush()
 
-	return err
+	mongo := yiigo.Mongo()
+
+	err := mongo.DB("demo").C("student").RemoveId(id)
+
+	if err != nil {
+		yiigo.Err(err.Error())
+
+		return err
+	}
+
+	mongo.Close()
+
+	return nil
 }
 
 func formatStudentList(Students []Student) []yiigo.X {
