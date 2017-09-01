@@ -51,7 +51,7 @@ func GetAllStudents() ([]yiigo.X, error) {
 
 	mongo := yiigo.Mongo()
 
-	err := mongo.DB("demo").C("student").All(&students)
+	err := mongo.DB("demo").C("student").Find(bson.M{}).All(&students)
 
 	mongo.Close()
 
@@ -85,7 +85,7 @@ func AddNewStudent(data bson.M) (int, error) {
 
 	mongo := yiigo.Mongo()
 
-	err := mongo.DB("demo").C("student").Insert(data)
+	err = mongo.DB("demo").C("student").Insert(data)
 
 	if err != nil {
 		yiigo.Err(err.Error())
@@ -136,10 +136,10 @@ func DeleteStudentByID(id int) error {
 	return nil
 }
 
-func formatStudentList(Students []Student) []yiigo.X {
+func formatStudentList(students []models.Student) []yiigo.X {
 	data := []yiigo.X{}
 
-	for _, v := range Students {
+	for _, v := range students {
 		item := map[string]interface{}{
 			"id":     v.ID,
 			"name":   v.Name,

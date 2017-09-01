@@ -3,7 +3,6 @@ package service
 import (
 	"database/sql"
 	"demo/cache"
-	"demo/dao/mysql"
 	"demo/models"
 
 	"github.com/iiinsomnia/yiigo"
@@ -17,7 +16,7 @@ func GetBookById(id int) (yiigo.X, error) {
 	ok := cache.GetBookCache(id, book)
 
 	if !ok {
-		query := "SELECT * FROM yii_book WHERE id = ?"
+		query := "SELECT * FROM book WHERE id = ?"
 		err := yiigo.DB.Get(book, query, id)
 
 		if err != nil {
@@ -50,13 +49,13 @@ func GetBookById(id int) (yiigo.X, error) {
 func GetAllBooks() ([]yiigo.X, error) {
 	defer yiigo.Flush()
 
-	books := []Book{}
+	books := []models.Book{}
 
-	query := "SELECT * FROM yii_book"
-	err := yiigo.DB.Get(book, query, id)
+	query := "SELECT * FROM book"
+	err := yiigo.DB.Select(&books, query)
 
 	if err != nil && err != sql.ErrNoRows {
-		yiigo.Errf("%s, SQL: %s, Args: [%d]", err.Error(), query, id)
+		yiigo.Errf("%s, SQL: %s", err.Error(), query)
 
 		return nil, err
 	}
@@ -69,8 +68,16 @@ func GetAllBooks() ([]yiigo.X, error) {
 func AddNewBook(data yiigo.X) (int64, error) {
 	defer yiigo.Flush()
 
-	bookDao := mysql.NewBookDao()
-	id, err := bookDao.AddNewRecord(data)
+	sql, binds := yiigo.InsertSQL("book", data)
+	r, err := yiigo.DB.Exec(sql, binds...)
+
+	if err != nil {
+		yiigo.Errf("%s, SQL: %s, Args: %v", err.Error(), sql, binds)
+
+		return 0, err
+	}
+
+	id, err := r.LastInsertId()
 
 	return id, err
 }
@@ -78,22 +85,34 @@ func AddNewBook(data yiigo.X) (int64, error) {
 func UpdateBookById(id int, data yiigo.X) error {
 	defer yiigo.Flush()
 
-	bookDao := mysql.NewBookDao()
-	err := bookDao.UpdateById(id, data)
+	sql, binds := yiigo.UpdateSQL("UPDATE book SET ? WHERE id = ?", data, id)
+	_, err := yiigo.DB.Exec(sql, binds)
 
-	return err
+	if err != nil {
+		yiigo.Errf("%s, SQL: %s, Args: %v", err.Error(), sql, binds)
+
+		return err
+	}
+
+	return nil
 }
 
 func DeleteBookById(id int) error {
 	defer yiigo.Flush()
 
-	bookDao := mysql.NewBookDao()
-	err := bookDao.DeleteById(id)
+	query := "DELETE FROM book WHERE id = ?"
+	_, err := yiigo.DB.Exec(query, id)
 
-	return err
+	if err != nil {
+		yiigo.Errf("%s, SQL: %s, Args: [%d]", err.Error(), query, id)
+
+		return err
+	}
+
+	return nil
 }
 
-func formatBookList(books []Book) []yiigo.X {
+func formatBookList(books []models.Book) []yiigo.X {
 	data := []yiigo.X{}
 
 	for _, v := range books {

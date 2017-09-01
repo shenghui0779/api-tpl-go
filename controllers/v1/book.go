@@ -23,11 +23,11 @@ func BookIndex(c *gin.Context) {
 	data, err := service.GetAllBooks()
 
 	if err != nil {
-		yiigo.ReturnJSON(c, -1, "server internal error")
+		yiigo.Failed(c, "server internal error")
 		return
 	}
 
-	yiigo.ReturnSuccess(c, data)
+	yiigo.Success(c, data)
 }
 
 func BookView(c *gin.Context) {
@@ -36,25 +36,25 @@ func BookView(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.ReturnJSON(c, -1, "param error")
+		yiigo.Failed(c, "param error")
 		return
 	}
 
 	data, err := service.GetBookById(_id)
 
 	if err != nil {
-		yiigo.ReturnJSON(c, -1, "server internal error")
+		yiigo.Failed(c, "server internal error")
 		return
 	}
 
-	yiigo.ReturnSuccess(c, data)
+	yiigo.Success(c, data)
 }
 
 func BookAdd(c *gin.Context) {
 	form := &BookForm{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.ReturnJSON(c, -1, validate.Error())
+		yiigo.Failed(c, validate.Error())
 		return
 	}
 
@@ -71,11 +71,11 @@ func BookAdd(c *gin.Context) {
 	id, err := service.AddNewBook(data)
 
 	if err != nil {
-		yiigo.ReturnJSON(c, -1, "server internal error")
+		yiigo.Failed(c, "server internal error")
 		return
 	}
 
-	yiigo.ReturnSuccess(c, id)
+	yiigo.Success(c, id)
 }
 
 func BookEdit(c *gin.Context) {
@@ -84,14 +84,14 @@ func BookEdit(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.ReturnJSON(c, -1, "param error")
+		yiigo.Failed(c, "param error")
 		return
 	}
 
 	form := &BookForm{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.ReturnJSON(c, -1, validate.Error())
+		yiigo.Failed(c, validate.Error())
 		return
 	}
 
@@ -108,11 +108,11 @@ func BookEdit(c *gin.Context) {
 	err = service.UpdateBookById(_id, data)
 
 	if err != nil {
-		yiigo.ReturnJSON(c, -1, "server internal error")
+		yiigo.Failed(c, "server internal error")
 		return
 	}
 
-	yiigo.ReturnSuccess(c)
+	yiigo.Success(c)
 }
 
 func BookDelete(c *gin.Context) {
@@ -121,16 +121,16 @@ func BookDelete(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.ReturnJSON(c, -1, "param error")
+		yiigo.Failed(c, "param error")
 		return
 	}
 
 	err = service.DeleteBookById(_id)
 
 	if err != nil {
-		yiigo.ReturnJSON(c, -1, "server internal error")
+		yiigo.Failed(c, "server internal error")
 		return
 	}
 
-	yiigo.ReturnSuccess(c)
+	yiigo.Success(c)
 }
