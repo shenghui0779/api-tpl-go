@@ -33,15 +33,18 @@ func loadRoutes(r *gin.Engine) {
 }
 
 func run() {
-	mode := gin.ReleaseMode
+	debug := yiigo.EnvBool("app", "debug", true)
 
-	if yiigo.EnvBool("app", "debug", false) {
-		mode = gin.DebugMode
+	if !debug {
+		gin.SetMode(gin.ReleaseMode)
 	}
 
-	gin.SetMode(mode)
-
 	r := gin.New()
+
+	if debug {
+		r.Use(gin.Logger(), gin.Recovery())
+	}
+
 	loadRoutes(r)
 	r.Run(":8000")
 }
