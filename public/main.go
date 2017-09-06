@@ -13,7 +13,12 @@ func main() {
 	numCPU := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPU)
 
-	yiigo.Bootstrap(true, true, true)
+	err := yiigo.Bootstrap(true, true, true)
+
+	if err != nil {
+		yiigo.Error(err.Error())
+		yiigo.Flush()
+	}
 
 	fmt.Println("app start, version", yiigo.EnvString("app", "version", "1.0.0"))
 
