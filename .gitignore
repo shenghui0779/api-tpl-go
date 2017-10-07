@@ -25,4 +25,3 @@ _testmain.go
 env.ini
 log.xml
 logs/*
-public/logs

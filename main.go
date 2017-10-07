@@ -25,13 +25,6 @@ func main() {
 	run()
 }
 
-// load routes
-func loadRoutes(r *gin.Engine) {
-	routes.LoadWelcomeRoutes(r)
-	routes.LoadBookRoutes(r)
-	routes.LoadStudentRoutes(r)
-}
-
 func run() {
 	debug := yiigo.EnvBool("app", "debug", true)
 
@@ -42,9 +35,11 @@ func run() {
 	r := gin.New()
 
 	if debug {
-		r.Use(gin.Logger(), gin.Recovery())
+		r.Use(gin.Logger())
 	}
 
-	loadRoutes(r)
+	r.Use(gin.Recovery())
+
+	routes.RouteRegister(r)
 	r.Run(":8000")
 }
