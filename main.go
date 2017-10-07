@@ -13,7 +13,7 @@ func main() {
 	numCPU := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPU)
 
-	err := yiigo.Bootstrap(true, true, true)
+	err := yiigo.Bootstrap(true, false, true)
 
 	if err != nil {
 		yiigo.Error(err.Error())

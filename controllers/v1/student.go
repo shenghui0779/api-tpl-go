@@ -24,11 +24,11 @@ func StudentIndex(c *gin.Context) {
 	data, err := service.GetAllStudents()
 
 	if err != nil {
-		yiigo.Failed(c, "server internal error")
+		yiigo.JSON(c, -1, "server internal error")
 		return
 	}
 
-	yiigo.Success(c, data)
+	yiigo.OK(c, data)
 }
 
 func StudentView(c *gin.Context) {
@@ -37,25 +37,25 @@ func StudentView(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Failed(c, "param error")
+		yiigo.JSON(c, -1, "param error")
 		return
 	}
 
 	data, err := service.GetStudentByID(_id)
 
 	if err != nil {
-		yiigo.Failed(c, "server internal error")
+		yiigo.JSON(c, -1, "server internal error")
 		return
 	}
 
-	yiigo.Success(c, data)
+	yiigo.OK(c, data)
 }
 
 func StudentAdd(c *gin.Context) {
 	form := &StudentForm{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.Failed(c, validate.Error())
+		yiigo.JSON(c, -1, validate.Error())
 		return
 	}
 
@@ -71,11 +71,11 @@ func StudentAdd(c *gin.Context) {
 	id, err := service.AddNewStudent(data)
 
 	if err != nil {
-		yiigo.Failed(c, "server internal error")
+		yiigo.JSON(c, -1, "server internal error")
 		return
 	}
 
-	yiigo.Success(c, id)
+	yiigo.OK(c, gin.H{"id": id})
 }
 
 func StudentEdit(c *gin.Context) {
@@ -84,14 +84,14 @@ func StudentEdit(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Failed(c, "param error")
+		yiigo.JSON(c, -1, "param error")
 		return
 	}
 
 	form := &StudentForm{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.Failed(c, validate.Error())
+		yiigo.JSON(c, -1, validate.Error())
 		return
 	}
 
@@ -107,11 +107,11 @@ func StudentEdit(c *gin.Context) {
 	err = service.UpdateStudentByID(_id, data)
 
 	if err != nil {
-		yiigo.Failed(c, "server internal error")
+		yiigo.JSON(c, -1, "server internal error")
 		return
 	}
 
-	yiigo.Success(c)
+	yiigo.OK(c)
 }
 
 func StudentDelete(c *gin.Context) {
@@ -120,16 +120,16 @@ func StudentDelete(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Failed(c, "param error")
+		yiigo.JSON(c, -1, "param error")
 		return
 	}
 
 	err = service.DeleteStudentByID(_id)
 
 	if err != nil {
-		yiigo.Failed(c, "server internal error")
+		yiigo.JSON(c, -1, "server internal error")
 		return
 	}
 
-	yiigo.Success(c)
+	yiigo.OK(c)
 }
