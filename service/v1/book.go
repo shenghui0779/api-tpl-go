@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"demo/cache"
 	"demo/models"
+	"time"
 
 	"github.com/iiinsomnia/yiigo"
 )
@@ -46,12 +47,12 @@ func GetBookById(id int) (yiigo.X, error) {
 	return data, nil
 }
 
-func GetAllBooks() ([]yiigo.X, error) {
+func GetAllBooks() ([]models.Book, error) {
 	defer yiigo.Flush()
 
 	books := []models.Book{}
 
-	query := "SELECT * FROM book"
+	query := "SELECT * FROM book WHERE 1=1"
 	err := yiigo.DB.Select(&books, query)
 
 	if err != nil && err != sql.ErrNoRows {
@@ -60,13 +61,14 @@ func GetAllBooks() ([]yiigo.X, error) {
 		return nil, err
 	}
 
-	data := formatBookList(books)
-
-	return data, nil
+	return books, nil
 }
 
-func AddNewBook(data yiigo.X) (int64, error) {
+func AddNewBook(data *models.BookAdd) (int64, error) {
 	defer yiigo.Flush()
+
+	data.CreatedAt = time.Now()
+	data.UpdatedAt = time.Now()
 
 	sql, binds := yiigo.InsertSQL("book", data)
 	r, err := yiigo.DB.Exec(sql, binds...)
@@ -82,11 +84,13 @@ func AddNewBook(data yiigo.X) (int64, error) {
 	return id, err
 }
 
-func UpdateBookById(id int, data yiigo.X) error {
+func UpdateBookById(id int, data *models.BookEdit) error {
 	defer yiigo.Flush()
 
+	data.UpdatedAt = time.Now()
+
 	sql, binds := yiigo.UpdateSQL("UPDATE book SET ? WHERE id = ?", data, id)
-	_, err := yiigo.DB.Exec(sql, binds)
+	_, err := yiigo.DB.Exec(sql, binds...)
 
 	if err != nil {
 		yiigo.Errf("%s, SQL: %s, Args: %v", err.Error(), sql, binds)
@@ -110,25 +114,4 @@ func DeleteBookById(id int) error {
 	}
 
 	return nil
-}
-
-func formatBookList(books []models.Book) []yiigo.X {
-	data := []yiigo.X{}
-
-	for _, v := range books {
-		item := yiigo.X{
-			"id":           v.ID,
-			"title":        v.Title,
-			"subtitle":     v.SubTitle,
-			"author":       v.Author,
-			"version":      v.Version,
-			"price":        v.Price,
-			"publisher":    v.Publisher,
-			"publish_date": v.PublishDate,
-		}
-
-		data = append(data, item)
-	}
-
-	return data
 }

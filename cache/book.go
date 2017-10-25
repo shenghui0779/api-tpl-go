@@ -29,7 +29,7 @@ func GetBookCache(id int, data *models.Book) bool {
 		return false
 	}
 
-	err = yiigo.ScanRedisJSON(r, data)
+	err = yiigo.ScanJSON(r, data)
 
 	if err != nil {
 		yiigo.Err(err.Error())

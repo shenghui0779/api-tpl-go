@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"demo/models"
 	service "demo/service/v1"
 	"strconv"
 
@@ -8,16 +9,6 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/iiinsomnia/yiigo"
 )
-
-type BookForm struct {
-	Title       string `form:"title" binding:"required"`
-	SubTitle    string `form:"subtitle" binding:"required"`
-	Author      string `form:"author" binding:"required"`
-	Version     string `form:"version" binding:"required"`
-	Price       string `form:"price" binding:"required"`
-	Publisher   string `form:"publisher" binding:"required"`
-	PublishDate string `form:"publish_date" binding:"required"`
-}
 
 func BookIndex(c *gin.Context) {
 	data, err := service.GetAllBooks()
@@ -51,24 +42,14 @@ func BookView(c *gin.Context) {
 }
 
 func BookAdd(c *gin.Context) {
-	form := &BookForm{}
+	form := &models.BookAdd{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
 		yiigo.JSON(c, -1, validate.Error())
 		return
 	}
 
-	data := yiigo.X{
-		"title":        form.Title,
-		"subtitle":     form.SubTitle,
-		"author":       form.Author,
-		"version":      form.Version,
-		"price":        form.Price,
-		"publisher":    form.Publisher,
-		"publish_date": form.PublishDate,
-	}
-
-	id, err := service.AddNewBook(data)
+	id, err := service.AddNewBook(form)
 
 	if err != nil {
 		yiigo.JSON(c, -1, "server internal error")
@@ -88,24 +69,14 @@ func BookEdit(c *gin.Context) {
 		return
 	}
 
-	form := &BookForm{}
+	form := &models.BookEdit{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
 		yiigo.JSON(c, -1, validate.Error())
 		return
 	}
 
-	data := yiigo.X{
-		"title":        form.Title,
-		"subtitle":     form.SubTitle,
-		"author":       form.Author,
-		"version":      form.Version,
-		"price":        form.Price,
-		"publisher":    form.Publisher,
-		"publish_date": form.PublishDate,
-	}
-
-	err = service.UpdateBookById(_id, data)
+	err = service.UpdateBookById(_id, form)
 
 	if err != nil {
 		yiigo.JSON(c, -1, "server internal error")

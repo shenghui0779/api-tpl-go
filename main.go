@@ -16,8 +16,7 @@ func main() {
 	err := yiigo.Bootstrap(true, false, true)
 
 	if err != nil {
-		yiigo.Error(err.Error())
-		yiigo.Flush()
+		panic(err)
 	}
 
 	fmt.Println("app start, version", yiigo.EnvString("app", "version", "1.0.0"))
