@@ -15,11 +15,11 @@ func GetStudentByID(id int) (yiigo.X, error) {
 
 	student := &models.Student{}
 
-	mongo := yiigo.Mongo()
+	session := yiigo.Mongo.Clone()
 
-	err := mongo.DB("demo").C("student").FindId(id).One(student)
+	err := session.DB("demo").C("student").FindId(id).One(student)
 
-	mongo.Close()
+	session.Close()
 
 	if err != nil {
 		if err != mgo.ErrNotFound {
@@ -49,11 +49,11 @@ func GetAllStudents() ([]yiigo.X, error) {
 
 	students := []models.Student{}
 
-	mongo := yiigo.Mongo()
+	session := yiigo.Mongo.Clone()
 
-	err := mongo.DB("demo").C("student").Find(bson.M{}).All(&students)
+	err := session.DB("demo").C("student").Find(bson.M{}).All(&students)
 
-	mongo.Close()
+	session.Close()
 
 	if err != nil {
 		if err != mgo.ErrNotFound {
@@ -71,7 +71,9 @@ func GetAllStudents() ([]yiigo.X, error) {
 func AddNewStudent(data bson.M) (int, error) {
 	defer yiigo.Flush()
 
-	id, err := yiigo.Seq("demo", "student")
+	session := yiigo.Mongo.Clone()
+
+	id, err := yiigo.Seq(session, "demo", "student")
 
 	if err != nil {
 		yiigo.Err(err.Error())
@@ -83,9 +85,7 @@ func AddNewStudent(data bson.M) (int, error) {
 	data["created_at"] = time.Now()
 	data["updated_at"] = time.Now()
 
-	mongo := yiigo.Mongo()
-
-	err = mongo.DB("demo").C("student").Insert(data)
+	err = session.DB("demo").C("student").Insert(data)
 
 	if err != nil {
 		yiigo.Err(err.Error())
@@ -93,7 +93,7 @@ func AddNewStudent(data bson.M) (int, error) {
 		return 0, err
 	}
 
-	mongo.Close()
+	session.Close()
 
 	return id, nil
 }
@@ -103,9 +103,9 @@ func UpdateStudentByID(id int, data bson.M) error {
 
 	data["updated_at"] = time.Now()
 
-	mongo := yiigo.Mongo()
+	session := yiigo.Mongo.Clone()
 
-	err := mongo.DB("demo").C("student").UpdateId(id, bson.M{"$set": data})
+	err := session.DB("demo").C("student").UpdateId(id, bson.M{"$set": data})
 
 	if err != nil {
 		yiigo.Err(err.Error())
@@ -113,7 +113,7 @@ func UpdateStudentByID(id int, data bson.M) error {
 		return err
 	}
 
-	mongo.Close()
+	session.Close()
 
 	return nil
 }
@@ -121,9 +121,9 @@ func UpdateStudentByID(id int, data bson.M) error {
 func DeleteStudentByID(id int) error {
 	defer yiigo.Flush()
 
-	mongo := yiigo.Mongo()
+	session := yiigo.Mongo.Clone()
 
-	err := mongo.DB("demo").C("student").RemoveId(id)
+	err := session.DB("demo").C("student").RemoveId(id)
 
 	if err != nil {
 		yiigo.Err(err.Error())
@@ -131,7 +131,7 @@ func DeleteStudentByID(id int) error {
 		return err
 	}
 
-	mongo.Close()
+	session.Close()
 
 	return nil
 }
