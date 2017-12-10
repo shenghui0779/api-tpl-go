@@ -11,9 +11,6 @@ import (
 )
 
 func GetStudentByID(id int) (yiigo.X, error) {
-	defer yiigo.Flush()
-
-	student := &models.Student{}
 
 	session := yiigo.Mongo.Clone()
 
@@ -23,7 +20,7 @@ func GetStudentByID(id int) (yiigo.X, error) {
 
 	if err != nil {
 		if err != mgo.ErrNotFound {
-			yiigo.Err(err.Error())
+			yiigo.Logger.Error(err.Error())
 
 			return nil, err
 		}
@@ -45,18 +42,18 @@ func GetStudentByID(id int) (yiigo.X, error) {
 }
 
 func GetAllStudents() ([]yiigo.X, error) {
-	defer yiigo.Flush()
-
 	students := []models.Student{}
 
 	session := yiigo.Mongo.Clone()
 
-	err := session.DB("demo").C("student").Find(bson.M{}).All(&students)
+	defer session.Close()
 
-	session.Close()
+	err := session.DB("demo").C("student").Find(bson.M{}).All(&students)
 
 	if err != nil {
 		if err != mgo.ErrNotFound {
+			yiigo.Logger.Error(err.Error())
+
 			return nil, err
 		}
 
@@ -69,14 +66,14 @@ func GetAllStudents() ([]yiigo.X, error) {
 }
 
 func AddNewStudent(data bson.M) (int, error) {
-	defer yiigo.Flush()
-
 	session := yiigo.Mongo.Clone()
+
+	defer session.Close()
 
 	id, err := yiigo.Seq(session, "demo", "student")
 
 	if err != nil {
-		yiigo.Err(err.Error())
+		yiigo.Logger.Error(err.Error())
 
 		return 0, err
 	}
@@ -88,19 +85,15 @@ func AddNewStudent(data bson.M) (int, error) {
 	err = session.DB("demo").C("student").Insert(data)
 
 	if err != nil {
-		yiigo.Err(err.Error())
+		yiigo.Logger.Error(err.Error())
 
 		return 0, err
 	}
-
-	session.Close()
 
 	return id, nil
 }
 
 func UpdateStudentByID(id int, data bson.M) error {
-	defer yiigo.Flush()
-
 	data["updated_at"] = time.Now()
 
 	session := yiigo.Mongo.Clone()
@@ -108,7 +101,7 @@ func UpdateStudentByID(id int, data bson.M) error {
 	err := session.DB("demo").C("student").UpdateId(id, bson.M{"$set": data})
 
 	if err != nil {
-		yiigo.Err(err.Error())
+		yiigo.Logger.Error(err.Error())
 
 		return err
 	}
@@ -119,14 +112,12 @@ func UpdateStudentByID(id int, data bson.M) error {
 }
 
 func DeleteStudentByID(id int) error {
-	defer yiigo.Flush()
-
 	session := yiigo.Mongo.Clone()
 
 	err := session.DB("demo").C("student").RemoveId(id)
 
 	if err != nil {
-		yiigo.Err(err.Error())
+		yiigo.Logger.Error(err.Error())
 
 		return err
 	}

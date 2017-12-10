@@ -14,7 +14,8 @@ func BookIndex(c *gin.Context) {
 	data, err := service.GetAllBooks()
 
 	if err != nil {
-		yiigo.JSON(c, -1, "server internal error")
+		yiigo.Error(c, "server internal error")
+
 		return
 	}
 
@@ -27,14 +28,16 @@ func BookView(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.JSON(c, -1, "param error")
+		yiigo.Error(c, "param error")
+
 		return
 	}
 
 	data, err := service.GetBookById(_id)
 
 	if err != nil {
-		yiigo.JSON(c, -1, "server internal error")
+		yiigo.Error(c, "server internal error")
+
 		return
 	}
 
@@ -45,14 +48,16 @@ func BookAdd(c *gin.Context) {
 	form := &models.BookAdd{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.JSON(c, -1, validate.Error())
+		yiigo.Error(c, validate.Error())
+
 		return
 	}
 
 	id, err := service.AddNewBook(form)
 
 	if err != nil {
-		yiigo.JSON(c, -1, "server internal error")
+		yiigo.Error(c, "server internal error")
+
 		return
 	}
 
@@ -65,21 +70,24 @@ func BookEdit(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.JSON(c, -1, "param error")
+		yiigo.Error(c, "param error")
+
 		return
 	}
 
 	form := &models.BookEdit{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.JSON(c, -1, validate.Error())
+		yiigo.Error(c, validate.Error())
+
 		return
 	}
 
 	err = service.UpdateBookById(_id, form)
 
 	if err != nil {
-		yiigo.JSON(c, -1, "server internal error")
+		yiigo.Error(c, "server internal error")
+
 		return
 	}
 
@@ -92,14 +100,16 @@ func BookDelete(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.JSON(c, -1, "param error")
+		yiigo.Error(c, "param error")
+
 		return
 	}
 
 	err = service.DeleteBookById(_id)
 
 	if err != nil {
-		yiigo.JSON(c, -1, "server internal error")
+		yiigo.Error(c, "server internal error")
+
 		return
 	}
 

@@ -10,19 +10,16 @@ import (
 )
 
 func GetBookById(id int) (yiigo.X, error) {
-	defer yiigo.Flush()
-
 	book := &models.Book{}
 
 	ok := cache.GetBookCache(id, book)
 
 	if !ok {
-		query := "SELECT * FROM book WHERE id = ?"
-		err := yiigo.DB.Get(book, query, id)
+		err := yiigo.DB.Get(book, "SELECT * FROM book WHERE id = ?", id)
 
 		if err != nil {
 			if err != sql.ErrNoRows {
-				yiigo.Errf("%s, SQL: %s, Args: [%d]", err.Error(), query, id)
+				yiigo.Logger.Error(err.Error())
 
 				return nil, err
 			}
@@ -48,15 +45,12 @@ func GetBookById(id int) (yiigo.X, error) {
 }
 
 func GetAllBooks() ([]models.Book, error) {
-	defer yiigo.Flush()
-
 	books := []models.Book{}
 
-	query := "SELECT * FROM book WHERE 1=1"
-	err := yiigo.DB.Select(&books, query)
+	err := yiigo.DB.Select(&books, "SELECT * FROM book WHERE 1=1")
 
 	if err != nil && err != sql.ErrNoRows {
-		yiigo.Errf("%s, SQL: %s", err.Error(), query)
+		yiigo.Logger.Error(err.Error())
 
 		return nil, err
 	}
@@ -65,16 +59,13 @@ func GetAllBooks() ([]models.Book, error) {
 }
 
 func AddNewBook(data *models.BookAdd) (int64, error) {
-	defer yiigo.Flush()
-
 	data.CreatedAt = time.Now()
-	data.UpdatedAt = time.Now()
 
 	sql, binds := yiigo.InsertSQL("book", data)
 	r, err := yiigo.DB.Exec(sql, binds...)
 
 	if err != nil {
-		yiigo.Errf("%s, SQL: %s, Args: %v", err.Error(), sql, binds)
+		yiigo.Logger.Error(err.Error())
 
 		return 0, err
 	}
@@ -85,15 +76,13 @@ func AddNewBook(data *models.BookAdd) (int64, error) {
 }
 
 func UpdateBookById(id int, data *models.BookEdit) error {
-	defer yiigo.Flush()
-
 	data.UpdatedAt = time.Now()
 
 	sql, binds := yiigo.UpdateSQL("UPDATE book SET ? WHERE id = ?", data, id)
 	_, err := yiigo.DB.Exec(sql, binds...)
 
 	if err != nil {
-		yiigo.Errf("%s, SQL: %s, Args: %v", err.Error(), sql, binds)
+		yiigo.Logger.Error(err.Error())
 
 		return err
 	}
@@ -102,13 +91,10 @@ func UpdateBookById(id int, data *models.BookEdit) error {
 }
 
 func DeleteBookById(id int) error {
-	defer yiigo.Flush()
-
-	query := "DELETE FROM book WHERE id = ?"
-	_, err := yiigo.DB.Exec(query, id)
+	_, err := yiigo.DB.Exec("DELETE FROM book WHERE id = ?", id)
 
 	if err != nil {
-		yiigo.Errf("%s, SQL: %s, Args: [%d]", err.Error(), query, id)
+		yiigo.Logger.Error(err.Error())
 
 		return err
 	}

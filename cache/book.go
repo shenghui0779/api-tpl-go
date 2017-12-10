@@ -12,7 +12,7 @@ func GetBookCache(id int, data *models.Book) bool {
 	redis, err := yiigo.RedisPool.Get()
 
 	if err != nil {
-		yiigo.Err(err.Error())
+		yiigo.Logger.Error(err.Error())
 
 		return false
 	}
@@ -22,7 +22,7 @@ func GetBookCache(id int, data *models.Book) bool {
 	r, err := redis.Do("HGET", "slim:books", id)
 
 	if err != nil {
-		yiigo.Err(err.Error())
+		yiigo.Logger.Error(err.Error())
 
 		return false
 	}
@@ -34,7 +34,7 @@ func GetBookCache(id int, data *models.Book) bool {
 	err = yiigo.ScanJSON(r, data)
 
 	if err != nil {
-		yiigo.Err(err.Error())
+		yiigo.Logger.Error(err.Error())
 
 		return false
 	}
@@ -47,7 +47,7 @@ func SetBookCache(id int, data *models.Book) bool {
 	redis, err := yiigo.RedisPool.Get()
 
 	if err != nil {
-		yiigo.Err(err.Error())
+		yiigo.Logger.Error(err.Error())
 
 		return false
 	}
@@ -57,7 +57,7 @@ func SetBookCache(id int, data *models.Book) bool {
 	cache, err := json.Marshal(data)
 
 	if err != nil {
-		yiigo.Err(err.Error())
+		yiigo.Logger.Error(err.Error())
 
 		return false
 	}
@@ -65,7 +65,7 @@ func SetBookCache(id int, data *models.Book) bool {
 	_, err = redis.Do("HSET", "slim:books", id, cache)
 
 	if err != nil {
-		yiigo.Err(err.Error())
+		yiigo.Logger.Error(err.Error())
 
 		return false
 	}
@@ -78,7 +78,7 @@ func DelBookCache(id int) bool {
 	redis, err := yiigo.RedisPool.Get()
 
 	if err != nil {
-		yiigo.Err(err.Error())
+		yiigo.Logger.Error(err.Error())
 
 		return false
 	}
@@ -88,7 +88,7 @@ func DelBookCache(id int) bool {
 	_, err = redis.Do("HDEL", "slim:books", id)
 
 	if err != nil {
-		yiigo.Err(err.Error())
+		yiigo.Logger.Error(err.Error())
 
 		return false
 	}
