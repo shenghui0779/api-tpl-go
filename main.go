@@ -16,7 +16,7 @@ func main() {
 	err := yiigo.Bootstrap(true, false, true)
 
 	if err != nil {
-		panic(err)
+		yiigo.Logger.Panic(err.Error())
 	}
 
 	fmt.Println("app start, version", yiigo.EnvString("app", "version", "1.0.0"))
@@ -25,7 +25,7 @@ func main() {
 }
 
 func run() {
-	debug := yiigo.EnvBool("app", "debug", true)
+	debug := yiigo.EnvBool("app", "debug", false)
 
 	if !debug {
 		gin.SetMode(gin.ReleaseMode)
