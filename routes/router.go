@@ -10,7 +10,7 @@ import (
 // RouteRegister register routes
 func RouteRegister(r *gin.Engine) {
 	r.GET("/", func(c *gin.Context) {
-		yiigo.JSON(c, 0, "welcome to golang app!")
+		yiigo.JSON(c, true, 0, "welcome to golang app!")
 	})
 
 	_v1 := r.Group("/v1")

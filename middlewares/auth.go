@@ -16,7 +16,7 @@ func Auth() gin.HandlerFunc {
 		accessSign := c.Request.Header.Get("Access-Sign")
 
 		if strings.TrimSpace(uuid) == "" || strings.TrimSpace(accessTime) == "" || strings.TrimSpace(accessSign) == "" {
-			yiigo.ReturnJSON(c, -1, "Invalid token, access failed!")
+			yiigo.Error(c, "Invalid token, access failed!")
 			c.Abort()
 
 			return
@@ -26,7 +26,7 @@ func Auth() gin.HandlerFunc {
 		code, msg := validateLogin()
 
 		if code != 0 {
-			yiigo.ReturnJSON(c, code, msg)
+			yiigo.JSON(c, false, code, msg)
 			c.Abort()
 
 			return
@@ -36,7 +36,7 @@ func Auth() gin.HandlerFunc {
 		code, msg = validateSign(c, accessTime, accessSign)
 
 		if code != 0 {
-			yiigo.ReturnJSON(c, code, msg)
+			yiigo.JSON(c, false, code, msg)
 			c.Abort()
 
 			return
@@ -53,7 +53,7 @@ func validateLogin() (int, string) {
 
 // 验签
 func validateSign(c *gin.Context, accessTime string, accessSign string) (int, string) {
-	accessExpire := yiigo.GetEnvInt64("app", "accessExpire", 0)
+	accessExpire := yiigo.EnvInt64("app", "accessExpire", 0)
 	now := time.Now().Unix()
 	timestamp, _ := strconv.ParseInt(accessTime, 10, 64)
 

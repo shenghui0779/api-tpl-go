@@ -1,6 +1,7 @@
 package main
 
 import (
+	"demo/middlewares"
 	"demo/routes"
 	"fmt"
 	"runtime"
@@ -13,7 +14,7 @@ func main() {
 	numCPU := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPU)
 
-	err := yiigo.Bootstrap(true, false, true)
+	err := yiigo.Bootstrap(true, false, false)
 
 	if err != nil {
 		yiigo.Logger.Panic(err.Error())
@@ -37,7 +38,7 @@ func run() {
 		r.Use(gin.Logger())
 	}
 
-	r.Use(gin.Recovery())
+	r.Use(middlewares.Recovery())
 
 	routes.RouteRegister(r)
 	r.Run(":8000")

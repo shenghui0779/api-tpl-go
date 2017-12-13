@@ -11,12 +11,13 @@ import (
 )
 
 func GetStudentByID(id int) (yiigo.X, error) {
+	student := &models.Student{}
 
 	session := yiigo.Mongo.Clone()
 
-	err := session.DB("demo").C("student").FindId(id).One(student)
+	defer session.Close()
 
-	session.Close()
+	err := session.DB("demo").C("student").FindId(id).One(student)
 
 	if err != nil {
 		if err != mgo.ErrNotFound {
