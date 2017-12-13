@@ -24,7 +24,7 @@ func StudentIndex(c *gin.Context) {
 	data, err := service.GetAllStudents()
 
 	if err != nil {
-		yiigo.Error(c, "server internal error")
+		yiigo.Error(c, 500, "internal server error")
 
 		return
 	}
@@ -38,7 +38,7 @@ func StudentView(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Error(c, "param error")
+		yiigo.Error(c, -1, "param error")
 
 		return
 	}
@@ -46,7 +46,7 @@ func StudentView(c *gin.Context) {
 	data, err := service.GetStudentByID(_id)
 
 	if err != nil {
-		yiigo.Error(c, "server internal error")
+		yiigo.Error(c, 500, "internal server error")
 
 		return
 	}
@@ -75,7 +75,7 @@ func StudentAdd(c *gin.Context) {
 	id, err := service.AddNewStudent(data)
 
 	if err != nil {
-		yiigo.Error(c, "server internal error")
+		yiigo.Error(c, 500, "internal server error")
 
 		return
 	}
@@ -89,7 +89,7 @@ func StudentEdit(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Error(c, "param error")
+		yiigo.Error(c, -1, "param error")
 
 		return
 	}
@@ -114,7 +114,7 @@ func StudentEdit(c *gin.Context) {
 	err = service.UpdateStudentByID(_id, data)
 
 	if err != nil {
-		yiigo.Error(c, "server internal error")
+		yiigo.Error(c, 500, "internal server error")
 
 		return
 	}
@@ -128,7 +128,7 @@ func StudentDelete(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Error(c, "param error")
+		yiigo.Error(c, -1, "param error")
 
 		return
 	}
@@ -136,7 +136,7 @@ func StudentDelete(c *gin.Context) {
 	err = service.DeleteStudentByID(_id)
 
 	if err != nil {
-		yiigo.Error(c, "server internal error")
+		yiigo.Error(c, 500, "internal server error")
 
 		return
 	}

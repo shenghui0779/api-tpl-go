@@ -14,7 +14,7 @@ func BookIndex(c *gin.Context) {
 	data, err := service.GetAllBooks()
 
 	if err != nil {
-		yiigo.Error(c, "server internal error")
+		yiigo.Error(c, 500, "internal server error")
 
 		return
 	}
@@ -28,7 +28,7 @@ func BookView(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Error(c, "param error")
+		yiigo.Error(c, -1, "param error")
 
 		return
 	}
@@ -36,7 +36,7 @@ func BookView(c *gin.Context) {
 	data, err := service.GetBookById(_id)
 
 	if err != nil {
-		yiigo.Error(c, "server internal error")
+		yiigo.Error(c, 500, "internal server error")
 
 		return
 	}
@@ -56,7 +56,7 @@ func BookAdd(c *gin.Context) {
 	id, err := service.AddNewBook(form)
 
 	if err != nil {
-		yiigo.Error(c, "server internal error")
+		yiigo.Error(c, 500, "internal server error")
 
 		return
 	}
@@ -70,7 +70,7 @@ func BookEdit(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Error(c, "param error")
+		yiigo.Error(c, -1, "param error")
 
 		return
 	}
@@ -86,7 +86,7 @@ func BookEdit(c *gin.Context) {
 	err = service.UpdateBookById(_id, form)
 
 	if err != nil {
-		yiigo.Error(c, "server internal error")
+		yiigo.Error(c, 500, "internal server error")
 
 		return
 	}
@@ -100,7 +100,7 @@ func BookDelete(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Error(c, "param error")
+		yiigo.Error(c, -1, "param error")
 
 		return
 	}
@@ -108,7 +108,7 @@ func BookDelete(c *gin.Context) {
 	err = service.DeleteBookById(_id)
 
 	if err != nil {
-		yiigo.Error(c, "server internal error")
+		yiigo.Error(c, 500, "internal server error")
 
 		return
 	}
