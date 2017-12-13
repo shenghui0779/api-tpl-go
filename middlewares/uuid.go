@@ -12,7 +12,7 @@ func UUID() gin.HandlerFunc {
 		uuid := c.Request.Header.Get("Access-UUID")
 
 		if strings.TrimSpace(uuid) == "" {
-			yiigo.Error(c, "Invalid token, access failed!")
+			yiigo.Error(c, -1, "invalid token")
 			c.Abort()
 
 			return

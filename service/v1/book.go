@@ -55,8 +55,6 @@ func GetAllBooks() ([]models.Book, error) {
 		return nil, err
 	}
 
-	panic("hello world")
-
 	return books, nil
 }
 

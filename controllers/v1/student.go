@@ -58,7 +58,7 @@ func StudentAdd(c *gin.Context) {
 	form := &StudentForm{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.Error(c, validate.Error())
+		yiigo.Error(c, -1, validate.Error())
 
 		return
 	}
@@ -97,7 +97,7 @@ func StudentEdit(c *gin.Context) {
 	form := &StudentForm{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.Error(c, validate.Error())
+		yiigo.Error(c, -1, validate.Error())
 
 		return
 	}

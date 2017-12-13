@@ -2,15 +2,15 @@ package routes
 
 import (
 	"demo/controllers/v1"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/iiinsomnia/yiigo"
 )
 
 // RouteRegister register routes
 func RouteRegister(r *gin.Engine) {
 	r.GET("/", func(c *gin.Context) {
-		yiigo.JSON(c, true, 0, "welcome to golang app!")
+		c.JSON(http.StatusOK, "☺︎ welcome to golang app!")
 	})
 
 	_v1 := r.Group("/v1")

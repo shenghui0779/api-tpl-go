@@ -48,7 +48,7 @@ func BookAdd(c *gin.Context) {
 	form := &models.BookAdd{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.Error(c, validate.Error())
+		yiigo.Error(c, -1, validate.Error())
 
 		return
 	}
@@ -78,7 +78,7 @@ func BookEdit(c *gin.Context) {
 	form := &models.BookEdit{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.Error(c, validate.Error())
+		yiigo.Error(c, -1, validate.Error())
 
 		return
 	}
