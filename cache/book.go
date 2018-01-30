@@ -9,15 +9,8 @@ import (
 
 // GetBookCache 获取缓存
 func GetBookCache(id int, data *models.Book) bool {
-	conn, err := yiigo.RedisPool.Get()
-
-	if err != nil {
-		yiigo.Logger.Error(err.Error())
-
-		return false
-	}
-
-	defer yiigo.RedisPool.Put(conn)
+	conn := yiigo.Redis.Get()
+	defer conn.Close()
 
 	r, err := conn.Do("HGET", "slim:books", id)
 
@@ -44,15 +37,8 @@ func GetBookCache(id int, data *models.Book) bool {
 
 // SetBookCache 设置缓存
 func SetBookCache(id int, data *models.Book) bool {
-	conn, err := yiigo.RedisPool.Get()
-
-	if err != nil {
-		yiigo.Logger.Error(err.Error())
-
-		return false
-	}
-
-	defer yiigo.RedisPool.Put(conn)
+	conn := yiigo.Redis.Get()
+	defer conn.Close()
 
 	cache, err := json.Marshal(data)
 
@@ -75,17 +61,10 @@ func SetBookCache(id int, data *models.Book) bool {
 
 // DelBookCache 删除缓存
 func DelBookCache(id int) bool {
-	conn, err := yiigo.RedisPool.Get()
+	conn := yiigo.Redis.Get()
+	defer conn.Close()
 
-	if err != nil {
-		yiigo.Logger.Error(err.Error())
-
-		return false
-	}
-
-	defer yiigo.RedisPool.Put(conn)
-
-	_, err = conn.Do("HDEL", "slim:books", id)
+	_, err := conn.Do("HDEL", "slim:books", id)
 
 	if err != nil {
 		yiigo.Logger.Error(err.Error())
