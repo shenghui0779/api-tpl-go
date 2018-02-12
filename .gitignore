@@ -22,6 +22,5 @@ _testmain.go
 *.exe
 *.test
 *.prof
-env.ini
-log.xml
+env.toml
 logs/*

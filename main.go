@@ -20,13 +20,13 @@ func main() {
 		yiigo.Logger.Panic(err.Error())
 	}
 
-	fmt.Println("app start, version", yiigo.EnvString("app", "version", "1.0.0"))
+	fmt.Println("app start, version", yiigo.Env.String("app.version", "1.0.0"))
 
 	run()
 }
 
 func run() {
-	debug := yiigo.EnvBool("app", "debug", false)
+	debug := yiigo.Env.Bool("app.debug", false)
 
 	if !debug {
 		gin.SetMode(gin.ReleaseMode)

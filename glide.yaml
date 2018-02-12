@@ -1,0 +1,9 @@
+package: demo
+import:
+- package: github.com/gin-gonic/gin
+  subpackages:
+  - binding
+- package: github.com/iiinsomnia/yiigo
+- package: gopkg.in/mgo.v2
+  subpackages:
+  - bson

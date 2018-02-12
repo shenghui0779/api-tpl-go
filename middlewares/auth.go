@@ -53,7 +53,7 @@ func validateLogin() (int, string) {
 
 // 验签
 func validateSign(c *gin.Context, accessTime string, accessSign string) (int, string) {
-	accessExpire := yiigo.EnvInt64("app", "accessExpire", 0)
+	accessExpire := yiigo.Env.Int64("app.accessExpire", 0)
 	now := time.Now().Unix()
 	timestamp, _ := strconv.ParseInt(accessTime, 10, 64)
 
