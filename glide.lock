@@ -1,5 +1,5 @@
 hash: 180da25edc4c1a449db65c2e7530c962f33994e1a253514a487b2df33c23bd29
-updated: 2018-02-12T21:19:00.086769369+08:00
+updated: 2018-02-13T16:56:21.169692+08:00
 imports:
 - name: github.com/garyburd/redigo
   version: d1ed5c67e5794de818ea85e6b522fda02623a484
@@ -21,7 +21,7 @@ imports:
   subpackages:
   - proto
 - name: github.com/iiinsomnia/yiigo
-  version: b23d180aeb6507561d7da05757b772e82cbc1e93
+  version: e73c004707fb82d508f23d2071c83baecd60c502
 - name: github.com/jmoiron/sqlx
   version: 05cef0741ade10ca668982355b3f3f0bcf0ff0a8
   subpackages:
