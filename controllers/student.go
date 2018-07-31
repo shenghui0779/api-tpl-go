@@ -1,14 +1,13 @@
-package v1
+package controllers
 
 import (
-	service "demo/service/v1"
+	"demo/service"
 	"strconv"
-
-	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/iiinsomnia/yiigo"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type StudentForm struct {

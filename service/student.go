@@ -4,9 +4,8 @@ import (
 	"demo/models"
 	"time"
 
-	"gopkg.in/mgo.v2"
-
 	"github.com/iiinsomnia/yiigo"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -43,7 +42,7 @@ func GetStudentByID(id int) (yiigo.X, error) {
 }
 
 func GetAllStudents() ([]yiigo.X, error) {
-	students := []models.Student{}
+	var students []models.Student
 
 	session := yiigo.Mongo.Clone()
 
@@ -129,7 +128,7 @@ func DeleteStudentByID(id int) error {
 }
 
 func formatStudentList(students []models.Student) []yiigo.X {
-	data := []yiigo.X{}
+	var data []yiigo.X
 
 	for _, v := range students {
 		item := map[string]interface{}{

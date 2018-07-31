@@ -45,7 +45,7 @@ func GetBookById(id int) (yiigo.X, error) {
 }
 
 func GetAllBooks() ([]models.Book, error) {
-	books := []models.Book{}
+	var books []models.Book
 
 	err := yiigo.DB.Select(&books, "SELECT * FROM book WHERE 1=1")
 

@@ -1,13 +1,13 @@
-package v1
+package controllers
 
 import (
-	"demo/models"
-	service "demo/service/v1"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/iiinsomnia/yiigo"
+	"demo/service"
+	"demo/models"
 )
 
 func BookIndex(c *gin.Context) {
