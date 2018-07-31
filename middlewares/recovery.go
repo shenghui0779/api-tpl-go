@@ -14,7 +14,7 @@ func Recovery() gin.HandlerFunc {
 		defer func() {
 			if err := recover(); err != nil {
 				yiigo.Logger.Error(fmt.Sprintf("%v\n%s", err, string(debug.Stack())))
-				yiigo.Error(c, 500, "Internal server error")
+				yiigo.Error(c, 5000, "Internal server error")
 				c.Abort()
 
 				return

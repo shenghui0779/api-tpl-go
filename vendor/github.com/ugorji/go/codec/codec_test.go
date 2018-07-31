@@ -881,7 +881,7 @@ func testCodecMiscOne(t *testing.T, h Handle) {
 	} else {
 		logT(t, "------- b: size: %v, value: %s", len(b), b1)
 	}
-	ts2 := new(TestStrucFlex)
+	ts2 := emptyTestStrucFlex()
 	testUnmarshalErr(ts2, b, h, t, "pointer-to-struct")
 	if ts2.I64 != math.MaxInt64*2/3 {
 		logT(t, "------- Unmarshal wrong. Expect I64 = 64. Got: %v", ts2.I64)
@@ -1874,12 +1874,13 @@ func doTestLargeContainerLen(t *testing.T, h Handle) {
 		0, 1,
 		math.MaxInt8, math.MaxInt8 + 4, math.MaxInt8 - 4,
 		math.MaxInt16, math.MaxInt16 + 4, math.MaxInt16 - 4,
-		math.MaxInt32, math.MaxInt32 + 4, math.MaxInt32 - 4,
-		math.MaxInt64, math.MaxInt64 - 4,
+		math.MaxInt32, math.MaxInt32 - 4,
+		// math.MaxInt32 + 4, // bombs on 32-bit
+		// math.MaxInt64, math.MaxInt64 - 4, // bombs on 32-bit
 
 		math.MaxUint8, math.MaxUint8 + 4, math.MaxUint8 - 4,
 		math.MaxUint16, math.MaxUint16 + 4, math.MaxUint16 - 4,
-		math.MaxUint32, math.MaxUint32 + 4, math.MaxUint32 - 4,
+		// math.MaxUint32, math.MaxUint32 + 4, math.MaxUint32 - 4, // bombs on 32-bit
 	} {
 		m[i] = make([]struct{}, i)
 	}
