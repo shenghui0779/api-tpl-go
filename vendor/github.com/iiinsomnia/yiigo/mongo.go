@@ -7,7 +7,7 @@ import (
 	"time"
 
 	toml "github.com/pelletier/go-toml"
-	"gopkg.in/mgo.v2"
+	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -22,7 +22,7 @@ type mongoConf struct {
 	Mode      int    `toml:"mode"`
 }
 
-// Sequence model for _id auto_increment
+// Sequence model for _id auto_increment of mongo
 type Sequence struct {
 	ID  string `bson:"_id"`
 	Seq int    `bson:"seq"`
@@ -80,7 +80,13 @@ func initSingleMongo(conf *mongoConf) error {
 
 	Mongo, err = mongoDial(conf)
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	mongoMap.Store("default", Mongo)
+
+	return nil
 }
 
 func initMultiMongo(conf []*mongoConf) error {
@@ -108,7 +114,7 @@ func mongoDial(conf *mongoConf) (*mgo.Session, error) {
 		dsn = fmt.Sprintf("mongodb://%s:%s@%s:%d", conf.Username, conf.Password, conf.Host, conf.Port)
 	}
 
-	m, err := mgo.DialWithTimeout(dsn, time.Duration(conf.Timeout)*time.Millisecond)
+	m, err := mgo.DialWithTimeout(dsn, time.Duration(conf.Timeout)*time.Second)
 
 	if err != nil {
 		return nil, err
@@ -125,7 +131,7 @@ func mongoDial(conf *mongoConf) (*mgo.Session, error) {
 	return m, nil
 }
 
-// MongoSession get mongo session
+// MongoSession returns a mongo session.
 func MongoSession(conn ...string) (*mgo.Session, error) {
 	schema := "default"
 
@@ -144,8 +150,8 @@ func MongoSession(conn ...string) (*mgo.Session, error) {
 	return session.Clone(), nil
 }
 
-// Seq get auto increment id
-func Seq(session *mgo.Session, db string, collection string, seqs ...int) (int, error) {
+// SeqID returns _id auto_increment of mongo.
+func SeqID(session *mgo.Session, db string, collection string, seqs ...int) (int, error) {
 	if len(seqs) == 0 {
 		seqs = append(seqs, 1)
 	}

@@ -3,7 +3,7 @@ package yiigo
 import (
 	"sync"
 
-	"gopkg.in/gomail.v2"
+	gomail "gopkg.in/gomail.v2"
 )
 
 type emailConfig struct {
@@ -46,7 +46,7 @@ func emailDial() {
 	emailDialer = gomail.NewDialer(conf.Host, conf.Port, conf.Username, conf.Password)
 }
 
-// Send send a mail
+// Send send an email.
 func (m *Mailer) Send() error {
 	msgSettings := []gomail.MessageSetting{}
 

@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 	toml "github.com/pelletier/go-toml"
 	"github.com/youtube/vitess/go/pools"
 	"golang.org/x/net/context"
@@ -97,6 +97,8 @@ func initRedis() error {
 func initSingleRedis(conf *redisConf) {
 	RedisPool = &RedisPoolResource{config: conf}
 	RedisPool.dial()
+
+	redisMap.Store("default", RedisPool)
 }
 
 func initMultiRedis(conf []*redisConf) {
@@ -112,7 +114,7 @@ func initMultiRedis(conf []*redisConf) {
 	}
 }
 
-// RedisConnPool get an redis pool
+// RedisConnPool returns a redis pool.
 func RedisConnPool(conn ...string) (*RedisPoolResource, error) {
 	schema := "default"
 
@@ -143,9 +145,9 @@ func (r *RedisPoolResource) dial() {
 		dialOptions := []redis.DialOption{
 			redis.DialPassword(r.config.Password),
 			redis.DialDatabase(r.config.Database),
-			redis.DialConnectTimeout(time.Duration(r.config.ConnTimeout) * time.Millisecond),
-			redis.DialReadTimeout(time.Duration(r.config.ReadTimeout) * time.Millisecond),
-			redis.DialWriteTimeout(time.Duration(r.config.WriteTimeout) * time.Millisecond),
+			redis.DialConnectTimeout(time.Duration(r.config.ConnTimeout) * time.Second),
+			redis.DialReadTimeout(time.Duration(r.config.ReadTimeout) * time.Second),
+			redis.DialWriteTimeout(time.Duration(r.config.WriteTimeout) * time.Second),
 		}
 
 		conn, err := redis.Dial("tcp", dsn, dialOptions...)
@@ -157,10 +159,10 @@ func (r *RedisPoolResource) dial() {
 		return RedisConn{conn}, nil
 	}
 
-	r.pool = pools.NewResourcePool(df, r.config.MinActiveConn, r.config.MaxActiveConn, time.Duration(r.config.IdleTimeout)*time.Millisecond)
+	r.pool = pools.NewResourcePool(df, r.config.MinActiveConn, r.config.MaxActiveConn, time.Duration(r.config.IdleTimeout)*time.Second)
 }
 
-// Get get a connection resource from the pool
+// Get get a connection resource from the pool.
 func (r *RedisPoolResource) Get() (RedisConn, error) {
 	if r.pool.IsClosed() {
 		r.dial()
@@ -184,73 +186,7 @@ func (r *RedisPoolResource) Get() (RedisConn, error) {
 	return rc, nil
 }
 
-// Put return a connection resource to the pool
+// Put returns a connection resource to the pool.
 func (r *RedisPoolResource) Put(rc RedisConn) {
 	r.pool.Put(rc)
-}
-
-// ScanJSON scans json string to the struct or struct slice pointed to by dest
-func ScanJSON(reply interface{}, dest interface{}) error {
-	v := reflect.Indirect(reflect.ValueOf(dest))
-
-	var err error
-
-	switch v.Kind() {
-	case reflect.Struct:
-		err = scanJSONObj(reply, dest)
-	case reflect.Slice:
-		err = scanJSONSlice(reply, dest)
-	}
-
-	return err
-}
-
-func scanJSONObj(reply interface{}, dest interface{}) error {
-	bytes, err := redis.Bytes(reply, nil)
-
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(bytes, dest)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func scanJSONSlice(reply interface{}, dest interface{}) error {
-	bytes, err := redis.ByteSlices(reply, nil)
-
-	if err != nil {
-		return err
-	}
-
-	if len(bytes) == 0 {
-		return nil
-	}
-
-	v := reflect.Indirect(reflect.ValueOf(dest))
-
-	if v.Kind() != reflect.Slice {
-		return errors.New("the dest must be a slice")
-	}
-
-	t := v.Type()
-	v.Set(reflect.MakeSlice(t, 0, 0))
-
-	for _, b := range bytes {
-		elem := reflect.New(t.Elem()).Elem()
-		err := json.Unmarshal(b, elem.Addr().Interface())
-
-		if err != nil {
-			return err
-		}
-
-		v.Set(reflect.Append(v, elem))
-	}
-
-	return nil
 }

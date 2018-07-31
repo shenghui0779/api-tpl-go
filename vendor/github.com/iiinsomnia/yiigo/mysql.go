@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -13,16 +14,17 @@ import (
 )
 
 type mysqlConf struct {
-	Name         string `toml:"name"`
-	Host         string `toml:"host"`
-	Port         int    `toml:"port"`
-	Username     string `toml:"username"`
-	Password     string `toml:"password"`
-	Database     string `toml:"database"`
-	Charset      string `toml:"charset"`
-	Collection   string `toml:"collection"`
-	MaxOpenConns int    `toml:"maxOpenConns"`
-	MaxIdleConns int    `toml:"maxIdleConns"`
+	Name            string `toml:"name"`
+	Host            string `toml:"host"`
+	Port            int    `toml:"port"`
+	Username        string `toml:"username"`
+	Password        string `toml:"password"`
+	Database        string `toml:"database"`
+	Charset         string `toml:"charset"`
+	Collection      string `toml:"collection"`
+	MaxOpenConns    int    `toml:"maxOpenConns"`
+	MaxIdleConns    int    `toml:"maxIdleConns"`
+	ConnMaxLifetime int    `toml:"connMaxLifetime"`
 }
 
 // SQLExpr SQL expression
@@ -83,7 +85,13 @@ func initSingleDB(conf *mysqlConf) error {
 
 	DB, err = dbDial(conf)
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	dbmap.Store("default", DB)
+
+	return nil
 }
 
 func initMultiDB(conf []*mysqlConf) error {
@@ -115,11 +123,12 @@ func dbDial(conf *mysqlConf) (*sqlx.DB, error) {
 
 	db.SetMaxOpenConns(conf.MaxOpenConns)
 	db.SetMaxIdleConns(conf.MaxIdleConns)
+	db.SetConnMaxLifetime(time.Duration(conf.ConnMaxLifetime) * time.Second)
 
 	return db, nil
 }
 
-// DBConn get db connection
+// DBConn returns a db connection.
 func DBConn(conn ...string) (*sqlx.DB, error) {
 	schema := "default"
 
@@ -136,8 +145,8 @@ func DBConn(conn ...string) (*sqlx.DB, error) {
 	return v.(*sqlx.DB), nil
 }
 
-// InsertSQL returns insert sql and binds
-// data expect struct, []struct, yiigo.X, []yiigo.X
+// InsertSQL returns insert sql and binds.
+// param data expects struct, []struct, yiigo.X, []yiigo.X.
 func InsertSQL(table string, data interface{}) (string, []interface{}) {
 	v := reflect.Indirect(reflect.ValueOf(data))
 
@@ -147,7 +156,7 @@ func InsertSQL(table string, data interface{}) (string, []interface{}) {
 	switch v.Kind() {
 	case reflect.Map:
 		if x, ok := data.(X); ok {
-			sql, binds = singleInsertWithMap(sql, x)
+			sql, binds = singleInsertWithMap(table, x)
 		}
 	case reflect.Struct:
 		sql, binds = singleInsertWithStruct(table, v)
@@ -174,8 +183,8 @@ func InsertSQL(table string, data interface{}) (string, []interface{}) {
 	return sql, binds
 }
 
-// UpdateSQL returns update sql and binds
-// data expect struct, yiigo.X
+// UpdateSQL returns update sql and binds.
+// param data expects struct, yiigo.X.
 func UpdateSQL(query string, data interface{}, args ...interface{}) (string, []interface{}) {
 	v := reflect.Indirect(reflect.ValueOf(data))
 
@@ -194,7 +203,7 @@ func UpdateSQL(query string, data interface{}, args ...interface{}) (string, []i
 	return sql, binds
 }
 
-// Expr returns expression, eg: yiigo.Expr("price * ? + ?", 2, 100)
+// Expr returns an expression, eg: yiigo.Expr("price * ? + ?", 2, 100).
 func Expr(expr string, args ...interface{}) *SQLExpr {
 	return &SQLExpr{Expr: expr, Args: args}
 }
@@ -229,6 +238,10 @@ func singleInsertWithStruct(table string, v reflect.Value) (string, []interface{
 	for i := 0; i < fieldNum; i++ {
 		column := t.Field(i).Tag.Get("db")
 
+		if column == "-" {
+			continue
+		}
+
 		if column == "" {
 			column = t.Field(i).Name
 		}
@@ -256,8 +269,6 @@ func batchInsertWithMap(table string, data []X, count int) (string, []interface{
 		columns = append(columns, fmt.Sprintf("`%s`", k))
 	}
 
-	fmt.Println(columns)
-
 	for _, x := range data {
 		phrs := make([]string, 0, fieldNum)
 
@@ -275,7 +286,7 @@ func batchInsertWithMap(table string, data []X, count int) (string, []interface{
 }
 
 func batchInsertWithStruct(table string, v reflect.Value, count int) (string, []interface{}) {
-	first := reflect.Indirect(v.Index(0))
+	first := v.Index(0)
 
 	if first.Kind() != reflect.Struct {
 		panic("the data must be a slice to struct")
@@ -289,22 +300,26 @@ func batchInsertWithStruct(table string, v reflect.Value, count int) (string, []
 
 	t := first.Type()
 
-	for i := 0; i < fieldNum; i++ {
-		column := t.Field(i).Tag.Get("db")
-
-		if column == "" {
-			column = t.Field(i).Name
-		}
-
-		columns = append(columns, fmt.Sprintf("`%s`", column))
-	}
-
 	for i := 0; i < count; i++ {
 		phrs := make([]string, 0, fieldNum)
 
 		for j := 0; j < fieldNum; j++ {
+			column := t.Field(j).Tag.Get("db")
+
+			if column == "-" {
+				continue
+			}
+
+			if i == 0 {
+				if column == "" {
+					column = t.Field(j).Name
+				}
+
+				columns = append(columns, fmt.Sprintf("`%s`", column))
+			}
+
 			phrs = append(phrs, "?")
-			binds = append(binds, reflect.Indirect(v.Index(i)).Field(j).Interface())
+			binds = append(binds, v.Index(i).Field(j).Interface())
 		}
 
 		placeholders = append(placeholders, fmt.Sprintf("(%s)", strings.Join(phrs, ", ")))
@@ -345,6 +360,10 @@ func updateWithStruct(query string, v reflect.Value, args ...interface{}) (strin
 
 	for i := 0; i < fieldNum; i++ {
 		column := t.Field(i).Tag.Get("db")
+
+		if column == "-" {
+			continue
+		}
 
 		if column == "" {
 			column = t.Field(i).Name

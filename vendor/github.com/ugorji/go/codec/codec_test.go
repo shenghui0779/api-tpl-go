@@ -1150,7 +1150,8 @@ func testCodecRpcOne(t *testing.T, rr Rpc, h Handle, doRequest bool, exitSleepMs
 	}
 	srv := rpc.NewServer()
 	srv.Register(testRpcInt)
-	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	ln, err := net.Listen("tcp", "127.0.0.1:0") // listen on ipv4 localhost
+	logT(t, "connFn: addr: %v, network: %v, port: %v", ln.Addr(), ln.Addr().Network(), (ln.Addr().(*net.TCPAddr)).Port)
 	// log("listener: %v", ln.Addr())
 	checkErrT(t, err)
 	port = (ln.Addr().(*net.TCPAddr)).Port
@@ -1169,10 +1170,12 @@ func testCodecRpcOne(t *testing.T, rr Rpc, h Handle, doRequest bool, exitSleepMs
 			// }
 			if atomic.LoadUint64(&serverExitFlag) == 1 {
 				serverExitChan <- true
-				conn1.Close()
+				if conn1 != nil {
+					conn1.Close()
+				}
 				return // exit serverFn goroutine
 			}
-			if err1 == nil {
+			if err1 == nil && conn1 != nil {
 				sc := rr.ServerCodec(testReadWriteCloser(conn1), h)
 				srv.ServeCodec(sc)
 			}
@@ -2287,6 +2290,26 @@ func doTestIntfMapping(t *testing.T, name string, h Handle) {
 	}
 }
 
+func doTestOmitempty(t *testing.T, name string, h Handle) {
+	testOnce.Do(testInitAll)
+	if h.getBasicHandle().StructToArray {
+		t.Skipf("Skipping OmitEmpty test when StructToArray=true")
+	}
+	type T1 struct {
+		A int  `codec:"a"`
+		B *int `codec:"b,omitempty"`
+		C int  `codec:"c,omitempty"`
+	}
+	type T2 struct {
+		A int `codec:"a"`
+	}
+	var v1 T1
+	var v2 T2
+	b1 := testMarshalErr(v1, h, t, name+"-omitempty")
+	b2 := testMarshalErr(v2, h, t, name+"-no-omitempty-trunc")
+	testDeepEqualErr(b1, b2, t, name+"-omitempty-cmp")
+}
+
 // -----------------
 
 func TestJsonDecodeNonStringScalarInStringContext(t *testing.T) {
@@ -2922,6 +2945,26 @@ func TestBincScalars(t *testing.T) {
 
 func TestSimpleScalars(t *testing.T) {
 	doTestScalars(t, "simple", testSimpleH)
+}
+
+func TestJsonOmitempty(t *testing.T) {
+	doTestOmitempty(t, "json", testJsonH)
+}
+
+func TestCborOmitempty(t *testing.T) {
+	doTestOmitempty(t, "cbor", testCborH)
+}
+
+func TestMsgpackOmitempty(t *testing.T) {
+	doTestOmitempty(t, "msgpack", testMsgpackH)
+}
+
+func TestBincOmitempty(t *testing.T) {
+	doTestOmitempty(t, "binc", testBincH)
+}
+
+func TestSimpleOmitempty(t *testing.T) {
+	doTestOmitempty(t, "simple", testSimpleH)
 }
 
 func TestJsonIntfMapping(t *testing.T) {

@@ -1,31 +1,30 @@
 package yiigo
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"reflect"
 	"sync"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 	toml "github.com/pelletier/go-toml"
 )
 
 type redisConf struct {
-	Name          string `toml:"name"`
-	Host          string `toml:"host"`
-	Port          int    `toml:"port"`
-	Password      string `toml:"password"`
-	Database      int    `toml:"database"`
-	ConnTimeout   int    `toml:"connTimeout"`
-	ReadTimeout   int    `toml:"readTimeout"`
-	WriteTimeout  int    `toml:"writeTimeout"`
-	MaxIdleConn   int    `toml:"maxIdleConn"`
-	MaxActiveConn int    `toml:"maxActiveConn"`
-	IdleTimeout   int    `toml:"idleTimeout"`
-	TestOnBorrow  int    `toml:"testOnBorrow"`
-	PoolWait      bool   `toml:"poolWait"`
+	Name            string `toml:"name"`
+	Host            string `toml:"host"`
+	Port            int    `toml:"port"`
+	Password        string `toml:"password"`
+	Database        int    `toml:"database"`
+	ConnTimeout     int    `toml:"connTimeout"`
+	ReadTimeout     int    `toml:"readTimeout"`
+	WriteTimeout    int    `toml:"writeTimeout"`
+	MaxIdleConn     int    `toml:"maxIdleConn"`
+	MaxActiveConn   int    `toml:"maxActiveConn"`
+	MaxConnLifetime int    `toml:"maxConnLifetime"`
+	IdleTimeout     int    `toml:"idleTimeout"`
+	TestOnBorrow    int    `toml:"testOnBorrow"`
+	PoolWait        bool   `toml:"poolWait"`
 }
 
 var (
@@ -80,7 +79,13 @@ func initSingleRedis(conf *redisConf) error {
 
 	Redis, err = redisDial(conf)
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	redisMap.Store("default", Redis)
+
+	return nil
 }
 
 func initMultiRedis(conf []*redisConf) error {
@@ -109,9 +114,9 @@ func redisDial(conf *redisConf) (*redis.Pool, error) {
 			dialOptions := []redis.DialOption{
 				redis.DialPassword(conf.Password),
 				redis.DialDatabase(conf.Database),
-				redis.DialConnectTimeout(time.Duration(conf.ConnTimeout) * time.Millisecond),
-				redis.DialReadTimeout(time.Duration(conf.ReadTimeout) * time.Millisecond),
-				redis.DialWriteTimeout(time.Duration(conf.WriteTimeout) * time.Millisecond),
+				redis.DialConnectTimeout(time.Duration(conf.ConnTimeout) * time.Second),
+				redis.DialReadTimeout(time.Duration(conf.ReadTimeout) * time.Second),
+				redis.DialWriteTimeout(time.Duration(conf.WriteTimeout) * time.Second),
 			}
 
 			conn, err := redis.Dial("tcp", dsn, dialOptions...)
@@ -119,17 +124,19 @@ func redisDial(conf *redisConf) (*redis.Pool, error) {
 			return conn, err
 		},
 		TestOnBorrow: func(c redis.Conn, t time.Time) error {
-			if conf.TestOnBorrow == 0 || time.Since(t) < time.Duration(conf.TestOnBorrow)*time.Millisecond {
+			if conf.TestOnBorrow == 0 || time.Since(t) < time.Duration(conf.TestOnBorrow)*time.Second {
 				return nil
 			}
+
 			_, err := c.Do("PING")
 
 			return err
 		},
-		MaxIdle:     conf.MaxIdleConn,
-		MaxActive:   conf.MaxActiveConn,
-		IdleTimeout: time.Duration(conf.IdleTimeout) * time.Millisecond,
-		Wait:        conf.PoolWait,
+		MaxIdle:         conf.MaxIdleConn,
+		MaxActive:       conf.MaxActiveConn,
+		IdleTimeout:     time.Duration(conf.IdleTimeout) * time.Second,
+		MaxConnLifetime: time.Duration(conf.MaxConnLifetime) * time.Second,
+		Wait:            conf.PoolWait,
 	}
 
 	conn := pool.Get()
@@ -144,7 +151,7 @@ func redisDial(conf *redisConf) (*redis.Pool, error) {
 	return pool, nil
 }
 
-// RedisPool get redis connection pool
+// RedisPool returns a redis connection pool.
 func RedisPool(conn ...string) (*redis.Pool, error) {
 	schema := "default"
 
@@ -159,70 +166,4 @@ func RedisPool(conn ...string) (*redis.Pool, error) {
 	}
 
 	return v.(*redis.Pool), nil
-}
-
-// ScanJSON scans json string to the struct or struct slice pointed to by dest
-func ScanJSON(reply interface{}, dest interface{}) error {
-	v := reflect.Indirect(reflect.ValueOf(dest))
-
-	var err error
-
-	switch v.Kind() {
-	case reflect.Struct:
-		err = scanJSONObj(reply, dest)
-	case reflect.Slice:
-		err = scanJSONSlice(reply, dest)
-	}
-
-	return err
-}
-
-func scanJSONObj(reply interface{}, dest interface{}) error {
-	bytes, err := redis.Bytes(reply, nil)
-
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(bytes, dest)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func scanJSONSlice(reply interface{}, dest interface{}) error {
-	bytes, err := redis.ByteSlices(reply, nil)
-
-	if err != nil {
-		return err
-	}
-
-	if len(bytes) == 0 {
-		return nil
-	}
-
-	v := reflect.Indirect(reflect.ValueOf(dest))
-
-	if v.Kind() != reflect.Slice {
-		return errors.New("the dest must be a slice")
-	}
-
-	t := v.Type()
-	v.Set(reflect.MakeSlice(t, 0, 0))
-
-	for _, b := range bytes {
-		elem := reflect.New(t.Elem()).Elem()
-		err := json.Unmarshal(b, elem.Addr().Interface())
-
-		if err != nil {
-			return err
-		}
-
-		v.Set(reflect.Append(v, elem))
-	}
-
-	return nil
 }
