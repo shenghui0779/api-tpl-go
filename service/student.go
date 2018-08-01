@@ -70,7 +70,7 @@ func AddNewStudent(data bson.M) (int, error) {
 
 	defer session.Close()
 
-	id, err := yiigo.Seq(session, "demo", "student")
+	id, err := yiigo.SeqID(session, "demo", "student")
 
 	if err != nil {
 		yiigo.Logger.Error(err.Error())

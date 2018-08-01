@@ -4,6 +4,7 @@ import (
 	"demo/models"
 	"encoding/json"
 
+	"github.com/gomodule/redigo/redis"
 	"github.com/iiinsomnia/yiigo"
 )
 
@@ -12,19 +13,17 @@ func GetBookCache(id int, data *models.Book) bool {
 	conn := yiigo.Redis.Get()
 	defer conn.Close()
 
-	r, err := conn.Do("HGET", "slim:books", id)
+	b, err := redis.Bytes(conn.Do("HGET", "yiigo:books", id))
 
 	if err != nil {
-		yiigo.Logger.Error(err.Error())
+		if err != redis.ErrNil {
+			yiigo.Logger.Error(err.Error())
+		}
 
 		return false
 	}
 
-	if r == nil {
-		return false
-	}
-
-	err = yiigo.ScanJSON(r, data)
+	err = json.Unmarshal(b, data)
 
 	if err != nil {
 		yiigo.Logger.Error(err.Error())
@@ -40,7 +39,7 @@ func SetBookCache(id int, data *models.Book) bool {
 	conn := yiigo.Redis.Get()
 	defer conn.Close()
 
-	cache, err := json.Marshal(data)
+	b, err := json.Marshal(data)
 
 	if err != nil {
 		yiigo.Logger.Error(err.Error())
@@ -48,7 +47,7 @@ func SetBookCache(id int, data *models.Book) bool {
 		return false
 	}
 
-	_, err = conn.Do("HSET", "slim:books", id, cache)
+	_, err = conn.Do("HSET", "yiigo:books", id, b)
 
 	if err != nil {
 		yiigo.Logger.Error(err.Error())
@@ -64,7 +63,7 @@ func DelBookCache(id int) bool {
 	conn := yiigo.Redis.Get()
 	defer conn.Close()
 
-	_, err := conn.Do("HDEL", "slim:books", id)
+	_, err := conn.Do("HDEL", "yiigo:books", id)
 
 	if err != nil {
 		yiigo.Logger.Error(err.Error())
