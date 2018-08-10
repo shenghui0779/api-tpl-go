@@ -65,7 +65,7 @@ func GetAllStudents() ([]yiigo.X, error) {
 	return data, nil
 }
 
-func AddNewStudent(data bson.M) (int, error) {
+func AddNewStudent(data bson.M) (int64, error) {
 	session := yiigo.Mongo.Clone()
 
 	defer session.Close()

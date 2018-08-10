@@ -1,10 +1,12 @@
-hash: 104fa4b33d129a867b1118c9554a2769dc1631b5763f584f5320b455cc982457
-updated: 2018-07-31T21:47:18.782713+08:00
+hash: ca0166bdfe4b427dfe311782ea98ccf015d02f92cdcd518d7d8101b1add14de6
+updated: 2018-08-10T21:49:19.306305+08:00
 imports:
+- name: github.com/fatih/color
+  version: 2d684516a8861da43017284349b7e303e809ac21
 - name: github.com/gin-contrib/sse
   version: 22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae
 - name: github.com/gin-gonic/gin
-  version: 220e8d34538f5dfdcc299dda79bf83cf52e633f6
+  version: 8fc8ce047243dbbbc5eb3d01b9fd026fc3b08c82
   subpackages:
   - binding
   - json
@@ -12,7 +14,7 @@ imports:
 - name: github.com/go-sql-driver/mysql
   version: 99ff426eb706cffe92ff3d058e168b278cabf7c7
 - name: github.com/golang/protobuf
-  version: 11bd559057bb9c65e24d1bd7f436d375323a8565
+  version: 89a0c16f4dc2a70c0ed864d8ef64878f24fdaa51
   subpackages:
   - proto
 - name: github.com/gomodule/redigo
@@ -21,13 +23,19 @@ imports:
   - internal
   - redis
 - name: github.com/iiinsomnia/yiigo
-  version: b8c597de83beca09885501d248e32acfc92d80b0
+  version: e5f18268f0870b370530092e7ad5cd67366e206c
 - name: github.com/jmoiron/sqlx
   version: 0dae4fefe7c0e190f7b5a78dac28a1c82cc8d849
   subpackages:
   - reflectx
 - name: github.com/json-iterator/go
-  version: 10a568c51178f31e41456cedaac7838e0f4f7360
+  version: 1624edc4454b8682399def8740d46db5e4362ba4
+- name: github.com/lib/pq
+  version: 90697d60dd844d5ef6ff15135d0203f65d2f53b8
+  subpackages:
+  - oid
+- name: github.com/mattn/go-colorable
+  version: efa589957cd060542a26d2dd7832fd6a6c6c3ade
 - name: github.com/mattn/go-isatty
   version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
 - name: github.com/modern-go/concurrent
@@ -45,7 +53,7 @@ imports:
 - name: go.uber.org/multierr
   version: 3c4937480c32f4c13a875a1829af76c98ca3d40a
 - name: go.uber.org/zap
-  version: 55d3c264ce04be1d1aeac671f981697d0589b7c0
+  version: ff33455a0e382e8a81d14dd7c922020b6b5e7982
   subpackages:
   - buffer
   - internal/bufferpool
@@ -53,12 +61,12 @@ imports:
   - internal/exit
   - zapcore
 - name: golang.org/x/sys
-  version: bd9dbc187b6e1dacfdd2722a87e83093c2d7bd6e
+  version: f0d5e33068cb57c22a181f5df0ffda885309eb5a
   repo: https://github.com/golang/sys.git
   subpackages:
   - unix
 - name: google.golang.org/appengine
-  version: d1d14a4f7b9509a25ea8dc059e6820bbfb387beb
+  version: 4216e58b9158e5f1c906f1aca75162a46a2ec88a
   repo: https://github.com/golang/appengine.git
   subpackages:
   - cloudsql

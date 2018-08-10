@@ -1,19 +1,15 @@
-// Package yiigo 简单易用的Golang微框架，封装常用优秀库，用于API、WEB和爬虫开发
+// Package yiigo 简单易用的 Go Web 微框架
 //
-// 获取：
+// 获取：(推荐使用Glide)
 //
 //    glide init
 //    glide get github.com/iiinsomnia/yiigo
 //
 //    go get github.com/iiinsomnia/yiigo
 //
-// 使用：
+// 使用：(自动根据配置初始化组件)
 //
-//     err := yiigo.Bootstrap(true, true, true)
-//
-//     if err != nil {
-//	       yiigo.Logger.Panic(err.Error())
-//     }
+//    import "github.com/iiinsomnia/yiigo"
 //
 // 获取相关依赖包：
 //

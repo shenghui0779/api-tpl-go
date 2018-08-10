@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fatih/color"
 	toml "github.com/pelletier/go-toml"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -25,51 +26,59 @@ type mongoConf struct {
 // Sequence model for _id auto_increment of mongo
 type Sequence struct {
 	ID  string `bson:"_id"`
-	Seq int    `bson:"seq"`
+	Seq int64  `bson:"seq"`
 }
 
 var (
-	// Mongo default session
-	Mongo    *mgo.Session
-	mongoMap sync.Map
+	// Mongo default mongo session
+	Mongo  *mgo.Session
+	mgoMap sync.Map
 )
 
 func initMongo() error {
-	var err error
-
 	result := Env.Get("mongo")
+
+	if result == nil {
+		color.Blue("[yiigo] no mongodb configured")
+
+		return nil
+	}
 
 	switch node := result.(type) {
 	case *toml.Tree:
 		conf := &mongoConf{}
-		err = node.Unmarshal(conf)
+		err := node.Unmarshal(conf)
 
 		if err != nil {
-			break
+			return err
 		}
 
 		err = initSingleMongo(conf)
+
+		if err != nil {
+			return err
+		}
 	case []*toml.Tree:
 		conf := make([]*mongoConf, 0, len(node))
 
 		for _, v := range node {
 			c := &mongoConf{}
-			err = v.Unmarshal(c)
+			err := v.Unmarshal(c)
 
 			if err != nil {
-				break
+				return err
 			}
 
 			conf = append(conf, c)
 		}
 
-		err = initMultiMongo(conf)
-	default:
-		return errors.New("mongo error config")
-	}
+		err := initMultiMongo(conf)
 
-	if err != nil {
-		return fmt.Errorf("mongo error: %s", err.Error())
+		if err != nil {
+			return err
+		}
+	default:
+		return errors.New("yiigo: invalid mongo config")
 	}
 
 	return nil
@@ -81,10 +90,12 @@ func initSingleMongo(conf *mongoConf) error {
 	Mongo, err = mongoDial(conf)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("yiigo: mongo.default connect error: %s", err.Error())
 	}
 
-	mongoMap.Store("default", Mongo)
+	mgoMap.Store("default", Mongo)
+
+	color.Green("[yiigo] mongo.default connect success")
 
 	return nil
 }
@@ -94,13 +105,15 @@ func initMultiMongo(conf []*mongoConf) error {
 		m, err := mongoDial(v)
 
 		if err != nil {
-			return err
+			return fmt.Errorf("yiigo: mongo.%s connect error: %s", v.Name, err.Error())
 		}
 
-		mongoMap.Store(v.Name, m)
+		mgoMap.Store(v.Name, m)
+
+		color.Green("[yiigo] mongo.%s connect success", v.Name)
 	}
 
-	if v, ok := mongoMap.Load("default"); ok {
+	if v, ok := mgoMap.Load("default"); ok {
 		Mongo = v.(*mgo.Session)
 	}
 
@@ -139,10 +152,10 @@ func MongoSession(conn ...string) (*mgo.Session, error) {
 		schema = conn[0]
 	}
 
-	v, ok := mongoMap.Load(schema)
+	v, ok := mgoMap.Load(schema)
 
 	if !ok {
-		return nil, fmt.Errorf("mongodb %s is not connected", schema)
+		return nil, fmt.Errorf("yiigo: mongo.%s is not connected", schema)
 	}
 
 	session := v.(*mgo.Session)
@@ -150,16 +163,18 @@ func MongoSession(conn ...string) (*mgo.Session, error) {
 	return session.Clone(), nil
 }
 
-// SeqID returns _id auto_increment of mongo.
-func SeqID(session *mgo.Session, db string, collection string, seqs ...int) (int, error) {
-	if len(seqs) == 0 {
-		seqs = append(seqs, 1)
+// SeqID returns _id auto_increment to mongo.
+func SeqID(session *mgo.Session, db string, collection string, seqs ...int64) (int64, error) {
+	var seq int64 = 1
+
+	if len(seqs) > 0 {
+		seq = seqs[0]
 	}
 
 	condition := bson.M{"_id": collection}
 
 	change := mgo.Change{
-		Update:    bson.M{"$inc": bson.M{"seq": seqs[0]}},
+		Update:    bson.M{"$inc": bson.M{"seq": seq}},
 		Upsert:    true,
 		ReturnNew: true,
 	}
