@@ -10,6 +10,8 @@ func init() {
 	loadEnv()
 	// init logger
 	initLogger()
+	// init http client
+	initHTTPClient()
 	// init core components
 	bootstrap()
 }

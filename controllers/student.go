@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"github.com/iiinsomnia/yiigo"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -23,12 +22,12 @@ func StudentIndex(c *gin.Context) {
 	data, err := service.GetAllStudents()
 
 	if err != nil {
-		yiigo.Error(c, 500, "internal server error")
+		Err(c, 500, "internal server error")
 
 		return
 	}
 
-	yiigo.OK(c, data)
+	OK(c, data)
 }
 
 func StudentView(c *gin.Context) {
@@ -37,7 +36,7 @@ func StudentView(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Error(c, -1, "param error")
+		Err(c, -1, "param error")
 
 		return
 	}
@@ -45,19 +44,19 @@ func StudentView(c *gin.Context) {
 	data, err := service.GetStudentByID(_id)
 
 	if err != nil {
-		yiigo.Error(c, 500, "internal server error")
+		Err(c, 500, "internal server error")
 
 		return
 	}
 
-	yiigo.OK(c, data)
+	OK(c, data)
 }
 
 func StudentAdd(c *gin.Context) {
 	form := &StudentForm{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.Error(c, -1, validate.Error())
+		Err(c, -1, validate.Error())
 
 		return
 	}
@@ -74,12 +73,12 @@ func StudentAdd(c *gin.Context) {
 	id, err := service.AddNewStudent(data)
 
 	if err != nil {
-		yiigo.Error(c, 500, "internal server error")
+		Err(c, 500, "internal server error")
 
 		return
 	}
 
-	yiigo.OK(c, gin.H{"id": id})
+	OK(c, gin.H{"id": id})
 }
 
 func StudentEdit(c *gin.Context) {
@@ -88,7 +87,7 @@ func StudentEdit(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Error(c, -1, "param error")
+		Err(c, -1, "param error")
 
 		return
 	}
@@ -96,7 +95,7 @@ func StudentEdit(c *gin.Context) {
 	form := &StudentForm{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.Error(c, -1, validate.Error())
+		Err(c, -1, validate.Error())
 
 		return
 	}
@@ -113,12 +112,12 @@ func StudentEdit(c *gin.Context) {
 	err = service.UpdateStudentByID(_id, data)
 
 	if err != nil {
-		yiigo.Error(c, 500, "internal server error")
+		Err(c, 500, "internal server error")
 
 		return
 	}
 
-	yiigo.OK(c)
+	OK(c)
 }
 
 func StudentDelete(c *gin.Context) {
@@ -127,7 +126,7 @@ func StudentDelete(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Error(c, -1, "param error")
+		Err(c, -1, "param error")
 
 		return
 	}
@@ -135,10 +134,10 @@ func StudentDelete(c *gin.Context) {
 	err = service.DeleteStudentByID(_id)
 
 	if err != nil {
-		yiigo.Error(c, 500, "internal server error")
+		Err(c, 500, "internal server error")
 
 		return
 	}
 
-	yiigo.OK(c)
+	OK(c)
 }

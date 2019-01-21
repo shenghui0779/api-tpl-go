@@ -1,6 +1,10 @@
-# yiigo 2.0 🎉🎉🎉
+# yiigo
 
-简单易用的 Go Web 微框架
+[![GoDoc](https://godoc.org/github.com/IIInsomnia/yiigo?status.svg)](https://godoc.org/github.com/IIInsomnia/yiigo)
+[![GitHub release](https://img.shields.io/github/release/IIInsomnia/yiigo.svg)](https://github.com/IIInsomnia/yiigo/releases/latest)
+[![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
+
+简单易用的 Golang 辅助库，让 Golang 开发更简单
 
 ## 特点
 
@@ -10,10 +14,9 @@
 - 采用 [sqlx](https://github.com/jmoiron/sqlx) 处理SQL查询
 - 支持多 [MySQL](https://github.com/go-sql-driver/mysql) 连接
 - 支持多 [PostgreSQL](https://github.com/lib/pq) 连接
-- 支持多 [mongo](http://labix.org/mgo) 连接
+- 支持多 [mongo](https://labix.org/mgo) 连接
 - 支持多 [redis](https://github.com/gomodule/redigo) 连接
 - 支持 [gomail](https://github.com/go-gomail/gomail) 邮件发送
-- 支持 [session](http://www.gorillatoolkit.org/pkg/sessions) 存取
 - 支持爬虫模拟登录
 
 ## 获取

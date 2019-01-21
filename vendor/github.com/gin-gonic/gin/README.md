@@ -238,7 +238,7 @@ func main() {
 func main() {
 	router := gin.Default()
 
-	// This handler will match /user/john but will not match neither /user/ or /user
+	// This handler will match /user/john but will not match /user/ or /user
 	router.GET("/user/:name", func(c *gin.Context) {
 		name := c.Param("name")
 		c.String(http.StatusOK, "Hello %s", name)
@@ -1117,7 +1117,7 @@ func main() {
     router.SetFuncMap(template.FuncMap{
         "formatAsDate": formatAsDate,
     })
-    router.LoadHTMLFiles("./fixtures/basic/raw.tmpl")
+    router.LoadHTMLFiles("./testdata/template/raw.tmpl")
 
     router.GET("/raw", func(c *gin.Context) {
         c.HTML(http.StatusOK, "raw.tmpl", map[string]interface{}{

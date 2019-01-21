@@ -1,4 +1,6 @@
 package: demo
 import:
 - package: github.com/iiinsomnia/yiigo
-  version: ~2.0.0
+  version: ~2.3.0
+- package: golang.org/x/sys
+  repo: https://github.com/golang/sys.git

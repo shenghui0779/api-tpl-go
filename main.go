@@ -5,6 +5,8 @@ import (
 	"demo/routes"
 	"runtime"
 
+	"go.uber.org/zap"
+
 	"github.com/gin-gonic/gin"
 	"github.com/iiinsomnia/yiigo"
 )
@@ -32,5 +34,8 @@ func run() {
 	r.Use(middlewares.Recovery())
 
 	routes.RouteRegister(r)
-	r.Run(":8000")
+
+	if err := r.Run(":8000"); err != nil {
+		yiigo.Logger.Panic("yiigo demo run error", zap.String("error", err.Error()))
+	}
 }

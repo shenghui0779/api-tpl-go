@@ -6,7 +6,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fatih/color"
 	toml "github.com/pelletier/go-toml"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -39,8 +38,6 @@ func initMongo() error {
 	result := Env.Get("mongo")
 
 	if result == nil {
-		color.Blue("[yiigo] no mongodb configured")
-
 		return nil
 	}
 
@@ -95,8 +92,6 @@ func initSingleMongo(conf *mongoConf) error {
 
 	mgoMap.Store("default", Mongo)
 
-	color.Green("[yiigo] mongo.default connect success")
-
 	return nil
 }
 
@@ -109,8 +104,6 @@ func initMultiMongo(conf []*mongoConf) error {
 		}
 
 		mgoMap.Store(v.Name, m)
-
-		color.Green("[yiigo] mongo.%s connect success", v.Name)
 	}
 
 	if v, ok := mgoMap.Load("default"); ok {
@@ -130,6 +123,10 @@ func mongoDial(conf *mongoConf) (*mgo.Session, error) {
 	m, err := mgo.DialWithTimeout(dsn, time.Duration(conf.Timeout)*time.Second)
 
 	if err != nil {
+		return nil, err
+	}
+
+	if err := m.Ping(); err != nil {
 		return nil, err
 	}
 

@@ -6,31 +6,121 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fatih/color"
 	"github.com/gomodule/redigo/redis"
 	toml "github.com/pelletier/go-toml"
+	"golang.org/x/net/context"
+	"vitess.io/vitess/go/pools"
 )
 
 type redisConf struct {
-	Name            string `toml:"name"`
-	Host            string `toml:"host"`
-	Port            int    `toml:"port"`
-	Password        string `toml:"password"`
-	Database        int    `toml:"database"`
-	ConnTimeout     int    `toml:"connTimeout"`
-	ReadTimeout     int    `toml:"readTimeout"`
-	WriteTimeout    int    `toml:"writeTimeout"`
-	MaxIdleConn     int    `toml:"maxIdleConn"`
-	MaxActiveConn   int    `toml:"maxActiveConn"`
-	MaxConnLifetime int    `toml:"maxConnLifetime"`
-	IdleTimeout     int    `toml:"idleTimeout"`
-	TestOnBorrow    int    `toml:"testOnBorrow"`
-	PoolWait        bool   `toml:"poolWait"`
+	Name         string `toml:"name"`
+	Host         string `toml:"host"`
+	Port         int    `toml:"port"`
+	Password     string `toml:"password"`
+	Database     int    `toml:"database"`
+	ConnTimeout  int    `toml:"connTimeout"`
+	ReadTimeout  int    `toml:"readTimeout"`
+	WriteTimeout int    `toml:"writeTimeout"`
+	PoolSize     int    `toml:"poolSize"`
+	PoolLimit    int    `toml:"poolLimit"`
+	IdleTimeout  int    `toml:"idleTimeout"`
+}
+
+// RedisConn redis connection resource
+type RedisConn struct {
+	redis.Conn
+}
+
+// Close close connection resorce
+func (r RedisConn) Close() {
+	r.Conn.Close()
+}
+
+// RedisPoolResource redis pool resource
+type RedisPoolResource struct {
+	pool   *pools.ResourcePool
+	config *redisConf
+	mutex  sync.Mutex
+}
+
+func (r *RedisPoolResource) dial() (redis.Conn, error) {
+	dsn := fmt.Sprintf("%s:%d", r.config.Host, r.config.Port)
+
+	dialOptions := []redis.DialOption{
+		redis.DialPassword(r.config.Password),
+		redis.DialDatabase(r.config.Database),
+		redis.DialConnectTimeout(time.Duration(r.config.ConnTimeout) * time.Second),
+		redis.DialReadTimeout(time.Duration(r.config.ReadTimeout) * time.Second),
+		redis.DialWriteTimeout(time.Duration(r.config.WriteTimeout) * time.Second),
+	}
+
+	conn, err := redis.Dial("tcp", dsn, dialOptions...)
+
+	return conn, err
+}
+
+func (r *RedisPoolResource) initPool() {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	if r.pool != nil && !r.pool.IsClosed() {
+		return
+	}
+
+	df := func() (pools.Resource, error) {
+		conn, err := r.dial()
+
+		if err != nil {
+			return nil, err
+		}
+
+		return RedisConn{conn}, nil
+	}
+
+	r.pool = pools.NewResourcePool(df, r.config.PoolSize, r.config.PoolLimit, time.Duration(r.config.IdleTimeout)*time.Second)
+}
+
+// Get get a connection resource from the pool.
+func (r *RedisPoolResource) Get() (RedisConn, error) {
+	if r.pool.IsClosed() {
+		r.initPool()
+	}
+
+	ctx := context.TODO()
+	resource, err := r.pool.Get(ctx)
+
+	if err != nil {
+		return RedisConn{}, err
+	}
+
+	rc := resource.(RedisConn)
+
+	// if rc is error, close and reconnect
+	if rc.Err() != nil {
+		conn, err := r.dial()
+
+		if err != nil {
+			r.pool.Put(rc)
+
+			return rc, err
+		}
+
+		rc.Close()
+
+		return RedisConn{conn}, nil
+	}
+
+	return rc, nil
+}
+
+// Put returns a connection resource to the pool.
+func (r *RedisPoolResource) Put(rc RedisConn) {
+	r.pool.Put(rc)
 }
 
 var (
-	// Redis default redis connection pool
-	Redis    *redis.Pool
+	// Redis default connection pool
+	Redis    *RedisPoolResource
 	redisMap sync.Map
 )
 
@@ -38,8 +128,6 @@ func initRedis() error {
 	result := Env.Get("redis")
 
 	if result == nil {
-		color.Blue("[yiigo] no redis configured")
-
 		return nil
 	}
 
@@ -52,11 +140,7 @@ func initRedis() error {
 			return err
 		}
 
-		err = initSingleRedis(conf)
-
-		if err != nil {
-			return err
-		}
+		initSingleRedis(conf)
 	case []*toml.Tree:
 		conf := make([]*redisConf, 0, len(node))
 
@@ -71,11 +155,7 @@ func initRedis() error {
 			conf = append(conf, c)
 		}
 
-		err := initMultiRedis(conf)
-
-		if err != nil {
-			return err
-		}
+		initMultiRedis(conf)
 	default:
 		return errors.New("yiigo: invalid redis config")
 	}
@@ -83,89 +163,28 @@ func initRedis() error {
 	return nil
 }
 
-func initSingleRedis(conf *redisConf) error {
-	var err error
-
-	Redis, err = redisDial(conf)
-
-	if err != nil {
-		return fmt.Errorf("yiigo: redis.default connect error: %s", err.Error())
-	}
+func initSingleRedis(conf *redisConf) {
+	Redis = &RedisPoolResource{config: conf}
+	Redis.initPool()
 
 	redisMap.Store("default", Redis)
-
-	color.Green("[yiigo] redis.default connect success")
-
-	return nil
 }
 
-func initMultiRedis(conf []*redisConf) error {
+func initMultiRedis(conf []*redisConf) {
 	for _, v := range conf {
-		p, err := redisDial(v)
+		poolResource := &RedisPoolResource{config: v}
+		poolResource.initPool()
 
-		if err != nil {
-			return fmt.Errorf("yiigo: redis.%s connect error: %s", v.Name, err.Error())
-		}
-
-		redisMap.Store(v.Name, p)
-
-		color.Green("[yiigo] redis.%s connect success", v.Name)
+		redisMap.Store(v.Name, poolResource)
 	}
 
 	if v, ok := redisMap.Load("default"); ok {
-		Redis = v.(*redis.Pool)
+		Redis = v.(*RedisPoolResource)
 	}
-
-	return nil
 }
 
-func redisDial(conf *redisConf) (*redis.Pool, error) {
-	pool := &redis.Pool{
-		Dial: func() (redis.Conn, error) {
-			dsn := fmt.Sprintf("%s:%d", conf.Host, conf.Port)
-
-			dialOptions := []redis.DialOption{
-				redis.DialPassword(conf.Password),
-				redis.DialDatabase(conf.Database),
-				redis.DialConnectTimeout(time.Duration(conf.ConnTimeout) * time.Second),
-				redis.DialReadTimeout(time.Duration(conf.ReadTimeout) * time.Second),
-				redis.DialWriteTimeout(time.Duration(conf.WriteTimeout) * time.Second),
-			}
-
-			conn, err := redis.Dial("tcp", dsn, dialOptions...)
-
-			return conn, err
-		},
-		TestOnBorrow: func(c redis.Conn, t time.Time) error {
-			if conf.TestOnBorrow == 0 || time.Since(t) < time.Duration(conf.TestOnBorrow)*time.Second {
-				return nil
-			}
-
-			_, err := c.Do("PING")
-
-			return err
-		},
-		MaxIdle:         conf.MaxIdleConn,
-		MaxActive:       conf.MaxActiveConn,
-		IdleTimeout:     time.Duration(conf.IdleTimeout) * time.Second,
-		MaxConnLifetime: time.Duration(conf.MaxConnLifetime) * time.Second,
-		Wait:            conf.PoolWait,
-	}
-
-	conn := pool.Get()
-	defer conn.Close()
-
-	_, err := conn.Do("PING")
-
-	if err != nil {
-		return nil, err
-	}
-
-	return pool, nil
-}
-
-// RedisPool returns a redis connection pool.
-func RedisPool(conn ...string) (*redis.Pool, error) {
+// RedisPool returns a redis pool.
+func RedisPool(conn ...string) (*RedisPoolResource, error) {
 	schema := "default"
 
 	if len(conn) > 0 {
@@ -178,5 +197,5 @@ func RedisPool(conn ...string) (*redis.Pool, error) {
 		return nil, fmt.Errorf("yiigo: redis.%s is not connected", schema)
 	}
 
-	return v.(*redis.Pool), nil
+	return v.(*RedisPoolResource), nil
 }

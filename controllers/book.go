@@ -3,23 +3,23 @@ package controllers
 import (
 	"strconv"
 
+	"demo/models"
+	"demo/service"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"github.com/iiinsomnia/yiigo"
-	"demo/service"
-	"demo/models"
 )
 
 func BookIndex(c *gin.Context) {
 	data, err := service.GetAllBooks()
 
 	if err != nil {
-		yiigo.Error(c, 500, "internal server error")
+		Err(c, 500, "internal server error")
 
 		return
 	}
 
-	yiigo.OK(c, data)
+	OK(c, data)
 }
 
 func BookView(c *gin.Context) {
@@ -28,7 +28,7 @@ func BookView(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Error(c, -1, "param error")
+		Err(c, -1, "param error")
 
 		return
 	}
@@ -36,19 +36,19 @@ func BookView(c *gin.Context) {
 	data, err := service.GetBookById(_id)
 
 	if err != nil {
-		yiigo.Error(c, 500, "internal server error")
+		Err(c, 500, "internal server error")
 
 		return
 	}
 
-	yiigo.OK(c, data)
+	OK(c, data)
 }
 
 func BookAdd(c *gin.Context) {
 	form := &models.BookAdd{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.Error(c, -1, validate.Error())
+		Err(c, -1, validate.Error())
 
 		return
 	}
@@ -56,12 +56,12 @@ func BookAdd(c *gin.Context) {
 	id, err := service.AddNewBook(form)
 
 	if err != nil {
-		yiigo.Error(c, 500, "internal server error")
+		Err(c, 500, "internal server error")
 
 		return
 	}
 
-	yiigo.OK(c, gin.H{"id": id})
+	OK(c, gin.H{"id": id})
 }
 
 func BookEdit(c *gin.Context) {
@@ -70,7 +70,7 @@ func BookEdit(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Error(c, -1, "param error")
+		Err(c, -1, "param error")
 
 		return
 	}
@@ -78,7 +78,7 @@ func BookEdit(c *gin.Context) {
 	form := &models.BookEdit{}
 
 	if validate := c.ShouldBindWith(form, binding.Form); validate != nil {
-		yiigo.Error(c, -1, validate.Error())
+		Err(c, -1, validate.Error())
 
 		return
 	}
@@ -86,12 +86,12 @@ func BookEdit(c *gin.Context) {
 	err = service.UpdateBookById(_id, form)
 
 	if err != nil {
-		yiigo.Error(c, 500, "internal server error")
+		Err(c, 500, "internal server error")
 
 		return
 	}
 
-	yiigo.OK(c)
+	OK(c)
 }
 
 func BookDelete(c *gin.Context) {
@@ -100,7 +100,7 @@ func BookDelete(c *gin.Context) {
 	_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		yiigo.Error(c, -1, "param error")
+		Err(c, -1, "param error")
 
 		return
 	}
@@ -108,10 +108,10 @@ func BookDelete(c *gin.Context) {
 	err = service.DeleteBookById(_id)
 
 	if err != nil {
-		yiigo.Error(c, 500, "internal server error")
+		Err(c, 500, "internal server error")
 
 		return
 	}
 
-	yiigo.OK(c)
+	OK(c)
 }
