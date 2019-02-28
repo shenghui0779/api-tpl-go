@@ -183,7 +183,7 @@ func generateInsertShardedQuery(node *sqlparser.Insert, eins *engine.Insert, val
 	for rowNum, val := range valueTuples {
 		midBuf.Myprintf("%v", val)
 		eins.Mid[rowNum] = midBuf.String()
-		midBuf.Truncate(0)
+		midBuf.Reset()
 	}
 	suffixBuf.Myprintf("%v", node.OnDup)
 	eins.Suffix = suffixBuf.String()
@@ -206,7 +206,7 @@ func modifyForAutoinc(ins *sqlparser.Insert, eins *engine.Insert) error {
 	return nil
 }
 
-// swapBindVariables swaps in bind variable names at the the specified
+// swapBindVariables swaps in bind variable names at the specified
 // column position in the AST values and returns the converted values back.
 // Bind variable names are generated using baseName.
 func swapBindVariables(rows sqlparser.Values, colNum int, baseName string) (sqltypes.PlanValue, error) {

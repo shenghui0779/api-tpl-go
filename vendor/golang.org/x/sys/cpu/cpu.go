@@ -6,6 +6,13 @@
 // various CPU architectures.
 package cpu
 
+// Initialized reports whether the CPU features were initialized.
+//
+// For some GOOS/GOARCH combinations initialization of the CPU features depends
+// on reading an operating specific file, e.g. /proc/self/auxv on linux/arm
+// Initialized will report false if reading the file fails.
+var Initialized bool
+
 // CacheLinePad is used to pad structs to avoid false sharing.
 type CacheLinePad struct{ _ [cacheLineSize]byte }
 
@@ -29,6 +36,8 @@ var X86 struct {
 	HasOSXSAVE   bool // OS supports XSAVE/XRESTOR for saving/restoring XMM registers.
 	HasPCLMULQDQ bool // PCLMULQDQ instruction - most often used for AES-GCM
 	HasPOPCNT    bool // Hamming weight instruction POPCNT.
+	HasRDRAND    bool // RDRAND instruction (on-chip random number generator)
+	HasRDSEED    bool // RDSEED instruction (on-chip random number generator)
 	HasSSE2      bool // Streaming SIMD extension 2 (always available on amd64)
 	HasSSE3      bool // Streaming SIMD extension 3
 	HasSSSE3     bool // Supplemental streaming SIMD extension 3

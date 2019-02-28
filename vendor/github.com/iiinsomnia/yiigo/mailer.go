@@ -1,87 +1,141 @@
 package yiigo
 
 import (
+	"fmt"
 	"sync"
 
-	gomail "gopkg.in/gomail.v2"
+	"gopkg.in/gomail.v2"
 )
 
-type emailConfig struct {
-	Title    string `toml:"title"`
-	Host     string `toml:"host"`
-	Port     int    `toml:"port"`
-	Username string `toml:"username"`
-	Password string `toml:"password"`
+// EMail email
+type EMail struct {
+	Title   string
+	Subject string
+	From    string
+	To      []string
+	Cc      []string
+	Content string
+	Attach  []string
 }
 
-// Mailer email
-type Mailer struct {
-	Title    string
-	Subject  string
-	From     string
-	To       []string
-	Cc       []string
-	Content  string
-	Attach   []string
-	Charset  string
-	Encoding gomail.Encoding
+// emailOptions email options
+type emailOptions struct {
+	charset     string
+	encoding    gomail.Encoding
+	contentType string
 }
 
-var (
-	emailDialer *gomail.Dialer
-	emailMutex  sync.Mutex
-)
+// EMailOption configures how we set up the db
+type EMailOption interface {
+	apply(options *emailOptions)
+}
 
-func emailDial() {
-	emailMutex.Lock()
-	defer emailMutex.Unlock()
+// funcEMailOption implements email option
+type funcEMailOption struct {
+	f func(options *emailOptions)
+}
 
-	if emailDialer != nil {
-		return
-	}
+func (fo *funcEMailOption) apply(o *emailOptions) {
+	fo.f(o)
+}
 
-	conf := &emailConfig{}
-	Env.Unmarshal("email", conf)
+func newFuncEMailOption(f func(options *emailOptions)) *funcEMailOption {
+	return &funcEMailOption{f: f}
+}
 
-	emailDialer = gomail.NewDialer(conf.Host, conf.Port, conf.Username, conf.Password)
+// EMailDialer email dialer
+type EMailDialer struct {
+	dialer *gomail.Dialer
 }
 
 // Send send an email.
-func (m *Mailer) Send() error {
-	msgSettings := make([]gomail.MessageSetting, 0, 2)
+func (m *EMailDialer) Send(e *EMail, options ...EMailOption) error {
+	o := &emailOptions{contentType: "text/html"}
 
-	if m.Charset != "" {
-		msgSettings = append(msgSettings, gomail.SetCharset(m.Charset))
+	if len(options) > 0 {
+		for _, option := range options {
+			option.apply(o)
+		}
 	}
 
-	if m.Encoding != "" {
-		msgSettings = append(msgSettings, gomail.SetEncoding(m.Encoding))
+	settings := make([]gomail.MessageSetting, 0, 2)
+
+	if o.charset != "" {
+		settings = append(settings, gomail.SetCharset(o.charset))
 	}
 
-	msg := gomail.NewMessage(msgSettings...)
-
-	msg.SetHeader("Subject", m.Subject)
-	msg.SetAddressHeader("From", m.From, m.Title)
-	msg.SetHeader("To", m.To...)
-
-	if len(m.Cc) > 0 {
-		msg.SetHeader("Cc", m.Cc...)
+	if o.encoding != "" {
+		settings = append(settings, gomail.SetEncoding(o.encoding))
 	}
 
-	if len(m.Attach) > 0 {
-		for _, v := range m.Attach {
+	msg := gomail.NewMessage(settings...)
+
+	msg.SetHeader("Subject", e.Subject)
+	msg.SetAddressHeader("From", e.From, e.Title)
+	msg.SetHeader("To", e.To...)
+
+	if len(e.Cc) > 0 {
+		msg.SetHeader("Cc", e.Cc...)
+	}
+
+	if len(e.Attach) > 0 {
+		for _, v := range e.Attach {
 			msg.Attach(v)
 		}
 	}
 
-	msg.SetBody("text/html", m.Content)
-
-	if emailDialer == nil {
-		emailDial()
-	}
+	msg.SetBody(o.contentType, e.Content)
 
 	// Send the email
-	err := emailDialer.DialAndSend(msg)
+	err := m.dialer.DialAndSend(msg)
 
 	return err
+}
+
+var (
+	Mailer    *EMailDialer
+	mailerMap sync.Map
+)
+
+// WithEMailCharset specifies the `Charset` to email.
+func WithEMailCharset(s string) EMailOption {
+	return newFuncEMailOption(func(o *emailOptions) {
+		o.charset = s
+	})
+}
+
+// WithEMailEncoding specifies the `Encoding` to email.
+func WithEMailEncoding(e gomail.Encoding) EMailOption {
+	return newFuncEMailOption(func(o *emailOptions) {
+		o.encoding = e
+	})
+}
+
+// WithEMailContentType specifies the `ContentType` to email.
+func WithEMailContentType(s string) EMailOption {
+	return newFuncEMailOption(func(o *emailOptions) {
+		o.contentType = s
+	})
+}
+
+// RegisterMailer register a mailer
+func RegisterMailer(name, host string, port int, account, password string) {
+	m := &EMailDialer{dialer: gomail.NewDialer(host, port, account, password)}
+
+	mailerMap.Store(name, m)
+
+	if name == AsDefault {
+		Mailer = m
+	}
+}
+
+// UseMailer returns a mailer
+func UseMailer(name string) *EMailDialer {
+	v, ok := mailerMap.Load(name)
+
+	if !ok {
+		panic(fmt.Errorf("yiigo: mailer.%s is not registered", name))
+	}
+
+	return v.(*EMailDialer)
 }

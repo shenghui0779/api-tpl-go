@@ -10,4 +10,4 @@
 4. 运行 `go run main.go`
 
 > 注意：
-> 本demo基于yiigo2.0，使用了MySQL、mongodb和redis，测试时务必运行各服务
+> 本demo基于yiigo3.x

@@ -23,12 +23,10 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
 	"strings"
 	"testing"
 
 	"vitess.io/vitess/go/sqltypes"
-	"vitess.io/vitess/go/testfiles"
 	"vitess.io/vitess/go/vt/key"
 	"vitess.io/vitess/go/vt/sqlparser"
 	"vitess.io/vitess/go/vt/topo/topoproto"
@@ -237,7 +235,7 @@ func testFile(t *testing.T, filename string, vschema *vindexes.VSchema) {
 			out = string(bout)
 		}
 		if out != tcase.output {
-			t.Errorf("File: %s, Line:%v\n%s, want\n%s", filename, tcase.lineno, out, tcase.output)
+			t.Errorf("File: %s, Line:%v\n got:\n%s, \nwant:\n%s", filename, tcase.lineno, out, tcase.output)
 			// Uncomment these lines to re-generate input files
 			if err != nil {
 				out = fmt.Sprintf("\"%s\"", out)
@@ -334,8 +332,5 @@ func iterateExecFile(name string) (testCaseIterator chan testCase) {
 }
 
 func locateFile(name string) string {
-	if path.IsAbs(name) {
-		return name
-	}
-	return testfiles.Locate("vtgate/" + name)
+	return "testdata/" + name
 }

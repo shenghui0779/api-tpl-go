@@ -1,38 +1,38 @@
-hash: 2d8ffe503921cae282c326f6b5c915c081fb42a8a6ea41c0d3ed0e70b1e20634
-updated: 2019-01-21T17:13:51.855458+08:00
+hash: d5db817e7afbe374a1a9463eb1bc3e58ef9643898f2905b181c940dc97ae9d31
+updated: 2019-02-28T17:28:48.096201+08:00
 imports:
 - name: github.com/gin-contrib/sse
-  version: 22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae
+  version: 996076df5b3348fd04ff02aa5f9abd971c2d2d28
 - name: github.com/gin-gonic/gin
-  version: b869fe1415e4b9eb52f247441830d502aece2d4d
+  version: ccb105dbcb48cbcec988df8a46e90af3adf7c0ff
   subpackages:
   - binding
-  - json
+  - internal/json
   - render
 - name: github.com/go-sql-driver/mysql
-  version: c45f530f8e7fe40f4687eaa50d0c8c5f1b66f9e0
+  version: 972a708cf97995463843c08c8585b26997daf0e1
+- name: github.com/go-stack/stack
+  version: 2fee6af1a9795aafbe0253a0cfbdf668e1fb8a9a
 - name: github.com/golang/protobuf
-  version: 347cf4a86c1cb8d262994d8ef5924d4576c5b331
+  version: c823c79ea1570fb5ff454033735a8e68575d1d0f
   subpackages:
   - proto
+- name: github.com/golang/snappy
+  version: 2a8bb927dd31d8daada140a5d09578521ce5c36a
 - name: github.com/gomodule/redigo
-  version: 02dc2736dbc3a4a56907b0d5a9fead2f71b499db
+  version: b47395aa17662ff86cb5c52f3bf669bf842ec27a
   subpackages:
   - redis
 - name: github.com/iiinsomnia/yiigo
-  version: d2d022f40aa0b098d4cd67a19e099efb49569e4d
+  version: b72a3640dd06484e06f88203f3577ca4f0132d56
 - name: github.com/jmoiron/sqlx
   version: 82935fac6c1a317907c8f43ed3f7f85ea844a78b
   subpackages:
   - reflectx
 - name: github.com/json-iterator/go
-  version: f64ce68b6eea7b957a0d0d43e224dfe491b0babe
-- name: github.com/lib/pq
-  version: 9eb73efc1fcc404148b56765b0d3f61d9a5ef8ee
-  subpackages:
-  - oid
+  version: 5bc93205020f6311d7e4a34f82c5616a18ec35e5
 - name: github.com/mattn/go-isatty
-  version: 3fb116b820352b7f0c281308a4d6250c22d94e27
+  version: 369ecd8cea9851e459abb67eb171853e3986591e
 - name: github.com/modern-go/concurrent
   version: bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94
 - name: github.com/modern-go/reflect2
@@ -40,33 +40,86 @@ imports:
 - name: github.com/pelletier/go-toml
   version: 27c6b39a135b7dc87a14afb068809132fb7a9a8f
 - name: github.com/ugorji/go
-  version: 772ced7fd4c2f6322c07537a9a93b68d74551fa6
+  version: e444a5086c436778cf9281a7059a3d58b9e17935
   subpackages:
   - codec
+- name: github.com/xdg/scram
+  version: 7eeb5667e42c09cb51bf7b7c28aea8c56767da90
+- name: github.com/xdg/stringprep
+  version: 73f8eece6fdcd902c185bf651de50f3828bed5ed
+- name: go.mongodb.org/mongo-driver
+  version: fcec76a7c147bbcef3aecb66ce318bd4a0b004b4
+  subpackages:
+  - bson
+  - bson/bsoncodec
+  - bson/bsonrw
+  - bson/bsontype
+  - bson/primitive
+  - event
+  - internal
+  - mongo
+  - mongo/options
+  - mongo/readconcern
+  - mongo/readpref
+  - mongo/writeconcern
+  - tag
+  - version
+  - x/bsonx
+  - x/bsonx/bsoncore
+  - x/mongo/driver
+  - x/mongo/driver/auth
+  - x/mongo/driver/auth/internal/gssapi
+  - x/mongo/driver/session
+  - x/mongo/driver/topology
+  - x/mongo/driver/uuid
+  - x/network/address
+  - x/network/command
+  - x/network/compressor
+  - x/network/connection
+  - x/network/connstring
+  - x/network/description
+  - x/network/result
+  - x/network/wiremessage
 - name: go.uber.org/atomic
   version: 1ea20fb1cbb1cc08cbd0d913a96dead89aa18289
 - name: go.uber.org/multierr
   version: 3c4937480c32f4c13a875a1829af76c98ca3d40a
 - name: go.uber.org/zap
-  version: 67bc79d13d155c02fd008f721863ff8cc5f30659
+  version: d2a364dac1d9b70c651d9f47381c5912361e5596
   subpackages:
   - buffer
   - internal/bufferpool
   - internal/color
   - internal/exit
   - zapcore
+- name: golang.org/x/crypto
+  version: 31a38585487a4b1fd6ff4f8f3db26f1fb296ac82
+  repo: https://github.com/golang/crypto.git
+  subpackages:
+  - pbkdf2
 - name: golang.org/x/net
-  version: ed066c81e75eba56dd9bd2139ade88125b855585
+  version: c95aed5357e77a4bf7d3955c46740000a17adee1
   repo: https://github.com/golang/net.git
   subpackages:
   - context
+- name: golang.org/x/sync
+  version: e225da77a7e68af35c70ccbf71af2b83e6acac3c
+  repo: https://github.com/golang/sync.git
+  subpackages:
+  - semaphore
 - name: golang.org/x/sys
-  version: 770c60269bf0ef965e9e7ac8bedcb6bca2a1cefd
+  version: 92a0ff1e1e2f61773648454ec71ec0c0f1c700a2
   repo: https://github.com/golang/sys.git
   subpackages:
   - unix
+- name: golang.org/x/text
+  version: d14c52b222ee852cdba8b07206ca0c614b389876
+  repo: https://github.com/golang/text.git
+  subpackages:
+  - transform
+  - unicode/norm
 - name: google.golang.org/appengine
-  version: e9657d882bb81064595ca3b56cbe2546bbabf7b1
+  version: 54a98f90d1c46b7731eb8fb305d2a321c30ef610
   repo: https://github.com/golang/appengine.git
   subpackages:
   - cloudsql
@@ -76,19 +129,12 @@ imports:
   version: 5f1438d3fca68893a817e4a66806cea46a9e4ebf
 - name: gopkg.in/gomail.v2
   version: 81ebce5c23dfd25c6c67194b37d3dd3f338c98b1
-- name: gopkg.in/mgo.v2
-  version: 9856a29383ce1c59f308dd1cf0363a79b5bef6b5
-  subpackages:
-  - bson
-  - internal/json
-  - internal/sasl
-  - internal/scram
 - name: gopkg.in/natefinch/lumberjack.v2
   version: a96e63847dc3c67d17befa69c303767e2f84e54f
 - name: gopkg.in/yaml.v2
   version: 51d6538a90f86fe93ac480b35f37b2be17fef232
 - name: vitess.io/vitess
-  version: c462dd862b9705fbec7107965e1279b3b641bad0
+  version: 4e3faef0886e5b2e36a42b5ab989ceac67e24f77
   subpackages:
   - go/cache
   - go/pools

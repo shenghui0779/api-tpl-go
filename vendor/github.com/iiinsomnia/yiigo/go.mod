@@ -1,23 +1,15 @@
-module github.com/IIInsomnia/yiigo
+module github.com/iiinsomnia/yiigo
+
+go 1.12
 
 require (
-	github.com/go-sql-driver/mysql v0.0.0-20181031140716-fd197cdcfae0
-	github.com/gomodule/redigo v0.0.0-20181026001555-e8fc0692a7e2
-	github.com/jmoiron/sqlx v0.0.0-20181024163419-82935fac6c1a
-	github.com/lib/pq v0.0.0-20181016162627-9eb73efc1fcc
-	github.com/pelletier/go-toml v0.0.0-20180930205832-81a861c69d25
-	go.uber.org/atomic v1.3.2
-	go.uber.org/multierr v1.1.0
-	go.uber.org/zap v0.0.0-20180814183419-67bc79d13d15
-	golang.org/x/net v0.0.0
-	google.golang.org/appengine v0.0.0
-	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc
+	github.com/go-sql-driver/mysql v1.4.1-0.20190217072658-972a708cf979
+	github.com/gomodule/redigo v1.7.1-0.20190226174433-b47395aa1766
+	github.com/jmoiron/sqlx v1.2.1-0.20181024163419-82935fac6c1a
+	github.com/pelletier/go-toml v1.2.1-0.20181124002727-27c6b39a135b
+	go.mongodb.org/mongo-driver v1.0.0-rc1
+	go.uber.org/zap v1.9.2-0.20190215012540-d2a364dac1d9
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
-	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0-20170531160350-a96e63847dc3
-	vitess.io/vitess v0.0.0-20181108210702-753757752536
+	vitess.io/vitess v3.0.0-rc.3.0.20190228015701-4e3faef0886e+incompatible
 )
-
-replace google.golang.org/appengine => github.com/golang/appengine v1.3.0
-
-replace golang.org/x/net => golang.org/x/net v0.0.0-20181108094442-03003ca0c849

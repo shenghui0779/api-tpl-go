@@ -135,6 +135,10 @@ type FakeMysqlDaemon struct {
 	SemiSyncMasterEnabled bool
 	// SemiSyncSlaveEnabled represents the state of rpl_semi_sync_slave_enabled.
 	SemiSyncSlaveEnabled bool
+
+	// TimeoutHook is a func that can be called at the beginning of any method to fake a timeout.
+	// all a test needs to do is make it { return context.DeadlineExceeded }
+	TimeoutHook func() error
 }
 
 // NewFakeMysqlDaemon returns a FakeMysqlDaemon where mysqld appears
@@ -300,6 +304,9 @@ func (fmd *FakeMysqlDaemon) DemoteMaster() (mysql.Position, error) {
 
 // WaitMasterPos is part of the MysqlDaemon interface
 func (fmd *FakeMysqlDaemon) WaitMasterPos(_ context.Context, pos mysql.Position) error {
+	if fmd.TimeoutHook != nil {
+		return fmd.TimeoutHook()
+	}
 	if reflect.DeepEqual(fmd.WaitMasterPosition, pos) {
 		return nil
 	}
@@ -395,6 +402,16 @@ func (fmd *FakeMysqlDaemon) GetSchema(dbName string, tables, excludeTables []str
 		return nil, fmt.Errorf("no schema defined")
 	}
 	return tmutils.FilterTables(fmd.Schema, tables, excludeTables, includeViews)
+}
+
+// GetColumns is part of the MysqlDaemon interface
+func (fmd *FakeMysqlDaemon) GetColumns(dbName, table string) ([]string, error) {
+	return []string{}, nil
+}
+
+// GetPrimaryKeyColumns is part of the MysqlDaemon interface
+func (fmd *FakeMysqlDaemon) GetPrimaryKeyColumns(dbName, table string) ([]string, error) {
+	return []string{}, nil
 }
 
 // PreflightSchemaChange is part of the MysqlDaemon interface

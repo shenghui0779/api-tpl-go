@@ -390,6 +390,9 @@ func TestExecutorSet(t *testing.T) {
 		in:  "set net_write_timeout = 600",
 		out: &vtgatepb.Session{Autocommit: true},
 	}, {
+		in:  "set sql_mode = 'STRICT_ALL_TABLES'",
+		out: &vtgatepb.Session{Autocommit: true},
+	}, {
 		in:  "set net_read_timeout = 600",
 		out: &vtgatepb.Session{Autocommit: true},
 	}, {
@@ -1841,7 +1844,7 @@ func TestExecutorUnrecognized(t *testing.T) {
 func TestExecutorMessageAckSharded(t *testing.T) {
 	executor, sbc1, sbc2, _ := createExecutorEnv()
 
-	// Constant in IN is just a number, not a bind variable.
+	// Constant in IN clause is just a number, not a bind variable.
 	ids := []*querypb.Value{{
 		Type:  sqltypes.VarChar,
 		Value: []byte("1"),
@@ -1860,7 +1863,7 @@ func TestExecutorMessageAckSharded(t *testing.T) {
 		t.Errorf("sbc2.MessageIDs: %+v, want nil\n", sbc2.MessageIDs)
 	}
 
-	// Constant in IN is just a couple numbers, not bind variables.
+	// Constants in IN clause are just numbers, not bind variables.
 	// They result in two different MessageIDs on two shards.
 	sbc1.MessageIDs = nil
 	sbc2.MessageIDs = nil
