@@ -4,10 +4,10 @@
 
 ## 使用
 
-1. clone 到 `GOPATH` 的 `demo` 目录下
-2. 环境配置：`env.toml.example` -> `env.toml`，并修改相关配置
-3. 创建数据库，导入 `demo.sql`
+1. 下载到工作目录
+2. 创建数据库，导入 `demo.sql`
+3. 环境配置：`yiigo.toml.example` -> `yiigo.toml`，并修改相关配置
 4. 运行 `go run main.go`
 
 > 注意：
-> 本demo基于yiigo3.x
+> 本demo基于yiigo.v4
