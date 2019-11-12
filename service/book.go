@@ -1,103 +1,118 @@
 package service
 
 import (
-	"database/sql"
-	"demo/cache"
-	"demo/models"
-	"time"
-
-	"github.com/iiinsomnia/yiigo"
+	"github.com/iiinsomnia/yiigo_demo/cache"
+	"github.com/iiinsomnia/yiigo_demo/dao"
+	"github.com/iiinsomnia/yiigo_demo/helpers"
+	"github.com/iiinsomnia/yiigo_demo/reply"
 )
 
-func GetBookById(id int) (yiigo.X, error) {
-	book := &models.Book{}
-
-	ok := cache.GetBookCache(id, book)
-
-	if !ok {
-		err := yiigo.DB.Get(book, "SELECT * FROM book WHERE id = ?", id)
-
-		if err != nil {
-			if err != sql.ErrNoRows {
-				yiigo.Logger.Error(err.Error())
-
-				return nil, err
-			}
-
-			return yiigo.X{}, nil
-		}
-
-		cache.SetBookCache(id, book)
-	}
-
-	data := yiigo.X{
-		"id":           book.ID,
-		"title":        book.Title,
-		"subtitle":     book.SubTitle,
-		"author":       book.Author,
-		"version":      book.Version,
-		"price":        book.Price,
-		"publisher":    book.Publisher,
-		"publish_date": book.PublishDate,
-	}
-
-	return data, nil
+type BookAdd struct {
+	Title       string  `json:"title" valid:"required~title必填"`
+	SubTitle    string  `json:"subtitle" valid:"required~subtitle必填"`
+	Author      string  `json:"author" valid:"required~author必填"`
+	Version     string  `json:"version" valid:"required~version必填"`
+	Price       float64 `json:"price" valid:"required~price必填"`
+	Publisher   string  `json:"publisher" valid:"required~publisher必填"`
+	PublishDate string  `json:"publish_date" valid:"required~publish_date必填"`
 }
 
-func GetAllBooks() ([]models.Book, error) {
-	var books []models.Book
-
-	err := yiigo.DB.Select(&books, "SELECT * FROM book WHERE 1=1")
-
-	if err != nil && err != sql.ErrNoRows {
-		yiigo.Logger.Error(err.Error())
-
-		return nil, err
+func (b *BookAdd) Do() error {
+	createData := &dao.BookCreateData{
+		Title:       b.Title,
+		SubTitle:    b.SubTitle,
+		Author:      b.Author,
+		Version:     b.Version,
+		Price:       b.Price,
+		Publisher:   b.Publisher,
+		PublishDate: b.PublishDate,
 	}
 
-	return books, nil
-}
+	bookDao := dao.NewBook()
 
-func AddNewBook(data *models.BookAdd) (int64, error) {
-	data.CreatedAt = time.Now()
-
-	sql, binds := yiigo.InsertSQL("book", data)
-	r, err := yiigo.DB.Exec(sql, binds...)
-
-	if err != nil {
-		yiigo.Logger.Error(err.Error())
-
-		return 0, err
-	}
-
-	id, err := r.LastInsertId()
-
-	return id, err
-}
-
-func UpdateBookById(id int, data *models.BookEdit) error {
-	data.UpdatedAt = time.Now()
-
-	sql, binds := yiigo.UpdateSQL("UPDATE book SET ? WHERE id = ?", data, id)
-	_, err := yiigo.DB.Exec(sql, binds...)
-
-	if err != nil {
-		yiigo.Logger.Error(err.Error())
-
-		return err
+	if err := bookDao.Create(createData); err != nil {
+		return helpers.Error(10101, err)
 	}
 
 	return nil
 }
 
-func DeleteBookById(id int) error {
-	_, err := yiigo.DB.Exec("DELETE FROM book WHERE id = ?", id)
+type BookInfo struct {
+	ID int64 `json:"id" valid:"required~id必填"`
+}
 
-	if err != nil {
-		yiigo.Logger.Error(err.Error())
+func (b *BookInfo) Do() (*reply.BookInfoReply, error) {
+	bookCache := cache.NewBook()
 
-		return err
+	book, ok := bookCache.Get(b.ID)
+
+	if !ok {
+		var err error
+
+		bookDao := dao.NewBook()
+
+		book, err = bookDao.FindByID(b.ID)
+
+		if err != nil {
+			return nil, helpers.Error(50000, err)
+		}
+
+		if book == nil {
+			return nil, helpers.Error(10100)
+		}
+
+		bookCache.Set(b.ID, book)
 	}
+
+	resp := &reply.BookInfoReply{
+		Title:       book.Title,
+		SubTitle:    book.SubTitle,
+		Author:      book.Author,
+		Version:     book.Version,
+		Price:       book.Price,
+		Publisher:   book.Publisher,
+		PublishDate: book.PublishDate,
+		CreatedAt:   book.CreatedAt,
+		UpdatedAt:   book.UpdatedAt,
+	}
+
+	return resp, nil
+}
+
+type BookEdit struct {
+	ID          int64   `json:"id" valid:"required~id必填"`
+	Title       string  `json:"title" valid:"required~title必填"`
+	SubTitle    string  `json:"subtitle" valid:"required~subtitle必填"`
+	Author      string  `json:"author" valid:"required~author必填"`
+	Version     string  `json:"version" valid:"required~version必填"`
+	Price       float64 `json:"price" valid:"required~price必填"`
+	Publisher   string  `json:"publisher" valid:"required~publisher必填"`
+	PublishDate string  `json:"publish_date" valid:"required~publish_date必填"`
+}
+
+func UpdateBookById() error {
+	// data.UpdatedAt = time.Now()
+
+	// sql, binds := yiigo.UpdateSQL("UPDATE book SET ? WHERE id = ?", data, id)
+	// _, err := yiigo.DB.Exec(sql, binds...)
+
+	// if err != nil {
+	// 	yiigo.Logger.Error(err.Error())
+
+	// 	return err
+	// }
+
+	return nil
+}
+
+func DeleteBookById(id int) error {
+	// _, err := yiigo.DB.Exec("DELETE FROM book WHERE id = ?", id)
+
+	// if err != nil {
+	// 	yiigo.Logger.Error(err.Error())
+
+	// 	return err
+	// }
 
 	return nil
 }

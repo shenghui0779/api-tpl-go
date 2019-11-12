@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	"demo/controllers"
+	"github.com/iiinsomnia/yiigo_demo/controllers"
 
 	"github.com/gin-gonic/gin"
 )
