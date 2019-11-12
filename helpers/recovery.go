@@ -3,13 +3,13 @@ package helpers
 import (
 	"fmt"
 
-	"gitlab.meipian.cn/golib/yiigo"
+	"github.com/iiinsomnia/yiigo/v4"
 )
 
 // Recover recover panic
 func Recover() {
 	if err := recover(); err != nil {
-		yiigo.Logger().Error(fmt.Sprintf("yiigo_demo panic: %v", err))
+		yiigo.Logger().Error(fmt.Sprintf("yiigo-demo panic: %v", err))
 	}
 
 	return

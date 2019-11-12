@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/iiinsomnia/yiigo_demo/controllers"
+	"github.com/iiinsomnia/yiigo_demo/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,9 +15,12 @@ func RouteRegister(r *gin.Engine) {
 		c.JSON(http.StatusOK, "☺ welcome to golang app!")
 	})
 
-	r.GET("books", controllers.BookIndex)
-	r.GET("books/:id", controllers.BookView)
-	r.POST("books", controllers.BookAdd)
-	r.PUT("books/:id", controllers.BookEdit)
-	r.DELETE("books/:id", controllers.BookDelete)
+	root := r.Group("/")
+	root.Use(middlewares.Logger())
+	{
+		r.POST("book/info", controllers.GetBookInfo)
+		r.POST("book/add", controllers.AddBook)
+		r.POST("book/edit", controllers.EditBook)
+		r.POST("book/delete", controllers.DeleteBook)
+	}
 }

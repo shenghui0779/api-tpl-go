@@ -90,29 +90,36 @@ type BookEdit struct {
 	PublishDate string  `json:"publish_date" valid:"required~publish_date必填"`
 }
 
-func UpdateBookById() error {
-	// data.UpdatedAt = time.Now()
+func (b *BookEdit) Do() error {
+	updateData := &dao.BookUpdateData{
+		Title:       b.Title,
+		SubTitle:    b.SubTitle,
+		Author:      b.Author,
+		Version:     b.Version,
+		Price:       b.Price,
+		Publisher:   b.Publisher,
+		PublishDate: b.PublishDate,
+	}
 
-	// sql, binds := yiigo.UpdateSQL("UPDATE book SET ? WHERE id = ?", data, id)
-	// _, err := yiigo.DB.Exec(sql, binds...)
+	bookDao := dao.NewBook()
 
-	// if err != nil {
-	// 	yiigo.Logger.Error(err.Error())
-
-	// 	return err
-	// }
+	if err := bookDao.UpdateByID(b.ID, updateData); err != nil {
+		return helpers.Error(10102, err)
+	}
 
 	return nil
 }
 
-func DeleteBookById(id int) error {
-	// _, err := yiigo.DB.Exec("DELETE FROM book WHERE id = ?", id)
+type BookDelete struct {
+	ID int64 `json:"id" valid:"required~id必填"`
+}
 
-	// if err != nil {
-	// 	yiigo.Logger.Error(err.Error())
+func (b *BookDelete) Do() error {
+	bookDao := dao.NewBook()
 
-	// 	return err
-	// }
+	if err := bookDao.DeleteByID(b.ID); err != nil {
+		return helpers.Error(10103, err)
+	}
 
 	return nil
 }

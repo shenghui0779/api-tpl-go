@@ -3,7 +3,7 @@ package helpers
 import (
 	"fmt"
 
-	"gitlab.meipian.cn/golib/yiigo"
+	"github.com/iiinsomnia/yiigo/v4"
 	"go.uber.org/zap"
 )
 
