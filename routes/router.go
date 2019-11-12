@@ -18,9 +18,9 @@ func RouteRegister(r *gin.Engine) {
 	root := r.Group("/")
 	root.Use(middlewares.Logger())
 	{
-		r.POST("book/info", controllers.GetBookInfo)
-		r.POST("book/add", controllers.AddBook)
-		r.POST("book/edit", controllers.EditBook)
-		r.POST("book/delete", controllers.DeleteBook)
+		root.POST("book/info", controllers.GetBookInfo)
+		root.POST("book/add", controllers.AddBook)
+		root.POST("book/edit", controllers.EditBook)
+		root.POST("book/delete", controllers.DeleteBook)
 	}
 }
