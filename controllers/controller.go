@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/iiinsomnia/yiigo_demo/helpers"
+
+	"github.com/iiinsomnia/demo/helpers"
 )
 
 // OK returns success of an API.

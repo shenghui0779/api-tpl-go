@@ -33,26 +33,8 @@ func Error(code int, err ...error) error {
 		msg = m
 	}
 
-	fields := make([]zap.Field, 0, 1)
-
 	if len(err) > 0 {
-		fields = append(fields, zap.Error(err[0]))
-	}
-
-	yiigo.Logger().Error(fmt.Sprintf("Whoops! %d | %s", code, msg), fields...)
-
-	return &Err{
-		code: code,
-		msg:  msg,
-	}
-}
-
-// ErrNoLog returns an error
-func ErrNoLog(code int) error {
-	msg := "unkown code"
-
-	if m, ok := errCodes[code]; ok {
-		msg = m
+		yiigo.Logger().Error(fmt.Sprintf("Whoops! %d | %s", code, msg), zap.Error(err[0]))
 	}
 
 	return &Err{

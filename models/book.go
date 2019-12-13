@@ -17,14 +17,3 @@ type Book struct {
 func (b *Book) TableName() string {
 	return "book"
 }
-
-// BookEdit model for edit
-type BookEdit struct {
-	Title       string
-	SubTitle    string
-	Author      string
-	Version     string
-	Price       float64
-	Publisher   string
-	PublishDate string
-}

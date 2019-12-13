@@ -5,21 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
-	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/iiinsomnia/yiigo/v4"
-	"github.com/iiinsomnia/yiigo_demo/helpers"
 	"go.uber.org/zap"
 )
-
-var bufPool = sync.Pool{
-	New: func() interface{} {
-		return bytes.NewBuffer(make([]byte, 0, 16<<10)) // 16KB
-	},
-}
 
 // Logger log middleware
 func Logger() gin.HandlerFunc {
@@ -40,10 +31,6 @@ func Logger() gin.HandlerFunc {
 			return
 		}
 
-		requestID := yiigo.MD5(strconv.FormatInt(helpers.UniqueSerial(), 10))
-
-		c.Request.Header.Set("Request-ID", requestID)
-
 		defer func() {
 			endTime := time.Now().UnixNano()
 
@@ -54,9 +41,8 @@ func Logger() gin.HandlerFunc {
 			}
 
 			yiigo.Logger().Debug(fmt.Sprintf("[%s] %v", c.Request.Method, c.Request.URL),
-				zap.String("request_id", requestID),
 				zap.String("ip", c.ClientIP()),
-				zap.ByteString("params", body),
+				zap.String("params", body),
 				zap.Any("response", response),
 				zap.String("duration", fmt.Sprintf("%f ms", float64(endTime-startTime)/1e6)),
 			)
@@ -67,31 +53,29 @@ func Logger() gin.HandlerFunc {
 	}
 }
 
-func drainBody(c *gin.Context) ([]byte, error) {
-	buf := bufPool.Get().(*bytes.Buffer)
-	buf.Reset()
-
-	defer bufPool.Put(buf)
+func drainBody(c *gin.Context) (string, error) {
+	buf := yiigo.BufPool.Get()
+	defer yiigo.BufPool.Put(buf)
 
 	if c.Request.Body == nil || c.Request.Body == http.NoBody {
-		return nil, nil
+		return "", nil
 	}
 
 	if _, err := buf.ReadFrom(c.Request.Body); err != nil {
 		yiigo.Logger().Error("drain request body error", zap.Error(err))
 
-		return nil, err
+		return "", err
 	}
 
 	if err := c.Request.Body.Close(); err != nil {
 		yiigo.Logger().Error("drain request body error", zap.Error(err))
 
-		return nil, err
+		return "", err
 	}
 
-	body := buf.Bytes()
+	bodyStr := buf.String()
 
-	c.Request.Body = ioutil.NopCloser(bytes.NewReader(body))
+	c.Request.Body = ioutil.NopCloser(bytes.NewReader([]byte(bodyStr)))
 
-	return body, nil
+	return bodyStr, nil
 }

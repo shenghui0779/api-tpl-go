@@ -2,11 +2,13 @@ package cache
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/iiinsomnia/yiigo/v4"
-	"github.com/iiinsomnia/yiigo_demo/models"
 	"go.uber.org/zap"
+
+	"github.com/iiinsomnia/demo/models"
 )
 
 type Book struct {
@@ -14,15 +16,15 @@ type Book struct {
 	key  string
 }
 
-func NewBook() *Book {
+func NewBook(id int64) *Book {
 	return &Book{
 		pool: yiigo.Redis(),
-		key:  "yiigo.books",
+		key:  fmt.Sprintf("yiigo:books:%d", id),
 	}
 }
 
 // Get 获取缓存
-func (b *Book) Get(id int64) (*models.Book, bool) {
+func (b *Book) Get() (*models.Book, bool) {
 	conn, err := b.pool.Get()
 
 	if err != nil {
@@ -33,7 +35,7 @@ func (b *Book) Get(id int64) (*models.Book, bool) {
 
 	defer b.pool.Put(conn)
 
-	bs, err := redis.Bytes(conn.Do("HGET", b.key, id))
+	bs, err := redis.Bytes(conn.Do("GET", b.key))
 
 	if err != nil {
 		if err != redis.ErrNil {
@@ -55,7 +57,7 @@ func (b *Book) Get(id int64) (*models.Book, bool) {
 }
 
 // Set 设置缓存
-func (b *Book) Set(id int64, data *models.Book) bool {
+func (b *Book) Set(data *models.Book) bool {
 	conn, err := b.pool.Get()
 
 	if err != nil {
@@ -74,7 +76,7 @@ func (b *Book) Set(id int64, data *models.Book) bool {
 		return false
 	}
 
-	if _, err := conn.Do("HSET", b.key, id, bs); err != nil {
+	if _, err := conn.Do("SET", b.key, bs); err != nil {
 		yiigo.Logger().Error("set book cache error", zap.Error(err))
 
 		return false
@@ -84,7 +86,7 @@ func (b *Book) Set(id int64, data *models.Book) bool {
 }
 
 // Del 删除缓存
-func (b *Book) Del(id int64) bool {
+func (b *Book) Del() bool {
 	conn, err := b.pool.Get()
 
 	if err != nil {
@@ -95,7 +97,7 @@ func (b *Book) Del(id int64) bool {
 
 	defer b.pool.Put(conn)
 
-	if _, err := conn.Do("HDEL", b.key, id); err != nil {
+	if _, err := conn.Do("DEL", b.key); err != nil {
 		yiigo.Logger().Error("delete book cache error", zap.Error(err))
 
 		return false
