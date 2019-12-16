@@ -24,11 +24,11 @@ func (b *BookInfo) Do() (*reply.BookInfoReply, error) {
 		book, err = bookDao.FindByID(b.ID)
 
 		if err != nil {
-			return nil, helpers.Error(50000, err)
+			return nil, helpers.Error(helpers.ErrSystem, err)
 		}
 
 		if book == nil {
-			return nil, helpers.Error(10100)
+			return nil, helpers.Error(helpers.ErrBookNotFound)
 		}
 
 		bookCache.Set(book)

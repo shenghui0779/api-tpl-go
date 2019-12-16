@@ -11,7 +11,7 @@ var errCodes = map[int]string{
 }
 
 const (
-	ErrParams       = 1007
+	ErrParams       = 10000
 	ErrBookNotFound = 10100
 	ErrSystem       = 50000
 )
