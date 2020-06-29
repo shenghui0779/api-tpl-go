@@ -3,15 +3,8 @@ env = "dev" # dev | beta | prod
 debug = true
 port = 8000
 
-[apollo]
-appid = "test"
-cluster = "default"
-address = "127.0.0.1:8080"
-cache_dir = "./"
-
-    [apollo.namespace]
-
 [db]
+
     [db.default]
     driver = "mysql"
     dsn = "username:password@tcp(localhost:3306)/dbname?timeout=10s&charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=True&loc=Local"
@@ -19,9 +12,8 @@ cache_dir = "./"
     max_idle_conns = 10
     conn_max_lifetime = 60
 
-[mongo]
-
 [redis]
+
     [redis.default]
     address = "127.0.0.1:6379"
     password = ""
@@ -38,14 +30,8 @@ cache_dir = "./"
 [log]
 
     [log.default]
-    path = "app.log"
+    path = "logs/app.log"
     max_size = 500
     max_age = 0
     max_backups = 0
     compress = true
-
-[email]
-host = "smtp.exmail.qq.com"
-port = 25
-username = ""
-password = ""

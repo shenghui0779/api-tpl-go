@@ -6,7 +6,7 @@ import (
 	"runtime/debug"
 
 	"github.com/gin-gonic/gin"
-	"github.com/iiinsomnia/yiigo/v4"
+	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 )
 

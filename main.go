@@ -10,7 +10,7 @@ import (
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"github.com/iiinsomnia/yiigo/v4"
+	"github.com/shenghui0779/yiigo"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 

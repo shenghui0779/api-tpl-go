@@ -12,13 +12,13 @@ require (
 	github.com/facebookgo/stats v0.0.0-20151006221625-1b76add642e4 // indirect
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
 	github.com/gin-contrib/pprof v1.2.1
-	github.com/gin-gonic/gin v1.5.0
-	github.com/golang/snappy v0.0.1 // indirect
-	github.com/gomodule/redigo v2.0.1-0.20191111085604-09d84710e01a+incompatible
-	github.com/iiinsomnia/yiigo/v4 v4.0.3
-	github.com/jinzhu/gorm v1.9.12-0.20191206142228-79a77d771dee
-	github.com/jmoiron/sqlx v1.2.1-0.20191203222853-2ba0fc60eb4a
+	github.com/gin-gonic/gin v1.6.3
+	github.com/gomodule/redigo v1.8.1
+	github.com/jinzhu/gorm v1.9.13-0.20200305064831-7ea143b5484f
+	github.com/jmoiron/sqlx v1.2.1-0.20200324155115-ee514944af4b
 	github.com/pkg/errors v0.8.1
-	github.com/urfave/cli/v2 v2.0.0
-	go.uber.org/zap v1.11.0
+	github.com/shenghui0779/yiigo v1.0.0
+	github.com/urfave/cli/v2 v2.2.0
+	github.com/xdg/stringprep v1.0.0 // indirect
+	go.uber.org/zap v1.15.0
 )
