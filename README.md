@@ -8,6 +8,3 @@
 2. 创建数据库，导入 `demo.sql`
 3. 环境配置：`yiigo.toml.example` -> `yiigo.toml`，并修改相关配置
 4. 运行 `go run main.go`
-
-> 注意：
-> 本demo基于yiigo.v4
