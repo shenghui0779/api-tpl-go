@@ -35,7 +35,7 @@ func run() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		yiigo.Logger().Fatal("yiigo-demo run error", zap.Error(err))
+		yiigo.Logger().Fatal("app running error", zap.Error(err))
 	}
 }
 
@@ -68,6 +68,6 @@ func serving() {
 			ReadTimeout:  5 * time.Second,
 			WriteTimeout: 10 * time.Second,
 		}); err != nil {
-		yiigo.Logger().Fatal("yiigo-demo serving error", zap.Error(err))
+		yiigo.Logger().Fatal("serving error", zap.Error(err))
 	}
 }

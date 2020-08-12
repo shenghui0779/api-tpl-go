@@ -21,6 +21,8 @@ func Logger() gin.HandlerFunc {
 		body, err := drainBody(ctx)
 
 		if err != nil {
+			yiigo.Logger().Error("drain request body error", zap.Error(err))
+
 			ctx.JSON(http.StatusOK, gin.H{
 				"success": false,
 				"code":    50000,
@@ -64,14 +66,10 @@ func drainBody(ctx *gin.Context) (string, error) {
 	}
 
 	if _, err := buf.ReadFrom(ctx.Request.Body); err != nil {
-		yiigo.Logger().Error("drain request body error", zap.Error(err))
-
 		return "", err
 	}
 
 	if err := ctx.Request.Body.Close(); err != nil {
-		yiigo.Logger().Error("drain request body error", zap.Error(err))
-
 		return "", err
 	}
 

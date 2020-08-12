@@ -16,7 +16,7 @@ func Recovery() gin.HandlerFunc {
 		defer func() {
 			// panic 捕获
 			if err := recover(); err != nil {
-				yiigo.Logger().Error(fmt.Sprintf("pay-center panic: %v", err),
+				yiigo.Logger().Error(fmt.Sprintf("goroutine panic: %v", err),
 					zap.String("request_id", ctx.GetHeader("request_id")),
 					zap.String("stack", string(debug.Stack())),
 				)
