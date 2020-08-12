@@ -8,7 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
-	"github.com/iiinsomnia/demo/models"
+	"github.com/shenghui0779/demo/models"
 )
 
 type Book struct {

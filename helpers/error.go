@@ -3,6 +3,7 @@ package helpers
 import (
 	"fmt"
 
+	"github.com/gin-gonic/gin"
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 )
@@ -26,7 +27,7 @@ func (e *Err) Error() string {
 }
 
 // Error returns an error
-func Error(code int, err ...error) error {
+func Error(ctx *gin.Context, code int, err ...error) error {
 	msg := "unkown code"
 
 	if m, ok := errCodes[code]; ok {
@@ -34,7 +35,10 @@ func Error(code int, err ...error) error {
 	}
 
 	if len(err) > 0 {
-		yiigo.Logger().Error(fmt.Sprintf("Whoops! %d | %s", code, msg), zap.Error(err[0]))
+		yiigo.Logger().Error(fmt.Sprintf("[%v] %d | %s", ctx.Request.URL, code, msg),
+			zap.String("request_id", ctx.GetHeader("request_id")),
+			zap.Error(err[0]),
+		)
 	}
 
 	return &Err{

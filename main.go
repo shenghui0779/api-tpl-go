@@ -14,9 +14,9 @@ import (
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 
-	"github.com/iiinsomnia/demo/cmd"
-	"github.com/iiinsomnia/demo/middlewares"
-	"github.com/iiinsomnia/demo/routes"
+	"github.com/shenghui0779/demo/cmd"
+	"github.com/shenghui0779/demo/middlewares"
+	"github.com/shenghui0779/demo/routes"
 )
 
 func main() {

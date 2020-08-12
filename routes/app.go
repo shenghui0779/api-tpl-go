@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/iiinsomnia/demo/controllers"
-	"github.com/iiinsomnia/demo/middlewares"
+	"github.com/shenghui0779/demo/controllers"
+	"github.com/shenghui0779/demo/middlewares"
 )
 
 // RegisterApp register app routes

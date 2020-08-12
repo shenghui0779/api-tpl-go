@@ -1,4 +1,4 @@
-module github.com/iiinsomnia/demo
+module github.com/shenghui0779/demo
 
 go 1.13
 
@@ -13,11 +13,12 @@ require (
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
 	github.com/gin-contrib/pprof v1.2.1
 	github.com/gin-gonic/gin v1.6.3
-	github.com/gomodule/redigo v1.8.1
-	github.com/jinzhu/gorm v1.9.13-0.20200305064831-7ea143b5484f
-	github.com/jmoiron/sqlx v1.2.1-0.20200324155115-ee514944af4b
-	github.com/pkg/errors v0.8.1
-	github.com/shenghui0779/yiigo v1.0.0
+	github.com/gomodule/redigo v1.8.2
+	github.com/jinzhu/gorm v1.9.15
+	github.com/jmoiron/sqlx v1.2.1-0.20200615141059-0794cb1f47ee
+	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
+	github.com/pkg/errors v0.9.1
+	github.com/shenghui0779/yiigo v1.0.2
 	github.com/urfave/cli/v2 v2.2.0
 	github.com/xdg/stringprep v1.0.0 // indirect
 	go.uber.org/zap v1.15.0

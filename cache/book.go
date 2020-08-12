@@ -8,7 +8,7 @@ import (
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 
-	"github.com/iiinsomnia/demo/models"
+	"github.com/shenghui0779/demo/models"
 )
 
 type Book struct {

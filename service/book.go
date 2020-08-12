@@ -1,17 +1,18 @@
 package service
 
 import (
-	"github.com/iiinsomnia/demo/cache"
-	"github.com/iiinsomnia/demo/dao"
-	"github.com/iiinsomnia/demo/helpers"
-	"github.com/iiinsomnia/demo/reply"
+	"github.com/gin-gonic/gin"
+	"github.com/shenghui0779/demo/cache"
+	"github.com/shenghui0779/demo/dao"
+	"github.com/shenghui0779/demo/helpers"
+	"github.com/shenghui0779/demo/reply"
 )
 
 type BookInfo struct {
 	ID int64 `json:"id" valid:"required"`
 }
 
-func (b *BookInfo) Do() (*reply.BookInfoReply, error) {
+func (b *BookInfo) Do(ctx *gin.Context) (*reply.BookInfoReply, error) {
 	bookCache := cache.NewBook(b.ID)
 
 	book, ok := bookCache.Get()
@@ -24,11 +25,11 @@ func (b *BookInfo) Do() (*reply.BookInfoReply, error) {
 		book, err = bookDao.FindByID(b.ID)
 
 		if err != nil {
-			return nil, helpers.Error(helpers.ErrSystem, err)
+			return nil, helpers.Error(ctx, helpers.ErrSystem, err)
 		}
 
 		if book == nil {
-			return nil, helpers.Error(helpers.ErrBookNotFound)
+			return nil, helpers.Error(ctx, helpers.ErrBookNotFound)
 		}
 
 		bookCache.Set(book)

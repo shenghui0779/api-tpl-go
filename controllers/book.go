@@ -3,26 +3,26 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/iiinsomnia/demo/helpers"
-	"github.com/iiinsomnia/demo/service"
+	"github.com/shenghui0779/demo/helpers"
+	"github.com/shenghui0779/demo/service"
 )
 
-func GetBookInfo(c *gin.Context) {
+func GetBookInfo(ctx *gin.Context) {
 	s := new(service.BookInfo)
 
-	if err := c.ShouldBindJSON(s); err != nil {
-		Err(c, helpers.Error(helpers.ErrParams), err.Error())
+	if err := ctx.ShouldBindJSON(s); err != nil {
+		Err(ctx, helpers.Error(ctx, helpers.ErrParams), err.Error())
 
 		return
 	}
 
-	resp, err := s.Do()
+	resp, err := s.Do(ctx)
 
 	if err != nil {
-		Err(c, err)
+		Err(ctx, err)
 
 		return
 	}
 
-	OK(c, resp)
+	OK(ctx, resp)
 }
