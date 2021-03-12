@@ -1,28 +1,32 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
+	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/shenghui0779/demo/helpers"
 	"github.com/shenghui0779/demo/service"
 )
 
-func GetBookInfo(ctx *gin.Context) {
-	s := new(service.BookInfo)
-
-	if err := ctx.ShouldBindJSON(s); err != nil {
-		Err(ctx, helpers.Error(ctx, helpers.ErrParams), err.Error())
-
-		return
-	}
-
-	resp, err := s.Do(ctx)
+func BookInfo(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 
 	if err != nil {
-		Err(ctx, err)
+		Err(w, r, helpers.Err(helpers.ErrParams, err.Error()))
 
 		return
 	}
 
-	OK(ctx, resp)
+	s := service.NewBookService()
+
+	data, err := s.Info(r.Context(), id)
+
+	if err != nil {
+		Err(w, r, err)
+
+		return
+	}
+
+	OK(w, data)
 }

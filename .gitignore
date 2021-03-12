@@ -22,6 +22,7 @@ _testmain.go
 *.exe
 *.test
 *.prof
-env.toml
-logs/*
+
 .idea/
+logs/
+yiigo.toml

@@ -1,6 +1,6 @@
-package reply
+package response
 
-type BookInfoReply struct {
+type BookInfo struct {
 	Title       string  `json:"title"`
 	SubTitle    string  `json:"subtitle"`
 	Author      string  `json:"author"`

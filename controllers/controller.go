@@ -1,18 +1,41 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"reflect"
 
-	"github.com/gin-gonic/gin"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/shenghui0779/yiigo"
+	"go.uber.org/zap"
 
 	"github.com/shenghui0779/demo/helpers"
 )
 
+var validator = yiigo.NewGinValidator()
+
+func BindJSON(r *http.Request, obj interface{}) error {
+	if err := json.NewDecoder(r.Body).Decode(obj); err != nil {
+		return helpers.Err(helpers.ErrParams, err.Error())
+	}
+
+	if reflect.Indirect(reflect.ValueOf(obj)).Kind() != reflect.Struct {
+		return nil
+	}
+
+	if err := validator.ValidateStruct(obj); err != nil {
+		return helpers.Err(helpers.ErrParams, err.Error())
+	}
+
+	return nil
+}
+
 // OK returns success of an API.
-func OK(ctx *gin.Context, data ...interface{}) {
-	obj := gin.H{
+func OK(w http.ResponseWriter, data ...interface{}) {
+	obj := yiigo.X{
 		"err":  false,
-		"code": 1000,
+		"code": 0,
 		"msg":  "success",
 	}
 
@@ -20,29 +43,28 @@ func OK(ctx *gin.Context, data ...interface{}) {
 		obj["data"] = data[0]
 	}
 
-	ctx.Set("response", obj)
-
-	ctx.JSON(http.StatusOK, obj)
+	helpers.JSON(w, obj)
 }
 
 // Err returns error of an API.
-func Err(ctx *gin.Context, err error, msg ...string) {
-	obj := gin.H{
+func Err(w http.ResponseWriter, r *http.Request, err error) {
+	code := helpers.ErrCode(err)
+	msg := helpers.ErrMsg(err)
+
+	if code == helpers.ErrSystem {
+		yiigo.Logger().Error(fmt.Sprintf("server error: %d | %s", code, msg),
+			zap.String("url", r.URL.String()),
+			zap.String("method", r.Method),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+			zap.Error(err),
+		)
+	}
+
+	obj := yiigo.X{
 		"err":  true,
-		"code": 50000,
-		"msg":  "服务器错误，请稍后重试",
+		"code": code,
+		"msg":  msg,
 	}
 
-	if e, ok := err.(helpers.StatusErr); ok {
-		obj["code"] = e.Code()
-		obj["msg"] = e.Error()
-	}
-
-	if len(msg) > 0 {
-		obj["msg"] = msg[0]
-	}
-
-	ctx.Set("response", obj)
-
-	ctx.JSON(http.StatusOK, obj)
+	helpers.JSON(w, obj)
 }

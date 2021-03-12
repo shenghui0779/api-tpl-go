@@ -9,6 +9,6 @@ import (
 // Recover recover panic
 func Recover() {
 	if err := recover(); err != nil {
-		yiigo.Logger().Error(fmt.Sprintf("pay-center panic: %v", err))
+		yiigo.Logger().Error(fmt.Sprintf("goroutine panic: %v", err))
 	}
 }

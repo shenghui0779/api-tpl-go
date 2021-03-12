@@ -3,32 +3,42 @@ package dao
 import (
 	"database/sql"
 
-	"github.com/shenghui0779/yiigo"
-	"github.com/jinzhu/gorm"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-
 	"github.com/shenghui0779/demo/models"
+	"github.com/shenghui0779/yiigo"
 )
 
-type Book struct {
-	db  *sqlx.DB
-	orm *gorm.DB
+type BookDao interface {
+	FindByID(id int64) (*models.Book, error)
 }
 
-func NewBook() *Book {
-	return &Book{
-		db:  yiigo.DB(),
-		orm: yiigo.Orm(),
+type book struct {
+	db      *sqlx.DB
+	table   string
+	builder yiigo.SQLBuilder
+}
+
+func NewBookDao() BookDao {
+	return &book{
+		db:      yiigo.DB(),
+		table:   "book",
+		builder: yiigo.NewSQLBuilder(yiigo.MySQL),
 	}
 }
 
-func (b *Book) FindByID(id int64) (*models.Book, error) {
+func (b *book) FindByID(id int64) (*models.Book, error) {
+	query, binds := b.builder.Wrap(
+		yiigo.Table(b.table),
+		yiigo.Where("id = ?", id),
+		yiigo.Limit(1),
+	).ToQuery()
+
 	record := new(models.Book)
 
-	if err := b.db.Get(record, "SELECT * FROM `book` WHERE `id` = ? LIMIT 1", id); err != nil {
+	if err := b.db.Get(record, query, binds...); err != nil {
 		if err != sql.ErrNoRows {
-			return nil, errors.Wrap(err, "find book by id error")
+			return nil, errors.Wrap(err, "Dao.Book.FindByID error")
 		}
 
 		return nil, nil

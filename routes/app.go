@@ -3,26 +3,34 @@ package routes
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/shenghui0779/demo/controllers"
 	"github.com/shenghui0779/demo/middlewares"
+
+	"github.com/go-chi/chi/v5"
 )
 
 // RegisterApp register app routes
-func RegisterApp(r *gin.Engine) {
-	r.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "☺ welcome to golang app")
+func RegisterApp(r chi.Router) {
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("☺ welcome to golang app"))
 	})
 
-	// 探侦地址，用于健康检查
-	r.HEAD("/listen", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"status": "OK"})
+	// 浏览器访问会主动发送 /favicon.ico 请求
+	// r.Get("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+	// 	return
+	// })
+
+	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("pong"))
 	})
 
-	root := r.Group("/")
-	root.Use(middlewares.Logger())
-	{
-		root.POST("/book/info", controllers.GetBookInfo)
-	}
+	// r.Method(http.MethodGet, "/metrics", promhttp.Handler())
+
+	r.Route("/", func(r chi.Router) {
+		r.Use(middlewares.Logger)
+
+		r.Route("/books", func(r chi.Router) {
+			r.Get("/info/{id}", controllers.BookInfo)
+		})
+	})
 }

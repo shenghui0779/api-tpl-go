@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -11,21 +12,27 @@ import (
 	"github.com/shenghui0779/demo/models"
 )
 
-type Book struct {
+type BookCache interface {
+	Get(ctx context.Context) (*models.Book, bool)
+	Set(ctx context.Context, data *models.Book) bool
+	Del(ctx context.Context) bool
+}
+
+type book struct {
 	pool *yiigo.RedisPoolResource
 	key  string
 }
 
-func NewBook(id int64) *Book {
-	return &Book{
+func NewBookCache(id int64) BookCache {
+	return &book{
 		pool: yiigo.Redis(),
 		key:  fmt.Sprintf("yiigo:books:%d", id),
 	}
 }
 
 // Get 获取缓存
-func (b *Book) Get() (*models.Book, bool) {
-	conn, err := b.pool.Get()
+func (b *book) Get(ctx context.Context) (*models.Book, bool) {
+	conn, err := b.pool.Get(ctx)
 
 	if err != nil {
 		yiigo.Logger().Error("get book cache error", zap.Error(err))
@@ -57,8 +64,8 @@ func (b *Book) Get() (*models.Book, bool) {
 }
 
 // Set 设置缓存
-func (b *Book) Set(data *models.Book) bool {
-	conn, err := b.pool.Get()
+func (b *book) Set(ctx context.Context, data *models.Book) bool {
+	conn, err := b.pool.Get(ctx)
 
 	if err != nil {
 		yiigo.Logger().Error("set book cache error", zap.Error(err))
@@ -86,8 +93,8 @@ func (b *Book) Set(data *models.Book) bool {
 }
 
 // Del 删除缓存
-func (b *Book) Del() bool {
-	conn, err := b.pool.Get()
+func (b *book) Del(ctx context.Context) bool {
+	conn, err := b.pool.Get(ctx)
 
 	if err != nil {
 		yiigo.Logger().Error("delete book cache error", zap.Error(err))

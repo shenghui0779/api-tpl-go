@@ -1,48 +1,56 @@
 package helpers
 
-import (
-	"fmt"
-
-	"github.com/gin-gonic/gin"
-	"github.com/shenghui0779/yiigo"
-	"go.uber.org/zap"
-)
-
-type StatusErr interface {
-	Code() int
-	Error() string
+type Status interface {
+	error
+	Code() Code
 }
 
-type Err struct {
-	code int
+type Error struct {
+	code Code
 	msg  string
 }
 
-func (e *Err) Code() int {
+func (e *Error) Code() Code {
 	return e.code
 }
 
-func (e *Err) Error() string {
+func (e *Error) Error() string {
 	return e.msg
 }
 
-// Error returns an error
-func Error(ctx *gin.Context, code int, err ...error) error {
-	msg := "unkown code"
+// Err returns an error
+func Err(code Code, msg ...string) error {
+	err := &Error{code: code}
 
-	if m, ok := errCodes[code]; ok {
-		msg = m
+	if len(msg) != 0 {
+		err.msg = msg[0]
+
+		return err
 	}
 
-	if len(err) > 0 {
-		yiigo.Logger().Error(fmt.Sprintf("[%v] %d | %s", ctx.Request.URL, code, msg),
-			zap.String("request_id", ctx.GetHeader("request_id")),
-			zap.Error(err[0]),
-		)
+	err.msg = "Whoops! Something Wrong!"
+
+	if m, ok := codeM[code]; ok {
+		err.msg = m
 	}
 
-	return &Err{
-		code: code,
-		msg:  msg,
+	return err
+}
+
+// ErrCode returns error code
+func ErrCode(err error) Code {
+	if v, ok := err.(Status); ok {
+		return v.Code()
 	}
+
+	return ErrSystem
+}
+
+// ErrMsg returns error msg
+func ErrMsg(err error) string {
+	if v, ok := err.(Status); ok {
+		return v.Error()
+	}
+
+	return codeM[ErrSystem]
 }

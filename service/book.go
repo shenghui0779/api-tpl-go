@@ -1,50 +1,58 @@
 package service
 
 import (
-	"github.com/gin-gonic/gin"
+	"context"
+
+	"github.com/pkg/errors"
 	"github.com/shenghui0779/demo/cache"
 	"github.com/shenghui0779/demo/dao"
 	"github.com/shenghui0779/demo/helpers"
-	"github.com/shenghui0779/demo/reply"
+	"github.com/shenghui0779/demo/response"
 )
 
-type BookInfo struct {
-	ID int64 `json:"id" valid:"required"`
+type BookService interface {
+	Info(ctx context.Context, id int64) (*response.BookInfo, error)
 }
 
-func (b *BookInfo) Do(ctx *gin.Context) (*reply.BookInfoReply, error) {
-	bookCache := cache.NewBook(b.ID)
+func NewBookService() BookService {
+	return new(book)
+}
 
-	book, ok := bookCache.Get()
+type book struct{}
+
+func (b *book) Info(ctx context.Context, id int64) (*response.BookInfo, error) {
+	bookCache := cache.NewBookCache(id)
+
+	record, ok := bookCache.Get(ctx)
 
 	if !ok {
 		var err error
 
-		bookDao := dao.NewBook()
+		bookDao := dao.NewBookDao()
 
-		book, err = bookDao.FindByID(b.ID)
+		record, err = bookDao.FindByID(id)
 
 		if err != nil {
-			return nil, helpers.Error(ctx, helpers.ErrSystem, err)
+			return nil, errors.Wrap(err, "书籍查询失败")
 		}
 
-		if book == nil {
-			return nil, helpers.Error(ctx, helpers.ErrBookNotFound)
+		if record == nil {
+			return nil, helpers.Err(helpers.ErrInvalidBook)
 		}
 
-		bookCache.Set(book)
+		bookCache.Set(ctx, record)
 	}
 
-	resp := &reply.BookInfoReply{
-		Title:       book.Title,
-		SubTitle:    book.SubTitle,
-		Author:      book.Author,
-		Version:     book.Version,
-		Price:       book.Price,
-		Publisher:   book.Publisher,
-		PublishDate: book.PublishDate,
-		CreatedAt:   book.CreatedAt,
-		UpdatedAt:   book.UpdatedAt,
+	resp := &response.BookInfo{
+		Title:       record.Title,
+		SubTitle:    record.SubTitle,
+		Author:      record.Author,
+		Version:     record.Version,
+		Price:       record.Price,
+		Publisher:   record.Publisher,
+		PublishDate: record.PublishDate,
+		CreatedAt:   record.CreatedAt,
+		UpdatedAt:   record.UpdatedAt,
 	}
 
 	return resp, nil
