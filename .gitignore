@@ -25,4 +25,5 @@ _testmain.go
 
 .idea/
 logs/
+.DS_Store
 yiigo.toml
