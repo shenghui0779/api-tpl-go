@@ -7,12 +7,13 @@ import (
 	"net/url"
 	"strings"
 	"time"
-	"tplgo/internal/result"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/pkg/errors"
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
+
+	"tplgo/internal/result"
 )
 
 type Client interface {

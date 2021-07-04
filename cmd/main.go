@@ -5,15 +5,16 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"tplgo/internal/middlewares"
-	"tplgo/pkg/console"
-	"tplgo/pkg/routes"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/shenghui0779/yiigo"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
+
+	"tplgo/internal/middlewares"
+	"tplgo/pkg/console"
+	"tplgo/pkg/routes"
 )
 
 var envDir string
@@ -61,7 +62,7 @@ func serving() {
 	routes.Register(r)
 
 	srv := &http.Server{
-		Addr:         ":8000",
+		Addr:         ":10086",
 		Handler:      r,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,

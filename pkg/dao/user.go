@@ -2,6 +2,7 @@ package dao
 
 import (
 	"database/sql"
+
 	"tplgo/pkg/models"
 
 	"github.com/jmoiron/sqlx"
@@ -17,7 +18,7 @@ func NewUserDao() UserDao {
 	return &user{
 		db:      yiigo.DB(),
 		table:   "t_user",
-		builder: yiigo.NewSQLBuilder(yiigo.MySQL),
+		builder: yiigo.NewMySQLBuilder(),
 	}
 }
 

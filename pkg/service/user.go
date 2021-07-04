@@ -2,11 +2,12 @@ package service
 
 import (
 	"context"
+
+	"github.com/pkg/errors"
+
 	"tplgo/internal/result"
 	"tplgo/pkg/dao"
 	"tplgo/pkg/response"
-
-	"github.com/pkg/errors"
 )
 
 type UserService interface {

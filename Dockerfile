@@ -1,10 +1,14 @@
-FROM golang:1.16.4 AS builder
+FROM golang:1.16.5 AS builder
 
 WORKDIR /tplgo
 
 COPY . .
 
-RUN CGO_ENABLED=0 go build -mod=vendor -o tplgo ./cmd
+RUN go env -w GOPROXY="https://goproxy.cn"
+
+RUN go mod tidy
+
+RUN CGO_ENABLED=0 go build -o tplgo ./cmd
 
 FROM scratch
 
@@ -15,3 +19,5 @@ COPY --from=builder /tplgo/tplgo .
 EXPOSE 10086
 
 ENTRYPOINT ["./tplgo"]
+
+CMD ["--env-dir", "/data/config"]

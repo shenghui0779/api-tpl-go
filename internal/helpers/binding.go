@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"tplgo/internal/result"
+	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/shenghui0779/yiigo"
+
+	"tplgo/internal/result"
 )
 
 var validator = yiigo.NewValidator()
@@ -23,4 +26,14 @@ func BindJSON(r *http.Request, obj interface{}) result.Result {
 	}
 
 	return nil
+}
+
+func URLParamInt(r *http.Request, key string) (int64, result.Result) {
+	v, err := strconv.ParseInt(chi.URLParam(r, key), 10, 64)
+
+	if err != nil {
+		return 0, result.ErrParams.Wrap(result.WithMsg(err.Error()))
+	}
+
+	return v, nil
 }

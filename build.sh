@@ -1,2 +1,5 @@
 #!/bin/bash
-CGO_ENABLED=0 go build -mod=vendor -o tplgo ./cmd
+docker rm -f tplgo
+docker rmi -f tplgo
+docker build -t tplgo .
+docker run -d --name=tplgo --privileged -p 10086:10086 -v /data/config/tplgo:/data/config -v /data/logs/tplgo:/data/logs tplgo
