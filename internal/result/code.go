@@ -15,6 +15,7 @@ var ErrUserNotFound Result = New(10100, "用户不存在")
 
 // 系统错误
 var (
-	ErrSystem Result = New(50000, "服务器错误，请稍后重试")
-	ErrIao    Result = New(50001, "内部服务请求失败，请稍后重试")
+	ErrSystem  Result = New(50000, "服务器错误，请稍后重试")
+	ErrIao     Result = New(50001, "内部服务请求失败，请稍后重试")
+	ErrTimeout Result = New(50002, "系统繁忙，请稍后重试")
 )

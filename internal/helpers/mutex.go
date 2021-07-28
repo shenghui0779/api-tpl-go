@@ -3,48 +3,57 @@ package helpers
 import (
 	"context"
 	"time"
-	"tplgo/internal/result"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gomodule/redigo/redis"
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
+
+	"tplgo/internal/result"
 )
 
-// Mutex 分布式互斥锁
-// interval：每次获取锁的等待时间（毫秒）
-// timeout：锁获取超时时间（秒）
-func Mutex(ctx context.Context, key string, process func() result.Result, interval, timeout time.Duration) result.Result {
+// Mutex is a reader/writer mutual exclusion lock.
+type Mutex interface {
+	// Acquire 获取锁
+	// interval 每次获取锁的间隔时间（毫秒）
+	Acquire(ctx context.Context, process func(ctx context.Context) result.Result, interval time.Duration) result.Result
+}
+
+type distributed struct {
+	key    string
+	expire int64
+}
+
+func (d *distributed) Acquire(ctx context.Context, process func(ctx context.Context) result.Result, interval time.Duration) result.Result {
 	conn, err := yiigo.Redis().Get(ctx)
 
-	// 获取锁出错，直接执行任务
+	// 获取锁出错
 	if err != nil {
-		yiigo.Logger().Error("acquire mutex error", zap.Error(err), zap.String("request_id", middleware.GetReqID(ctx)))
+		yiigo.Logger().Error("[mutex] acquire lock error", zap.Error(err), zap.String("request_id", middleware.GetReqID(ctx)))
 
-		return process()
+		return result.ErrSystem
 	}
 
 	defer yiigo.Redis().Put(conn)
 
-	now := time.Now().Local()
-	expire := int64(timeout.Seconds())
-
 	for {
-		// 锁获取超时，执行任务
-		if time.Since(now).Seconds() >= timeout.Seconds() {
-			yiigo.Logger().Warn("acquire mutex timeout", zap.String("timeout", timeout.String()), zap.String("request_id", middleware.GetReqID(ctx)))
+		select {
+		case <-ctx.Done():
+			// 锁获取超时
+			yiigo.Logger().Warn("[mutex] acquire lock error", zap.Error(ctx.Err()), zap.String("request_id", middleware.GetReqID(ctx)))
 
-			return process()
+			return result.ErrTimeout
+		default:
 		}
 
 		// 获取锁
-		reply, err := redis.String(conn.Do("SET", key, time.Now().Nanosecond(), "EX", expire, "NX"))
+		reply, err := redis.String(conn.Do("SET", d.key, time.Now().Nanosecond(), "EX", d.expire, "NX"))
 
-		// 获取锁出错，直接执行任务
+		// 获取锁出错
 		if err != nil && err != redis.ErrNil {
-			yiigo.Logger().Error("acquire mutex error", zap.Error(err), zap.String("request_id", middleware.GetReqID(ctx)))
+			yiigo.Logger().Error("[mutex] acquire lock error", zap.Error(err), zap.String("request_id", middleware.GetReqID(ctx)))
 
-			return process()
+			return result.ErrSystem
 		}
 
 		// 获取锁成功，结束等待，执行任务
@@ -57,7 +66,22 @@ func Mutex(ctx context.Context, key string, process func() result.Result, interv
 	}
 
 	// 任务执行结束，释放锁
-	defer conn.Do("DEL", key)
+	defer conn.Do("DEL", d.key)
+	defer Recover(ctx)
 
-	return process()
+	return process(ctx)
+}
+
+// DistributedMutex returns is a distributed mutual exclusion lock.
+func DistributedMutex(key string, expire time.Duration) Mutex {
+	mutex := &distributed{
+		key:    key,
+		expire: 10,
+	}
+
+	if v := int64(expire.Seconds()); v != 0 {
+		mutex.expire = v
+	}
+
+	return mutex
 }
