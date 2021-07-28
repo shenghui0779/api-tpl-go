@@ -2,10 +2,11 @@ package user
 
 import (
 	"context"
-	"tplgo/internal/result"
-	"tplgo/pkg/iao/base"
 
 	"github.com/shenghui0779/yiigo"
+
+	"tplgo/internal/result"
+	"tplgo/pkg/iao/base"
 )
 
 type UserIao interface {

@@ -2,8 +2,9 @@ package routes
 
 import (
 	"net/http"
+
 	"tplgo/internal/middlewares"
-	"tplgo/pkg/routes/handlers"
+	"tplgo/pkg/routes/v1"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -26,11 +27,11 @@ func Register(r chi.Router) {
 	// prometheus metrics
 	// r.Method(http.MethodGet, "/metrics", promhttp.Handler())
 
-	r.Route("/", func(r chi.Router) {
+	r.Route("/v1", func(r chi.Router) {
 		r.Use(middlewares.Logger)
 
 		r.Route("/users", func(r chi.Router) {
-			r.Get("/info/{id}", handlers.UserInfo)
+			r.Get("/info/{id}", v1.UserInfo)
 		})
 	})
 }
