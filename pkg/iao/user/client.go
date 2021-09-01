@@ -5,8 +5,8 @@ import (
 
 	"github.com/shenghui0779/yiigo"
 
-	"tplgo/internal/result"
 	"tplgo/pkg/iao/base"
+	"tplgo/pkg/result"
 )
 
 type UserIao interface {

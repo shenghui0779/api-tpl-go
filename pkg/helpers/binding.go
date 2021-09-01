@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/shenghui0779/yiigo"
 
-	"tplgo/internal/result"
+	"tplgo/pkg/result"
 )
 
 var validator = yiigo.NewValidator()

@@ -2,16 +2,18 @@ package middlewares
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
-	"tplgo/internal/result"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
+
+	"tplgo/pkg/result"
 )
 
 var (
@@ -59,13 +61,12 @@ func Logger(next http.Handler) http.Handler {
 
 		next.ServeHTTP(ww, r)
 
-		yiigo.Logger("request").Info(r.URL.String(),
+		yiigo.Logger("request").Info(fmt.Sprintf("[%s] %s", r.Method, r.URL.String()),
 			zap.String("request_id", middleware.GetReqID(r.Context())),
-			zap.String("method", r.Method),
 			zap.String("body", replacer.Replace(string(body))),
 			zap.String("response", buf.String()),
-			zap.String("duration", time.Since(now).String()),
 			zap.Int("status", ww.Status()),
+			zap.String("duration", time.Since(now).String()),
 		)
 	})
 }

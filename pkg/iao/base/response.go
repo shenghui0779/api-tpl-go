@@ -1,6 +1,8 @@
 package base
 
-import "tplgo/internal/result"
+import (
+	"tplgo/pkg/result"
+)
 
 type Response interface {
 	ErrResult() result.Result

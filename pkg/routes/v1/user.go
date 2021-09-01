@@ -3,7 +3,7 @@ package v1
 import (
 	"net/http"
 
-	"tplgo/internal/helpers"
+	"tplgo/pkg/helpers"
 	"tplgo/pkg/service"
 )
 

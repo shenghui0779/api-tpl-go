@@ -3,11 +3,12 @@ package service
 import (
 	"context"
 	"testing"
-	"tplgo/internal/result"
+
 	"tplgo/pkg/consts"
 	"tplgo/pkg/mock"
 	"tplgo/pkg/models"
 	"tplgo/pkg/response"
+	"tplgo/pkg/result"
 
 	"github.com/go-playground/assert/v2"
 	"github.com/golang/mock/gomock"

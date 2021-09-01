@@ -7,8 +7,9 @@ package mock
 import (
 	context "context"
 	reflect "reflect"
-	result "tplgo/internal/result"
+
 	user "tplgo/pkg/iao/user"
+	"tplgo/pkg/result"
 
 	gomock "github.com/golang/mock/gomock"
 )

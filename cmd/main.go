@@ -12,8 +12,8 @@ import (
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 
-	"tplgo/internal/middlewares"
 	"tplgo/pkg/console"
+	"tplgo/pkg/middlewares"
 	"tplgo/pkg/routes"
 )
 

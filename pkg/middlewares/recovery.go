@@ -3,11 +3,12 @@ package middlewares
 import (
 	"net/http"
 	"runtime/debug"
-	"tplgo/internal/result"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
+
+	"tplgo/pkg/result"
 )
 
 // Recovery panic recover middleware

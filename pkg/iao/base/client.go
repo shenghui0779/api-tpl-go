@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -13,7 +16,7 @@ import (
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 
-	"tplgo/internal/result"
+	"tplgo/pkg/result"
 )
 
 type Client interface {
@@ -38,7 +41,27 @@ func (c *client) Get(ctx context.Context, path string, query url.Values, resp Re
 		yiigo.Logger().Info(fmt.Sprintf("Iao.Get: %s", reqURL), logFields...)
 	}()
 
-	b, err := yiigo.HTTPGet(ctx, reqURL, yiigo.WithHTTPTimeout(c.timeout))
+	r, err := yiigo.HTTPGet(ctx, reqURL)
+
+	if err != nil {
+		logFields = append(logFields, zap.Error(err))
+
+		return result.ErrIao.Wrap(result.WithErr(errors.Wrap(err, "Iao.Get error")))
+	}
+
+	defer r.Body.Close()
+
+	if r.StatusCode >= http.StatusBadRequest {
+		io.Copy(ioutil.Discard, r.Body)
+
+		err = fmt.Errorf("unexpected http status %d", r.StatusCode)
+
+		logFields = append(logFields, zap.Error(err))
+
+		return result.ErrIao.Wrap(result.WithErr(errors.Wrap(err, "Iao.Get error")))
+	}
+
+	b, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
 		logFields = append(logFields, zap.Error(err))
@@ -79,7 +102,27 @@ func (c *client) Post(ctx context.Context, path string, body PostBody, resp Resp
 
 	logFields = append(logFields, zap.ByteString("body", reqBody))
 
-	b, err := yiigo.HTTPPost(ctx, reqURL, reqBody, yiigo.WithHTTPHeader("Content-Type", "application/json; charset=utf-8"), yiigo.WithHTTPTimeout(c.timeout))
+	r, err := yiigo.HTTPPost(ctx, reqURL, reqBody, yiigo.WithHTTPHeader("Content-Type", "application/json; charset=utf-8"))
+
+	if err != nil {
+		logFields = append(logFields, zap.Error(err))
+
+		return result.ErrIao.Wrap(result.WithErr(errors.Wrap(err, "Iao.Post error")))
+	}
+
+	defer r.Body.Close()
+
+	if r.StatusCode >= http.StatusBadRequest {
+		io.Copy(ioutil.Discard, r.Body)
+
+		err = fmt.Errorf("unexpected http status %d", r.StatusCode)
+
+		logFields = append(logFields, zap.Error(err))
+
+		return result.ErrIao.Wrap(result.WithErr(errors.Wrap(err, "Iao.Post error")))
+	}
+
+	b, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
 		logFields = append(logFields, zap.Error(err))

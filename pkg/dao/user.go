@@ -3,11 +3,11 @@ package dao
 import (
 	"database/sql"
 
-	"tplgo/pkg/models"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/shenghui0779/yiigo"
+
+	"tplgo/pkg/models"
 )
 
 type UserDao interface {

@@ -76,12 +76,14 @@ func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
 }
 
 func (resp *response) clone() *response {
-	return &response{
-		code: resp.code,
-		msg:  resp.msg,
-		err:  resp.err,
-		data: resp.data,
-	}
+	newResp := new(response)
+
+	newResp.code = resp.code
+	newResp.msg = resp.msg
+	newResp.err = resp.err
+	newResp.data = resp.data
+
+	return newResp
 }
 
 // New returns a new Result

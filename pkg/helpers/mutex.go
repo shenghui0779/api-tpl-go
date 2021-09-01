@@ -9,22 +9,30 @@ import (
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 
-	"tplgo/internal/result"
+	"tplgo/pkg/result"
 )
+
+type MutexProcessFunc func(ctx context.Context) result.Result
 
 // Mutex is a reader/writer mutual exclusion lock.
 type Mutex interface {
 	// Acquire 获取锁
 	// interval 每次获取锁的间隔时间（毫秒）
-	Acquire(ctx context.Context, process func(ctx context.Context) result.Result, interval time.Duration) result.Result
+	Acquire(ctx context.Context, process MutexProcessFunc, timeout time.Duration) result.Result
 }
 
 type distributed struct {
-	key    string
-	expire int64
+	key     string
+	timeout time.Duration
 }
 
-func (d *distributed) Acquire(ctx context.Context, process func(ctx context.Context) result.Result, interval time.Duration) result.Result {
+func (d *distributed) Acquire(ctx context.Context, process MutexProcessFunc, interval time.Duration) result.Result {
+	if deadline, ok := ctx.Deadline(); ok {
+		if v := deadline.Sub(time.Now()); v < d.timeout {
+			d.timeout = v
+		}
+	}
+
 	conn, err := yiigo.Redis().Get(ctx)
 
 	// 获取锁出错
@@ -36,18 +44,21 @@ func (d *distributed) Acquire(ctx context.Context, process func(ctx context.Cont
 
 	defer yiigo.Redis().Put(conn)
 
+	// 缓存超时时间
+	ex := int64(d.timeout.Seconds())
+
 	for {
 		select {
 		case <-ctx.Done():
-			// 锁获取超时
-			yiigo.Logger().Warn("[mutex] acquire lock error", zap.Error(ctx.Err()), zap.String("request_id", middleware.GetReqID(ctx)))
+			// 锁获取超时或被取消
+			yiigo.Logger().Warn("[mutex] acquire lock error", zap.Error(ctx.Err()), zap.String("request_id", middleware.GetReqID(ctx)), zap.Duration("timeout", d.timeout))
 
 			return result.ErrTimeout
 		default:
 		}
 
 		// 获取锁
-		reply, err := redis.String(conn.Do("SET", d.key, time.Now().Nanosecond(), "EX", d.expire, "NX"))
+		reply, err := redis.String(conn.Do("SET", d.key, time.Now().Nanosecond(), "EX", ex, "NX"))
 
 		// 获取锁出错
 		if err != nil && err != redis.ErrNil {
@@ -73,14 +84,14 @@ func (d *distributed) Acquire(ctx context.Context, process func(ctx context.Cont
 }
 
 // DistributedMutex returns is a distributed mutual exclusion lock.
-func DistributedMutex(key string, expire time.Duration) Mutex {
+func DistributedMutex(key string, timeout time.Duration) Mutex {
 	mutex := &distributed{
-		key:    key,
-		expire: 10,
+		key:      key,
+		timeout:  10 * time.Second,
 	}
 
-	if v := int64(expire.Seconds()); v != 0 {
-		mutex.expire = v
+	if timeout > 0 {
+		mutex.timeout = timeout
 	}
 
 	return mutex

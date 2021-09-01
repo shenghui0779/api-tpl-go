@@ -5,9 +5,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"tplgo/internal/result"
 	"tplgo/pkg/dao"
 	"tplgo/pkg/response"
+	"tplgo/pkg/result"
 )
 
 type UserService interface {
