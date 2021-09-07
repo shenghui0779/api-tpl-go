@@ -17,7 +17,7 @@ import (
 	"tplgo/pkg/routes"
 )
 
-var envDir string
+var envFile string
 
 func main() {
 	app := &cli.App{
@@ -26,17 +26,18 @@ func main() {
 		Commands: console.Commands,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "env-dir",
+				Name:        "envfile",
 				Aliases:     []string{"E"},
-				Value:       "",
-				Usage:       "配置文件所在目录，默认当前目录",
-				Destination: &envDir,
+				Value:       "yiigo.toml",
+				Usage:       "设置配置文件，默认：yiigo.toml",
+				Destination: &envFile,
 			},
 		},
 		Before: func(c *cli.Context) error {
+			yiigo.LoadEnvFromFile(envFile)
 			yiigo.Init(
-				yiigo.WithEnvDir(envDir),
-				yiigo.WithEnvWatcher(),
+				yiigo.WithDB(yiigo.Default, yiigo.MySQL, yiigo.Env("db.dsn").String()),
+				yiigo.WithLogger(yiigo.Default, "logs/app.log"),
 			)
 
 			return nil

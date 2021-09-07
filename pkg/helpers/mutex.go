@@ -28,7 +28,7 @@ type distributed struct {
 
 func (d *distributed) Acquire(ctx context.Context, process MutexProcessFunc, interval time.Duration) result.Result {
 	if deadline, ok := ctx.Deadline(); ok {
-		if v := deadline.Sub(time.Now()); v < d.timeout {
+		if v := time.Until(deadline); v < d.timeout {
 			d.timeout = v
 		}
 	}
