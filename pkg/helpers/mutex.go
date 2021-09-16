@@ -16,23 +16,23 @@ type MutexProcessFunc func(ctx context.Context) result.Result
 // Mutex is a reader/writer mutual exclusion lock.
 type Mutex interface {
 	// Acquire 获取锁
-	// interval 每次获取锁的间隔时间
-	// expire 锁超时时间
-	Acquire(ctx context.Context, process MutexProcessFunc, interval, expire time.Duration) result.Result
+	// interval 每次获取锁的间隔时间（每隔interval时间尝试获取一次锁）
+	// timeout 锁获取超时时间
+	Acquire(ctx context.Context, process MutexProcessFunc, interval, timeout time.Duration) result.Result
 }
 
 type distributed struct {
-	key     string
-	timeout time.Duration
+	key    string
+	expire int64
 }
 
-func (d *distributed) Acquire(ctx context.Context, process MutexProcessFunc, interval, expire time.Duration) result.Result {
+func (d *distributed) Acquire(ctx context.Context, process MutexProcessFunc, interval, timeout time.Duration) result.Result {
 	mutexCtx := ctx
 
-	if d.timeout > 0 {
+	if timeout > 0 {
 		var cancel context.CancelFunc
 
-		mutexCtx, cancel = context.WithTimeout(mutexCtx, d.timeout)
+		mutexCtx, cancel = context.WithTimeout(mutexCtx, timeout)
 
 		defer cancel()
 	}
@@ -46,9 +46,6 @@ func (d *distributed) Acquire(ctx context.Context, process MutexProcessFunc, int
 
 	defer yiigo.Redis().Put(conn)
 
-	// 缓存超时时间
-	ex := int64(expire.Seconds())
-
 	for {
 		select {
 		case <-mutexCtx.Done():
@@ -58,7 +55,7 @@ func (d *distributed) Acquire(ctx context.Context, process MutexProcessFunc, int
 		}
 
 		// 获取锁
-		reply, err := redis.String(conn.Do("SET", d.key, time.Now().Nanosecond(), "EX", ex, "NX"))
+		reply, err := redis.String(conn.Do("SET", d.key, time.Now().Nanosecond(), "EX", d.expire, "NX"))
 
 		// 获取锁出错
 		if err != nil && err != redis.ErrNil {
@@ -82,9 +79,15 @@ func (d *distributed) Acquire(ctx context.Context, process MutexProcessFunc, int
 }
 
 // DistributedMutex returns is a distributed mutual exclusion lock.
-func DistributedMutex(key string, timeout time.Duration) Mutex {
-	return &distributed{
-		key:     key,
-		timeout: timeout,
+func DistributedMutex(key string, expire time.Duration) Mutex {
+	mutex := &distributed{
+		key:    key,
+		expire: 10,
 	}
+
+	if seconds := expire.Seconds(); seconds > 0 {
+		mutex.expire = int64(seconds)
+	}
+
+	return mutex
 }
