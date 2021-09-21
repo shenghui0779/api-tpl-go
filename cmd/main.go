@@ -37,7 +37,7 @@ func main() {
 			yiigo.LoadEnvFromFile(envFile)
 			yiigo.Init(
 				yiigo.WithDB(yiigo.Default, yiigo.MySQL, yiigo.Env("db.dsn").String()),
-				yiigo.WithLogger(yiigo.Default, "logs/app.log"),
+				yiigo.WithLogger(yiigo.Default, "logs/app.log", yiigo.WithLogStdErr()),
 			)
 
 			return nil

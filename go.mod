@@ -11,15 +11,13 @@ require (
 	github.com/gomodule/redigo v1.8.5
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/klauspost/compress v1.13.5 // indirect
-	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.10.0
-	github.com/shenghui0779/yiigo v1.4.2
+	github.com/shenghui0779/yiigo v1.4.3
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
-	go.uber.org/zap v1.19.0
-	golang.org/x/sys v0.0.0-20210906170528-6f6e22806c34 // indirect
+	go.uber.org/zap v1.19.1
 	golang.org/x/text v0.3.7 // indirect
 )
