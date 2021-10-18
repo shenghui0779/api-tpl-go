@@ -2,8 +2,7 @@ package user
 
 import (
 	"context"
-
-	"github.com/shenghui0779/yiigo"
+	"os"
 
 	"tplgo/pkg/iao/base"
 	"tplgo/pkg/result"
@@ -15,7 +14,7 @@ type UserIao interface {
 
 func New() UserIao {
 	return &apiUser{
-		client: base.NewClient(yiigo.Env("iao.user").String()),
+		client: base.NewClient(os.Getenv("IAO_USER")),
 	}
 }
 

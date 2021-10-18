@@ -28,16 +28,16 @@ func main() {
 			&cli.StringFlag{
 				Name:        "envfile",
 				Aliases:     []string{"E"},
-				Value:       "yiigo.toml",
-				Usage:       "设置配置文件，默认：yiigo.toml",
+				Value:       ".env",
+				Usage:       "设置配置文件，默认：.env",
 				Destination: &envFile,
 			},
 		},
 		Before: func(c *cli.Context) error {
-			yiigo.LoadEnvFromFile(envFile)
+			yiigo.LoadEnv(yiigo.WithEnvFile(envFile))
 			yiigo.Init(
-				yiigo.WithDB(yiigo.Default, yiigo.MySQL, yiigo.Env("db.dsn").String()),
-				yiigo.WithLogger(yiigo.Default, "logs/app.log"),
+				yiigo.WithDB(yiigo.Default, yiigo.MySQL, os.Getenv("DB_DSN")),
+				yiigo.WithLogger(yiigo.Default, "logs/app.log", yiigo.WithLogStdErr()),
 			)
 
 			return nil

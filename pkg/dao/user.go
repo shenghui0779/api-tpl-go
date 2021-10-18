@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/jmoiron/sqlx"
@@ -11,7 +12,7 @@ import (
 )
 
 type UserDao interface {
-	FindByID(id int64) (*models.User, error)
+	FindByID(ctx context.Context, id int64) (*models.User, error)
 }
 
 func NewUserDao() UserDao {
@@ -28,13 +29,13 @@ type user struct {
 	builder yiigo.SQLBuilder
 }
 
-func (u *user) FindByID(id int64) (*models.User, error) {
+func (u *user) FindByID(ctx context.Context, id int64) (*models.User, error) {
 	query, binds := u.builder.Wrap(
 		yiigo.Table(u.table),
 		yiigo.Select("id", "nickname", "avatar", "phone"),
 		yiigo.Where("id = ?", id),
 		yiigo.Limit(1),
-	).ToQuery()
+	).ToQuery(ctx)
 
 	record := new(models.User)
 

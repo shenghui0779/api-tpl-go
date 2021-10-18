@@ -25,7 +25,7 @@ type user struct {
 }
 
 func (u *user) Info(ctx context.Context, id int64) result.Result {
-	record, err := u.userdao.FindByID(id)
+	record, err := u.userdao.FindByID(ctx, id)
 
 	if err != nil {
 		return result.ErrSystem.Wrap(result.WithErr(errors.Wrap(err, "Service.User.Info 用户查询失败")))

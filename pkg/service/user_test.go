@@ -20,7 +20,7 @@ func TestUserInfo(t *testing.T) {
 
 	userDao := mock.NewMockUserDao(ctrl)
 
-	userDao.EXPECT().FindByID(int64(1)).Return(&models.User{
+	userDao.EXPECT().FindByID(context.Background(), int64(1)).Return(&models.User{
 		ID:           1,
 		Nickname:     "shenghui",
 		Avatar:       "avatar.jpg",

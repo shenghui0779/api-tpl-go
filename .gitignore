@@ -50,4 +50,4 @@ Thumbs.db
 
 .vscode/
 logs/
-yiigo.toml
+.env
