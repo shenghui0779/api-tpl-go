@@ -10,8 +10,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
+	"tplgo/pkg/logger"
 
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/pkg/errors"
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
@@ -35,7 +35,7 @@ func (c *client) Get(ctx context.Context, path string, query url.Values, resp Re
 	defer func() {
 		logFields = append(logFields, zap.String("duration", time.Since(now).String()))
 
-		yiigo.Logger().Info(fmt.Sprintf("[%s] [Iao.GET] %s", middleware.GetReqID(ctx), reqURL), logFields...)
+		logger.Info(ctx, fmt.Sprintf("[GET] %s", reqURL), logFields...)
 	}()
 
 	r, err := yiigo.HTTPGet(ctx, reqURL)
@@ -85,7 +85,7 @@ func (c *client) Post(ctx context.Context, path string, body PostBody, resp Resp
 	defer func() {
 		logFields = append(logFields, zap.String("duration", time.Since(now).String()))
 
-		yiigo.Logger().Info(fmt.Sprintf("[%s] [Iao.POST] %s", middleware.GetReqID(ctx), reqURL), logFields...)
+		logger.Info(ctx, fmt.Sprintf("[POST] %s", reqURL), logFields...)
 	}()
 
 	reqBody, err := body.Bytes()
