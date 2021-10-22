@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shenghui0779/yiigo"
 
+	"tplgo/pkg/logger"
 	"tplgo/pkg/models"
 )
 
@@ -19,7 +20,7 @@ func NewUserDao() UserDao {
 	return &user{
 		db:      yiigo.DB(),
 		table:   "t_user",
-		builder: yiigo.NewMySQLBuilder(),
+		builder: yiigo.NewMySQLBuilder(yiigo.WithBuilderLog(logger.SQL)),
 	}
 }
 

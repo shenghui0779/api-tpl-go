@@ -15,13 +15,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
-
-	"tplgo/pkg/result"
 )
 
 type Client interface {
-	Get(ctx context.Context, path string, query url.Values, resp Response) result.Result
-	Post(ctx context.Context, path string, body PostBody, resp Response) result.Result
+	Get(ctx context.Context, path string, query url.Values, resp Response) error
+	Post(ctx context.Context, path string, body PostBody, resp Response) error
 }
 
 type client struct {
@@ -29,16 +27,15 @@ type client struct {
 	timeout time.Duration
 }
 
-func (c *client) Get(ctx context.Context, path string, query url.Values, resp Response) result.Result {
+func (c *client) Get(ctx context.Context, path string, query url.Values, resp Response) error {
 	now := time.Now().Local()
 	reqURL := c.url(path, query)
-	logFields := make([]zap.Field, 0, 4)
+	logFields := make([]zap.Field, 0, 3)
 
 	defer func() {
-		logFields = append(logFields, zap.String("request_id", middleware.GetReqID(ctx)))
 		logFields = append(logFields, zap.String("duration", time.Since(now).String()))
 
-		yiigo.Logger().Info(fmt.Sprintf("Iao.Get: %s", reqURL), logFields...)
+		yiigo.Logger().Info(fmt.Sprintf("[%s] [Iao.GET] %s", middleware.GetReqID(ctx), reqURL), logFields...)
 	}()
 
 	r, err := yiigo.HTTPGet(ctx, reqURL)
@@ -46,7 +43,7 @@ func (c *client) Get(ctx context.Context, path string, query url.Values, resp Re
 	if err != nil {
 		logFields = append(logFields, zap.Error(err))
 
-		return result.ErrIao.Wrap(result.WithErr(errors.Wrap(err, "Iao.Get error")))
+		return errors.Wrap(err, "Iao.Get error")
 	}
 
 	defer r.Body.Close()
@@ -58,7 +55,7 @@ func (c *client) Get(ctx context.Context, path string, query url.Values, resp Re
 
 		logFields = append(logFields, zap.Error(err))
 
-		return result.ErrIao.Wrap(result.WithErr(errors.Wrap(err, "Iao.Get error")))
+		return errors.Wrap(err, "Iao.Get error")
 	}
 
 	b, err := ioutil.ReadAll(r.Body)
@@ -66,7 +63,7 @@ func (c *client) Get(ctx context.Context, path string, query url.Values, resp Re
 	if err != nil {
 		logFields = append(logFields, zap.Error(err))
 
-		return result.ErrIao.Wrap(result.WithErr(errors.Wrap(err, "Iao.Get error")))
+		return errors.Wrap(err, "Iao.Get error")
 	}
 
 	logFields = append(logFields, zap.ByteString("response", b))
@@ -74,22 +71,21 @@ func (c *client) Get(ctx context.Context, path string, query url.Values, resp Re
 	if err = json.Unmarshal(b, resp); err != nil {
 		logFields = append(logFields, zap.Error(err))
 
-		return result.ErrIao.Wrap(result.WithErr(errors.Wrap(err, "Iao.Get error")))
+		return errors.Wrap(err, "Iao.Get error")
 	}
 
-	return resp.ErrResult()
+	return nil
 }
 
-func (c *client) Post(ctx context.Context, path string, body PostBody, resp Response) result.Result {
+func (c *client) Post(ctx context.Context, path string, body PostBody, resp Response) error {
 	now := time.Now().Local()
 	reqURL := c.url(path, nil)
-	logFields := make([]zap.Field, 0, 5)
+	logFields := make([]zap.Field, 0, 4)
 
 	defer func() {
-		logFields = append(logFields, zap.String("request_id", middleware.GetReqID(ctx)))
 		logFields = append(logFields, zap.String("duration", time.Since(now).String()))
 
-		yiigo.Logger().Info(fmt.Sprintf("Iao.Post: %s", reqURL), logFields...)
+		yiigo.Logger().Info(fmt.Sprintf("[%s] [Iao.POST] %s", middleware.GetReqID(ctx), reqURL), logFields...)
 	}()
 
 	reqBody, err := body.Bytes()
@@ -97,7 +93,7 @@ func (c *client) Post(ctx context.Context, path string, body PostBody, resp Resp
 	if err != nil {
 		logFields = append(logFields, zap.Error(err))
 
-		return result.ErrIao.Wrap(result.WithErr(errors.Wrap(err, "Iao.Post error")))
+		return errors.Wrap(err, "Iao.Post error")
 	}
 
 	logFields = append(logFields, zap.ByteString("body", reqBody))
@@ -107,7 +103,7 @@ func (c *client) Post(ctx context.Context, path string, body PostBody, resp Resp
 	if err != nil {
 		logFields = append(logFields, zap.Error(err))
 
-		return result.ErrIao.Wrap(result.WithErr(errors.Wrap(err, "Iao.Post error")))
+		return errors.Wrap(err, "Iao.Post error")
 	}
 
 	defer r.Body.Close()
@@ -119,7 +115,7 @@ func (c *client) Post(ctx context.Context, path string, body PostBody, resp Resp
 
 		logFields = append(logFields, zap.Error(err))
 
-		return result.ErrIao.Wrap(result.WithErr(errors.Wrap(err, "Iao.Post error")))
+		return errors.Wrap(err, "Iao.Post error")
 	}
 
 	b, err := ioutil.ReadAll(r.Body)
@@ -127,7 +123,7 @@ func (c *client) Post(ctx context.Context, path string, body PostBody, resp Resp
 	if err != nil {
 		logFields = append(logFields, zap.Error(err))
 
-		return result.ErrIao.Wrap(result.WithErr(errors.Wrap(err, "Iao.Post error")))
+		return errors.Wrap(err, "Iao.Post error")
 	}
 
 	logFields = append(logFields, zap.ByteString("response", b))
@@ -135,10 +131,10 @@ func (c *client) Post(ctx context.Context, path string, body PostBody, resp Resp
 	if err = json.Unmarshal(b, resp); err != nil {
 		logFields = append(logFields, zap.Error(err))
 
-		return result.ErrIao.Wrap(result.WithErr(errors.Wrap(err, "Iao.Post error")))
+		return errors.Wrap(err, "Iao.Post error")
 	}
 
-	return resp.ErrResult()
+	return nil
 }
 
 func (c *client) url(path string, query url.Values) string {

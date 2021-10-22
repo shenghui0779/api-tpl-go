@@ -22,7 +22,7 @@ var envFile string
 func main() {
 	app := &cli.App{
 		Name:     "tplgo",
-		Usage:    "go project template",
+		Usage:    "go web project template",
 		Commands: console.Commands,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
