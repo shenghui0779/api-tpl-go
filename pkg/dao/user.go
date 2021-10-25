@@ -20,7 +20,7 @@ func NewUserDao() UserDao {
 	return &user{
 		db:      yiigo.DB(),
 		table:   "t_user",
-		builder: yiigo.NewMySQLBuilder(yiigo.WithBuilderLog(logger.SQL)),
+		builder: yiigo.NewMySQLBuilder(yiigo.WithSQLLogger(logger.SQL)),
 	}
 }
 
