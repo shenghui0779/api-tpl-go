@@ -8,16 +8,16 @@ RUN go env -w GOPROXY="https://goproxy.cn"
 
 RUN go mod tidy
 
-RUN CGO_ENABLED=0 go build -o tplgo ./cmd
+RUN CGO_ENABLED=0 go build -o ./bin/main ./cmd
 
 FROM scratch
 
-WORKDIR /goapp
+WORKDIR /data
 
-COPY --from=builder /tplgo/tplgo .
+COPY --from=builder /tplgo/bin/main .
 
 EXPOSE 10086
 
-ENTRYPOINT ["./tplgo"]
+ENTRYPOINT ["./bin/main"]
 
-CMD ["--env-dir", "/data/config"]
+CMD ["--envfile", "/data/config/.env"]
