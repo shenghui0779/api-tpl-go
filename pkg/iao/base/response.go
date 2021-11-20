@@ -1,11 +1,9 @@
 package base
 
-import (
-	"tplgo/pkg/result"
-)
-
 type Response interface {
-	ErrResult() result.Result
+	OK() bool
+	ErrCode() int
+	ErrMsg() string
 }
 
 type response struct {
@@ -15,16 +13,20 @@ type response struct {
 	Data interface{} `json:"data"`
 }
 
-func (r *response) ErrResult() result.Result {
-	if r.Err {
-		result.New(r.Code, r.Msg)
-	}
+func (r *response) OK() bool {
+	return !r.Err
+}
 
-	return nil
+func (r *response) ErrCode() int {
+	return r.Code
+}
+
+func (r *response) ErrMsg() string {
+	return r.Msg
 }
 
 // NewResponse returns new response.
-// Note: param data should be a pointer
+// Note: param data should be a pointer.
 func NewResponse(data ...interface{}) Response {
 	if len(data) == 0 {
 		return new(response)

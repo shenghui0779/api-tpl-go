@@ -3,9 +3,10 @@ package service
 import (
 	"context"
 
-	"github.com/pkg/errors"
+	"go.uber.org/zap"
 
 	"tplgo/pkg/dao"
+	"tplgo/pkg/logger"
 	"tplgo/pkg/response"
 	"tplgo/pkg/result"
 )
@@ -25,10 +26,12 @@ type user struct {
 }
 
 func (u *user) Info(ctx context.Context, id int64) result.Result {
-	record, err := u.userdao.FindByID(id)
+	record, err := u.userdao.FindByID(ctx, id)
 
 	if err != nil {
-		return result.ErrSystem.Wrap(result.WithErr(errors.Wrap(err, "Service.User.Info 用户查询失败")))
+		logger.Err(ctx, "Service.User.Info error", zap.Error(err))
+
+		return result.ErrSystem.Wrap(result.WithErr(err))
 	}
 
 	if record == nil {

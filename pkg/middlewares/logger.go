@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 
+	"tplgo/pkg/logger"
 	"tplgo/pkg/result"
 )
 
@@ -61,9 +61,8 @@ func Logger(next http.Handler) http.Handler {
 
 		next.ServeHTTP(ww, r)
 
-		yiigo.Logger("request").Info(fmt.Sprintf("[%s] %s", r.Method, r.URL.String()),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
-			zap.String("body", replacer.Replace(string(body))),
+		logger.Info(r.Context(), fmt.Sprintf("[%s] %s", r.Method, r.URL.String()),
+			zap.String("params", replacer.Replace(string(body))),
 			zap.String("response", buf.String()),
 			zap.Int("status", ww.Status()),
 			zap.String("duration", time.Since(now).String()),

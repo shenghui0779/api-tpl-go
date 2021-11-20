@@ -12,6 +12,7 @@ import (
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 
+	"tplgo/pkg/config"
 	"tplgo/pkg/console"
 	"tplgo/pkg/middlewares"
 	"tplgo/pkg/routes"
@@ -22,22 +23,23 @@ var envFile string
 func main() {
 	app := &cli.App{
 		Name:     "tplgo",
-		Usage:    "go project template",
+		Usage:    "go web project template",
 		Commands: console.Commands,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "envfile",
 				Aliases:     []string{"E"},
-				Value:       "yiigo.toml",
-				Usage:       "设置配置文件，默认：yiigo.toml",
+				Value:       ".env",
+				Usage:       "设置配置文件，默认：.env",
 				Destination: &envFile,
 			},
 		},
 		Before: func(c *cli.Context) error {
-			yiigo.LoadEnvFromFile(envFile)
+			yiigo.LoadEnv(yiigo.WithEnvFile(envFile))
+
 			yiigo.Init(
-				yiigo.WithDB(yiigo.Default, yiigo.MySQL, yiigo.Env("db.dsn").String()),
-				yiigo.WithLogger(yiigo.Default, "logs/app.log", yiigo.WithLogStdErr()),
+				yiigo.WithMySQL(yiigo.Default, config.DB()),
+				yiigo.WithLogger(yiigo.Default, config.Logger()),
 			)
 
 			return nil

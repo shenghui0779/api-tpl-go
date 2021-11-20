@@ -18,11 +18,11 @@ func BindJSON(r *http.Request, obj interface{}) result.Result {
 	defer io.Copy(io.Discard, r.Body)
 
 	if err := json.NewDecoder(r.Body).Decode(obj); err != nil {
-		return result.ErrParams.Wrap(result.WithMsg(err.Error()))
+		return result.ErrParams.Wrap(result.WithErr(err))
 	}
 
 	if err := validator.ValidateStruct(obj); err != nil {
-		return result.ErrParams.Wrap(result.WithMsg(err.Error()))
+		return result.ErrParams.Wrap(result.WithErr(err))
 	}
 
 	return nil
@@ -32,7 +32,7 @@ func URLParamInt(r *http.Request, key string) (int64, result.Result) {
 	v, err := strconv.ParseInt(chi.URLParam(r, key), 10, 64)
 
 	if err != nil {
-		return 0, result.ErrParams.Wrap(result.WithMsg(err.Error()))
+		return 0, result.ErrParams.Wrap(result.WithErr(err))
 	}
 
 	return v, nil

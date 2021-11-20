@@ -3,19 +3,23 @@ package helpers
 import (
 	"context"
 	"runtime/debug"
+	"tplgo/pkg/logger"
 
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 )
 
 // Recover recover panic
 func Recover(ctx context.Context) {
 	if err := recover(); err != nil {
-		yiigo.Logger().Error("Whoops! Server Panic",
-			zap.String("request_id", middleware.GetReqID(ctx)),
+		logger.Err(ctx, "Server Panic",
 			zap.Any("error", err),
 			zap.ByteString("stack", debug.Stack()),
 		)
 	}
+}
+
+// CtxCopyWithReqID returns a new context with request_id from origin context.
+func CtxCopyWithReqID(ctx context.Context) context.Context {
+	return context.WithValue(context.Background(), middleware.RequestIDKey, middleware.GetReqID(ctx))
 }
