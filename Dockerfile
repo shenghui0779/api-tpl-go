@@ -14,7 +14,7 @@ FROM scratch
 
 WORKDIR /data
 
-COPY --from=builder /tplgo/bin/main .
+COPY --from=builder /tplgo/bin/main ./bin
 
 EXPOSE 10086
 
