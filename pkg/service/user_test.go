@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"tplgo/pkg/consts"
-	"tplgo/pkg/mock"
+	"tplgo/pkg/dao"
 	"tplgo/pkg/models"
 	"tplgo/pkg/response"
 	"tplgo/pkg/result"
@@ -18,9 +18,9 @@ func TestUserInfo(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	userDao := mock.NewMockUserDao(ctrl)
+	userDao := dao.NewMockUserDao(ctrl)
 
-	userDao.EXPECT().FindByID(context.Background(), (1)).Return(&models.User{
+	userDao.EXPECT().FindByID(context.Background(), int64(1)).Return(&models.User{
 		ID:           1,
 		Nickname:     "shenghui",
 		Avatar:       "avatar.jpg",
