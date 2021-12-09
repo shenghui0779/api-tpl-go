@@ -16,10 +16,10 @@ FROM scratch
 
 WORKDIR /data
 
-COPY --from=builder /tplgo/bin/main ./bin
+COPY --from=builder /tplgo/bin/main .
 
 EXPOSE 10086
 
-ENTRYPOINT ["./bin/main"]
+ENTRYPOINT ["./main"]
 
 CMD ["--envfile", "/data/config/.env"]
