@@ -1,43 +1,55 @@
 package service
 
 import (
-	"context"
+	"net/http"
 
-	"github.com/pkg/errors"
-
-	"tplgo/pkg/dao"
-	"tplgo/pkg/response"
+	"tplgo/pkg/ent"
+	"tplgo/pkg/ent/user"
+	"tplgo/pkg/helpers"
+	"tplgo/pkg/logger"
 	"tplgo/pkg/result"
+
+	"go.uber.org/zap"
 )
 
-type UserService interface {
-	Info(ctx context.Context, id int64) result.Result
+type User interface {
+	Info(w http.ResponseWriter, r *http.Request)
 }
 
-func NewUserService() UserService {
-	return &user{
-		userdao: dao.NewUserDao(),
-	}
+func NewUser() User {
+	return new(users)
 }
 
-type user struct {
-	userdao dao.UserDao
+type users struct{}
+
+type RespUserInfo struct {
+	ID       int64  `json:"id"`
+	Nickname string `json:"nickname"`
+	Avatar   string `json:"avatar"`
 }
 
-func (u *user) Info(ctx context.Context, id int64) result.Result {
-	record, err := u.userdao.FindByID(id)
+func (u *users) Info(w http.ResponseWriter, r *http.Request) {
+	uid := helpers.URLParamInt(r, "id")
+
+	record, err := ent.DB.User.Query().Where(user.ID(uid)).First(r.Context())
 
 	if err != nil {
-		return result.ErrSystem.Wrap(result.WithErr(errors.Wrap(err, "Service.User.Info 用户查询失败")))
+		if ent.IsNotFound(err) {
+			result.ErrNotFound().JSON(w, r)
+
+			return
+		}
+
+		logger.Err(r.Context(), "err query user", zap.Error(err))
+
+		result.ErrSystem(result.Err(err)).JSON(w, r)
+
+		return
 	}
 
-	if record == nil {
-		return result.ErrUserNotFound
-	}
-
-	return result.OK.Wrap(result.WithData(&response.UserInfo{
-		ID:     id,
-		Name:   record.Nickname,
-		Avatar: record.Avatar,
-	}))
+	result.OK(result.Data(&RespUserInfo{
+		ID:       uid,
+		Nickname: record.Nickname,
+		Avatar:   record.Avatar,
+	})).JSON(w, r)
 }

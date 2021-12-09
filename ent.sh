@@ -1,0 +1,1 @@
+go generate ./pkg/ent

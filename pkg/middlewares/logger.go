@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/shenghui0779/yiigo"
+	"github.com/tidwall/pretty"
 	"go.uber.org/zap"
 
+	"tplgo/pkg/logger"
 	"tplgo/pkg/result"
 )
 
@@ -22,8 +22,6 @@ var (
 			return bytes.NewBuffer(make([]byte, 0, 2<<10)) // 2KB
 		},
 	}
-
-	replacer = strings.NewReplacer("\n", "", "\t", "", "\r", "#")
 )
 
 func Logger(next http.Handler) http.Handler {
@@ -39,7 +37,7 @@ func Logger(next http.Handler) http.Handler {
 			body, err = ioutil.ReadAll(r.Body)
 
 			if err != nil {
-				result.ErrSystem.Wrap(result.WithErr(err)).JSON(w, r)
+				result.ErrSystem(result.Err(err)).JSON(w, r)
 
 				return
 			}
@@ -47,7 +45,7 @@ func Logger(next http.Handler) http.Handler {
 			// 关闭原Body
 			r.Body.Close()
 
-			r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+			r.Body = ioutil.NopCloser(bytes.NewReader(body))
 		}
 
 		// 存储返回结果
@@ -61,9 +59,8 @@ func Logger(next http.Handler) http.Handler {
 
 		next.ServeHTTP(ww, r)
 
-		yiigo.Logger("request").Info(fmt.Sprintf("[%s] %s", r.Method, r.URL.String()),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
-			zap.String("body", replacer.Replace(string(body))),
+		logger.Info(r.Context(), fmt.Sprintf("[%s] %s", r.Method, r.URL.String()),
+			zap.ByteString("params", pretty.Ugly(body)),
 			zap.String("response", buf.String()),
 			zap.Int("status", ww.Status()),
 			zap.String("duration", time.Since(now).String()),

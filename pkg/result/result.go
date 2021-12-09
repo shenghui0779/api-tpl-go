@@ -1,95 +1,38 @@
 package result
 
 import (
-	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
-
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/shenghui0779/yiigo"
-	"go.uber.org/zap"
 )
 
 type Result interface {
-	Wrap(options ...ResultOption) Result
 	JSON(w http.ResponseWriter, r *http.Request)
 }
 
-type response struct {
-	code int
-	msg  string
-	err  error
-	data interface{}
-}
+type ResultOption func(r *response)
 
-func (resp *response) Wrap(options ...ResultOption) Result {
-	newR := resp.clone()
-
-	if len(options) != 0 {
-		for _, f := range options {
-			f(newR)
-		}
-	}
-
-	return newR
-}
-
-func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
-	obj := yiigo.X{
-		"code": resp.code,
-		"err":  false,
-		"msg":  resp.msg,
-	}
-
-	if resp.code != 0 {
-		obj["err"] = true
-	}
-
-	if resp.data != nil {
-		obj["data"] = resp.data
-	}
-
-	// 如有错误，记录日志
-	if resp.err != nil {
-		yiigo.Logger().Error(fmt.Sprintf("Whoops! Server Error: %d | %s", resp.code, resp.msg),
-			zap.String("url", r.URL.String()),
-			zap.String("method", r.Method),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
-			zap.Error(resp.err),
-		)
-	}
-
-	b, err := json.Marshal(obj)
-
-	if err != nil {
-		yiigo.Logger().Error("Response JSON error", zap.Error(err))
-
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Header().Add("Content-Type", "application/json; charset=utf-8")
-
-	if _, err = w.Write(b); err != nil {
-		yiigo.Logger().Error("Response JSON error", zap.Error(err))
+func Err(err error) ResultOption {
+	return func(r *response) {
+		r.err = err
 	}
 }
 
-func (resp *response) clone() *response {
-	newResp := new(response)
-
-	newResp.code = resp.code
-	newResp.msg = resp.msg
-	newResp.err = resp.err
-	newResp.data = resp.data
-
-	return newResp
+func Data(data interface{}) ResultOption {
+	return func(r *response) {
+		r.data = data
+	}
 }
 
 // New returns a new Result
-func New(code int, msg string) Result {
-	return &response{
+func New(code int, msg string, options ...ResultOption) Result {
+	resp := &response{
 		code: code,
-		msg:  msg,
+		err:  errors.New(msg),
 	}
+
+	for _, f := range options {
+		f(resp)
+	}
+
+	return resp
 }

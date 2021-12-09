@@ -1,11 +1,9 @@
-package base
+package client
 
-import (
-	"tplgo/pkg/result"
-)
+import "fmt"
 
 type Response interface {
-	ErrResult() result.Result
+	Error() error
 }
 
 type response struct {
@@ -15,16 +13,16 @@ type response struct {
 	Data interface{} `json:"data"`
 }
 
-func (r *response) ErrResult() result.Result {
-	if r.Err {
-		result.New(r.Code, r.Msg)
+func (r *response) Error() error {
+	if !r.Err {
+		return fmt.Errorf("%d|%s", r.Code, r.Msg)
 	}
 
 	return nil
 }
 
 // NewResponse returns new response.
-// Note: param data should be a pointer
+// Note: param data should be a pointer.
 func NewResponse(data ...interface{}) Response {
 	if len(data) == 0 {
 		return new(response)

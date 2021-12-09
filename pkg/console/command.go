@@ -1,20 +1,28 @@
 package console
 
 import (
-	"fmt"
+	"context"
+	"tplgo/pkg/ent"
+	"tplgo/pkg/ent/migrate"
 
+	"github.com/shenghui0779/yiigo"
 	"github.com/urfave/cli/v2"
 )
 
 var Commands = []*cli.Command{
 	{
-		Name:    "test",
-		Aliases: []string{"T"},
-		Usage:   "test cmd",
+		Name:    "migrate",
+		Aliases: []string{"M"},
+		Usage:   "数据库迁移",
 		Action: func(c *cli.Context) error {
-			fmt.Println("this is a test cmd")
+			client := ent.NewClient(ent.Driver(yiigo.EntDriver()))
+			defer client.Close()
 
-			return nil
+			return client.Schema.Create(context.Background(),
+				migrate.WithDropIndex(true),
+				migrate.WithDropColumn(true),
+				migrate.WithForeignKeys(false),
+			)
 		},
 	},
 }

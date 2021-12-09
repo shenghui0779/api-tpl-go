@@ -7,18 +7,16 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/pkg/errors"
 	"github.com/shenghui0779/yiigo"
-
-	"tplgo/pkg/result"
 )
 
-type MutexProcessFunc func(ctx context.Context) result.Result
+type MutexHandler func(ctx context.Context) error
 
 // Mutex is a reader/writer mutual exclusion lock.
 type Mutex interface {
 	// Acquire 获取锁
 	// interval 每次获取锁的间隔时间（每隔interval时间尝试获取一次锁）
 	// timeout 锁获取超时时间
-	Acquire(ctx context.Context, process MutexProcessFunc, interval, timeout time.Duration) result.Result
+	Acquire(ctx context.Context, callback MutexHandler, interval, timeout time.Duration) error
 }
 
 type distributed struct {
@@ -26,7 +24,7 @@ type distributed struct {
 	expire int64
 }
 
-func (d *distributed) Acquire(ctx context.Context, process MutexProcessFunc, interval, timeout time.Duration) result.Result {
+func (d *distributed) Acquire(ctx context.Context, callback MutexHandler, interval, timeout time.Duration) error {
 	mutexCtx := ctx
 
 	if timeout > 0 {
@@ -41,7 +39,7 @@ func (d *distributed) Acquire(ctx context.Context, process MutexProcessFunc, int
 
 	// 获取锁出错
 	if err != nil {
-		return result.ErrMutex.Wrap(result.WithErr(errors.Wrap(err, "acquire lock error")))
+		return errors.Wrap(err, "err redis conn")
 	}
 
 	defer yiigo.Redis().Put(conn)
@@ -50,7 +48,7 @@ func (d *distributed) Acquire(ctx context.Context, process MutexProcessFunc, int
 		select {
 		case <-mutexCtx.Done():
 			// 锁获取超时或被取消
-			return result.ErrMutex.Wrap(result.WithErr(errors.Wrap(mutexCtx.Err(), "acquire lock error")))
+			return errors.Wrap(mutexCtx.Err(), "err mutex context")
 		default:
 		}
 
@@ -59,7 +57,7 @@ func (d *distributed) Acquire(ctx context.Context, process MutexProcessFunc, int
 
 		// 获取锁出错
 		if err != nil && err != redis.ErrNil {
-			return result.ErrMutex.Wrap(result.WithErr(errors.Wrap(err, "acquire lock error")))
+			return errors.Wrap(err, "err redis setnx")
 		}
 
 		// 获取锁成功，结束等待，执行任务
@@ -75,7 +73,7 @@ func (d *distributed) Acquire(ctx context.Context, process MutexProcessFunc, int
 	defer conn.Do("DEL", d.key)
 	defer Recover(ctx)
 
-	return process(ctx)
+	return callback(ctx)
 }
 
 // DistributedMutex returns is a distributed mutual exclusion lock.

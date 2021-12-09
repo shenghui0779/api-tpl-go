@@ -1,21 +1,29 @@
 package result
 
-// 成功
-var OK Result = New(0, "success")
+func OK(options ...ResultOption) Result {
+	return New(0, "OK", options...)
+}
 
-// 基础 10000 - 10099
-var (
-	ErrParams       Result = New(10000, "参数错误")
-	ErrIllegal      Result = New(10001, "身份验证失败，请重新授权")
-	ErrLoginExpired Result = New(10002, "登录已过期，请重新授权")
-)
+func ErrParams(options ...ResultOption) Result {
+	return New(10000, "params error", options...)
+}
 
-// 用户 10100 - 10199
-var ErrUserNotFound Result = New(10100, "用户不存在")
+func ErrAuth(options ...ResultOption) Result {
+	return New(20000, "unauthorized", options...)
+}
 
-// 系统错误
-var (
-	ErrSystem Result = New(50000, "服务器错误，请稍后重试")
-	ErrIao    Result = New(50001, "内部服务请求失败，请稍后重试")
-	ErrMutex  Result = New(50002, "锁获取失败")
-)
+func ErrPerm(options ...ResultOption) Result {
+	return New(30000, "permission denied", options...)
+}
+
+func ErrNotFound(options ...ResultOption) Result {
+	return New(40000, "entity not found", options...)
+}
+
+func ErrSystem(options ...ResultOption) Result {
+	return New(50000, "internal server error", options...)
+}
+
+func ErrService(options ...ResultOption) Result {
+	return New(60000, "internal service error", options...)
+}
