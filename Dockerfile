@@ -18,7 +18,7 @@ WORKDIR /data
 
 COPY --from=builder /tplgo/bin/main .
 
-EXPOSE 10086
+EXPOSE 8000
 
 ENTRYPOINT ["./main"]
 
