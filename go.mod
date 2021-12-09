@@ -19,5 +19,4 @@ require (
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.19.1
 	golang.org/x/text v0.3.7 // indirect
-	gopkg.in/inf.v0 v0.9.1
 )
