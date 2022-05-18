@@ -1,21 +1,20 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/shenghui0779/yiigo"
-	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 
 	"tplgo/pkg/config"
-	"tplgo/pkg/console"
 	"tplgo/pkg/ent"
-	"tplgo/pkg/iao"
 	"tplgo/pkg/middlewares"
 	"tplgo/pkg/routes"
 )
@@ -23,48 +22,34 @@ import (
 var envFile string
 
 func main() {
-	app := &cli.App{
-		Name:     "tplgo",
-		Usage:    "go web project template",
-		Commands: console.Commands,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "envfile",
-				Aliases:     []string{"E"},
-				Value:       ".env",
-				Usage:       "设置配置文件，默认：.env",
-				Destination: &envFile,
-			},
-		},
-		Before: func(c *cli.Context) error {
-			yiigo.LoadEnv(yiigo.WithEnvFile(envFile))
+	flag.StringVar(&envFile, "envfile", ".env", "设置ENV配置文件")
 
-			yiigo.Init(
-				yiigo.WithMySQL(yiigo.Default, config.DB()),
-				yiigo.WithLogger(yiigo.Default, config.Logger()),
-			)
+	flag.Parse()
 
-			return nil
-		},
-		Action: func(c *cli.Context) error {
-			ent.InitDB()
-			iao.InitClient()
+	yiigo.LoadEnv(yiigo.WithEnvFile(envFile), yiigo.WithEnvWatcher(func(e fsnotify.Event) {
+		yiigo.Logger().Info("env change ok", zap.String("event", e.String()))
+	}))
 
-			serving()
+	yiigo.Init(
+		yiigo.WithMySQL(yiigo.Default, config.DB()),
+		yiigo.WithLogger(yiigo.Default, config.Logger()),
+	)
 
-			return nil
-		},
+	ent.InitDB()
+
+	// make sure we have a working tempdir in minimal containers, because:
+	// os.TempDir(): The directory is neither guaranteed to exist nor have accessible permissions.
+	if err := os.MkdirAll(os.TempDir(), 0775); err != nil {
+		yiigo.Logger().Error("err create temp dir", zap.Error(err))
 	}
 
-	if err := app.Run(os.Args); err != nil {
-		yiigo.Logger().Fatal("app running error", zap.Error(err))
-	}
+	serving()
 }
 
 func serving() {
 	r := chi.NewRouter()
 
-	r.Use(middleware.RequestID, middlewares.Recovery)
+	r.Use(middleware.RequestID, middlewares.Recovery, middlewares.Cors)
 
 	routes.Register(r)
 
