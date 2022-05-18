@@ -1,4 +1,4 @@
-FROM golang:1.17.9 AS builder
+FROM golang:1.17.10 AS builder
 
 WORKDIR /tplgo
 
