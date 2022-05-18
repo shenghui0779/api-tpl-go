@@ -30,3 +30,7 @@ func Warn(ctx context.Context, msg string, fields ...zap.Field) {
 func Err(ctx context.Context, msg string, fields ...zap.Field) {
 	yiigo.Logger().Error(fmt.Sprintf("[%s] %s", GetReqID(ctx), msg), fields...)
 }
+
+func Panic(ctx context.Context, msg string, fields ...zap.Field) {
+	yiigo.Logger().Panic(fmt.Sprintf("[%s] %s", GetReqID(ctx), msg), fields...)
+}

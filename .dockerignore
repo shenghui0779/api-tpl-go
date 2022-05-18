@@ -14,9 +14,11 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+.git/
 .idea/
 .vscode/
 .DS_Store
 logs/
 *.log
+*.tar
 .env

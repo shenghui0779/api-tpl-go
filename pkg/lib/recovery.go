@@ -1,8 +1,9 @@
-package helpers
+package lib
 
 import (
 	"context"
 	"runtime/debug"
+
 	"tplgo/pkg/logger"
 
 	"github.com/go-chi/chi/v5/middleware"
@@ -20,6 +21,7 @@ func Recover(ctx context.Context) {
 }
 
 // CtxCopyWithReqID returns a new context with request_id from origin context.
+// Often used for goroutine.
 func CtxCopyWithReqID(ctx context.Context) context.Context {
 	return context.WithValue(context.Background(), middleware.RequestIDKey, middleware.GetReqID(ctx))
 }

@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+
 	"tplgo/pkg/middlewares"
 	"tplgo/pkg/service"
 
@@ -26,13 +27,23 @@ func Register(r chi.Router) {
 	// prometheus metrics
 	// r.Method(http.MethodGet, "/metrics", promhttp.Handler())
 
-	r.With(middlewares.Logger).Route("/v1/", func(r chi.Router) {
-		user(r)
+	r.Route("/v1/", func(r chi.Router) {
+		r.With(middlewares.Logger()).Group(func(r chi.Router) {
+			{
+				s := service.NewAuth()
+
+				r.Post("/login", s.Login)
+				r.With(middlewares.Auth).Get("/logout", s.Logout)
+			}
+
+			r.With(middlewares.Auth).Group(func(r chi.Router) {
+				{
+					s := service.NewUser()
+
+					r.Post("/users", s.Create)
+					r.Get("/users", s.List)
+				}
+			})
+		})
 	})
-}
-
-func user(r chi.Router) {
-	user := service.NewUser()
-
-	r.Get("/users/{id}", user.Info)
 }

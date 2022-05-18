@@ -16,11 +16,7 @@ func Recovery(next http.Handler) http.Handler {
 		defer func() {
 			// panic 捕获
 			if err := recover(); err != nil {
-				logger.Err(r.Context(), "Server Panic",
-					zap.Any("error", err),
-					zap.ByteString("stack", debug.Stack()),
-				)
-
+				logger.Err(r.Context(), "Server Panic", zap.Any("error", err), zap.ByteString("stack", debug.Stack()))
 				result.ErrSystem().JSON(w, r)
 			}
 		}()

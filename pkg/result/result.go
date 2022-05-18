@@ -1,7 +1,6 @@
 package result
 
 import (
-	"errors"
 	"net/http"
 )
 
@@ -13,21 +12,21 @@ type ResultOption func(r *response)
 
 func Err(err error) ResultOption {
 	return func(r *response) {
-		r.err = err
+		r.Msg = err.Error()
 	}
 }
 
 func Data(data interface{}) ResultOption {
 	return func(r *response) {
-		r.data = data
+		r.Data = data
 	}
 }
 
 // New returns a new Result
 func New(code int, msg string, options ...ResultOption) Result {
 	resp := &response{
-		code: code,
-		err:  errors.New(msg),
+		Code: code,
+		Msg:  msg,
 	}
 
 	for _, f := range options {

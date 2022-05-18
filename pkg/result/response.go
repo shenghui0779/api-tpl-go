@@ -6,46 +6,41 @@ import (
 	"net/http"
 	"tplgo/pkg/logger"
 
-	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 )
 
 type response struct {
-	code int
-	err  error
-	data interface{}
+	Code  int         `json:"code"`
+	Err   bool        `json:"err"`
+	Msg   string      `json:"msg"`
+	ReqID string      `json:"req_id"`
+	Data  interface{} `json:"data,omitempty"`
 }
 
 func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
-	obj := yiigo.X{
-		"code": resp.code,
-		"err":  false,
-		"msg":  fmt.Sprintf("[%s] %s", logger.GetReqID(r.Context()), resp.err.Error()),
+	ctx := r.Context()
+
+	resp.ReqID = logger.GetReqID(ctx)
+
+	if resp.Code != CodeOK {
+		resp.Err = true
 	}
 
-	if resp.code != 0 {
-		obj["err"] = true
-	}
-
-	if resp.data != nil {
-		obj["data"] = resp.data
-	}
-
-	b, err := json.Marshal(obj)
+	b, err := json.Marshal(resp)
 
 	if err != nil {
-		logger.Err(r.Context(), "Response JSON error", zap.Error(err))
+		logger.Err(ctx, "err marshal response to JSON", zap.Error(err))
 
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fmt.Sprintf("[%s] %s", logger.GetReqID(r.Context()), err.Error())))
+		w.Write([]byte(fmt.Sprintf("[%s] %s", logger.GetReqID(ctx), err.Error())))
 
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	w.Header().Add("Content-Type", "application/json; charset=utf-8")
 
 	if _, err = w.Write(b); err != nil {
-		logger.Err(r.Context(), "Response JSON error", zap.Error(err))
+		logger.Err(ctx, "err write response", zap.Error(err))
 	}
 }

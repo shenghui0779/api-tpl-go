@@ -1,8 +1,8 @@
 package consts
 
-type Gender int
+const MaxFormMemory = 32 << 20
 
 const (
-	Male   Gender = 1
-	Female Gender = 2
+	MIMEForm          = "application/x-www-form-urlencoded"
+	MIMEMultipartForm = "multipart/form-data"
 )

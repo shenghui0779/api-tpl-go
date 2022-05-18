@@ -1,5 +1,22 @@
-# yiigo-example
+# tplgo
 
-一个`yiigo`的使用demo；也是一个实用的Web项目开发模板
+A template for building go web service with [yiigo](https://github.com/shenghui0779/yiigo).
 
-> 记得执行 `ent.sh`
+> 1. ORM [entgo.io](https://entgo.io/)
+> 2. Table `User` refers to `pkg/ent/schema/user.go`
+> 3. Set `GOPROXY` [ `go env -w GOPROXY="https://goproxy.cn,direct"` ]
+
+### 1. prepare
+
+```shell
+go mod download
+sh ent.sh
+go mod tidy -compat=1.17
+```
+
+### 2. run
+
+```shell
+mv .env.example => cmd/.env
+cd cmd          => go run main.go
+```

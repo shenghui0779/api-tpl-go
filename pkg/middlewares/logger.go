@@ -9,9 +9,11 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/shenghui0779/yiigo"
 	"github.com/tidwall/pretty"
 	"go.uber.org/zap"
 
+	"tplgo/pkg/consts"
 	"tplgo/pkg/logger"
 	"tplgo/pkg/result"
 )
@@ -19,51 +21,106 @@ import (
 var (
 	bufPool = sync.Pool{
 		New: func() interface{} {
-			return bytes.NewBuffer(make([]byte, 0, 2<<10)) // 2KB
+			return bytes.NewBuffer(make([]byte, 0, 4<<10)) // 4KB
 		},
 	}
 )
 
-func Logger(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		now := time.Now().Local()
+type loggercfg struct {
+	nobody bool
+	noresp bool
+}
 
-		var body []byte
+type LoggerOption func(cfg *loggercfg)
 
-		// 取出请求Body
-		if r.Body != nil && r.Body != http.NoBody {
-			var err error
+func NoBody() LoggerOption {
+	return func(cfg *loggercfg) {
+		cfg.nobody = true
+	}
+}
 
-			body, err = ioutil.ReadAll(r.Body)
+func NoResp() LoggerOption {
+	return func(cfg *loggercfg) {
+		cfg.noresp = true
+	}
+}
 
-			if err != nil {
-				result.ErrSystem(result.Err(err)).JSON(w, r)
+// Logger 日志中间件
+func Logger(options ...LoggerOption) func(next http.Handler) http.Handler {
+	cfg := new(loggercfg)
 
-				return
+	for _, f := range options {
+		f(cfg)
+	}
+
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			now := time.Now()
+
+			var params string
+
+			// 需要记录参数 且 请求包含body
+			if !cfg.nobody && r.Body != nil && r.Body != http.NoBody {
+				switch yiigo.ContentType(r) {
+				case consts.MIMEForm:
+					if err := r.ParseForm(); err != nil {
+						result.ErrSystem(result.Err(err)).JSON(w, r)
+
+						return
+					}
+
+					params = r.Form.Encode()
+				case consts.MIMEMultipartForm:
+					if err := r.ParseMultipartForm(consts.MaxFormMemory); err != nil {
+						if err != http.ErrNotMultipart {
+							result.ErrSystem(result.Err(err)).JSON(w, r)
+
+							return
+						}
+					}
+
+					params = r.Form.Encode()
+				default:
+					// 取出Body
+					body, err := ioutil.ReadAll(r.Body)
+
+					if err != nil {
+						result.ErrSystem(result.Err(err)).JSON(w, r)
+
+						return
+					}
+
+					// 关闭原Body
+					r.Body.Close()
+
+					params = string(pretty.Ugly(body))
+
+					r.Body = ioutil.NopCloser(bytes.NewReader(body))
+				}
 			}
 
-			// 关闭原Body
-			r.Body.Close()
+			ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 
-			r.Body = ioutil.NopCloser(bytes.NewReader(body))
-		}
+			var buf *bytes.Buffer
 
-		// 存储返回结果
-		buf := bufPool.Get().(*bytes.Buffer)
-		buf.Reset()
+			// 需要记录返回
+			if !cfg.noresp {
+				buf = bufPool.Get().(*bytes.Buffer)
+				buf.Reset()
 
-		defer bufPool.Put(buf)
+				defer bufPool.Put(buf)
 
-		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
-		ww.Tee(buf)
+				ww.Tee(buf)
+			}
 
-		next.ServeHTTP(ww, r)
+			next.ServeHTTP(ww, r)
 
-		logger.Info(r.Context(), fmt.Sprintf("[%s] %s", r.Method, r.URL.String()),
-			zap.ByteString("params", pretty.Ugly(body)),
-			zap.String("response", buf.String()),
-			zap.Int("status", ww.Status()),
-			zap.String("duration", time.Since(now).String()),
-		)
-	})
+			logger.Info(r.Context(), fmt.Sprintf("[%s] %s", r.Method, r.URL.String()),
+				zap.String("params", params),
+				zap.String("response", buf.String()),
+				zap.Int("status", ww.Status()),
+				zap.String("duration", time.Since(now).String()),
+			)
+		})
+	}
 }

@@ -1,14 +1,13 @@
-FROM golang:1.16.5 AS builder
+FROM golang:1.17.9 AS builder
 
 WORKDIR /tplgo
 
 COPY . .
 
 RUN go env -w GOPROXY="https://goproxy.cn"
-
-RUN go mod tidy
-
+RUN go mod download
 RUN sh ent.sh
+RUN go mod tidy -compat=1.17
 
 RUN CGO_ENABLED=0 go build -o ./bin/main ./cmd
 
@@ -22,4 +21,4 @@ EXPOSE 8000
 
 ENTRYPOINT ["./main"]
 
-CMD ["--envfile", "/data/config/.env"]
+CMD ["-envfile", "/data/config/.env"]

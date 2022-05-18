@@ -1,29 +1,35 @@
 package result
 
+const CodeOK = 0
+
 func OK(options ...ResultOption) Result {
-	return New(0, "OK", options...)
+	return New(CodeOK, "OK", options...)
 }
 
 func ErrParams(options ...ResultOption) Result {
-	return New(10000, "params error", options...)
+	return New(10000, "参数错误", options...)
 }
 
 func ErrAuth(options ...ResultOption) Result {
-	return New(20000, "unauthorized", options...)
+	return New(20000, "未授权，请先登录", options...)
 }
 
 func ErrPerm(options ...ResultOption) Result {
-	return New(30000, "permission denied", options...)
+	return New(30000, "权限不足", options...)
 }
 
 func ErrNotFound(options ...ResultOption) Result {
-	return New(40000, "entity not found", options...)
+	return New(40000, "数据不存在", options...)
 }
 
 func ErrSystem(options ...ResultOption) Result {
-	return New(50000, "internal server error", options...)
+	return New(50000, "内部服务器错误，请稍后重试", options...)
+}
+
+func ErrData(options ...ResultOption) Result {
+	return New(60000, "数据异常", options...)
 }
 
 func ErrService(options ...ResultOption) Result {
-	return New(60000, "internal service error", options...)
+	return New(70000, "服务异常", options...)
 }

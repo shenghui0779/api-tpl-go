@@ -3,8 +3,14 @@ package ent
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"os"
 	"runtime/debug"
+	"strconv"
 
+	"tplgo/pkg/logger"
+
+	"entgo.io/ent/dialect"
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 )
@@ -13,12 +19,22 @@ import (
 var DB *Client
 
 func InitDB() {
-	DB = NewClient(Driver(yiigo.EntDriver()), Debug())
+	dbug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
+
+	if dbug {
+		DB = NewClient(Driver(dialect.DebugWithContext(yiigo.EntDriver(), func(ctx context.Context, v ...interface{}) {
+			logger.Info(ctx, "SQL info", zap.String("SQL", fmt.Sprint(v...)))
+		})))
+	} else {
+		DB = NewClient(Driver(yiigo.EntDriver()))
+	}
 }
+
+type TxHandler func(ctx context.Context, tx *Tx) error
 
 // Transaction Executes ent transaction with callback function.
 // The provided context is used until the transaction is committed or rolledback.
-func Transaction(ctx context.Context, process func(ctx context.Context, tx *Tx) error) error {
+func Transaction(ctx context.Context, callback TxHandler) error {
 	tx, err := DB.Tx(ctx)
 
 	if err != nil {
@@ -27,20 +43,20 @@ func Transaction(ctx context.Context, process func(ctx context.Context, tx *Tx) 
 
 	defer func() {
 		if r := recover(); r != nil {
-			yiigo.Logger().Fatal("ent transaction process panic", zap.Any("error", r), zap.ByteString("stack", debug.Stack()))
+			logger.Err(ctx, "ent transaction panic", zap.Any("error", r), zap.ByteString("stack", debug.Stack()))
 
-			txRollback(tx)
+			rollback(ctx, tx)
 		}
 	}()
 
-	if err = process(ctx, tx); err != nil {
-		txRollback(tx)
+	if err = callback(ctx, tx); err != nil {
+		rollback(ctx, tx)
 
 		return err
 	}
 
 	if err = tx.Commit(); err != nil {
-		txRollback(tx)
+		rollback(ctx, tx)
 
 		return err
 	}
@@ -48,8 +64,8 @@ func Transaction(ctx context.Context, process func(ctx context.Context, tx *Tx) 
 	return nil
 }
 
-func txRollback(tx *Tx) {
+func rollback(ctx context.Context, tx *Tx) {
 	if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
-		yiigo.Logger().Error("ent transaction rollback error", zap.Error(err))
+		logger.Err(ctx, "err ent transaction rollback", zap.Error(err))
 	}
 }
