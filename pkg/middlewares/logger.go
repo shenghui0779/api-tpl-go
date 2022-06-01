@@ -116,6 +116,7 @@ func Logger(options ...LoggerOption) func(next http.Handler) http.Handler {
 			next.ServeHTTP(ww, r)
 
 			logger.Info(r.Context(), fmt.Sprintf("[%s] %s", r.Method, r.URL.String()),
+				zap.String("addr", r.RemoteAddr),
 				zap.String("params", params),
 				zap.String("response", buf.String()),
 				zap.Int("status", ww.Status()),
