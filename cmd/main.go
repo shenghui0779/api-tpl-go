@@ -28,6 +28,7 @@ func main() {
 
 	yiigo.LoadEnv(yiigo.WithEnvFile(envFile), yiigo.WithEnvWatcher(func(e fsnotify.Event) {
 		yiigo.Logger().Info("env change ok", zap.String("event", e.String()))
+		config.RefreshENV()
 	}))
 
 	yiigo.Init(
@@ -35,6 +36,7 @@ func main() {
 		yiigo.WithLogger(yiigo.Default, config.Logger()),
 	)
 
+	config.RefreshENV()
 	ent.InitDB()
 
 	// make sure we have a working tempdir in minimal containers, because:

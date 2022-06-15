@@ -4,10 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 	"runtime/debug"
-	"strconv"
 
+	cfg "tplgo/pkg/config"
 	"tplgo/pkg/logger"
 
 	"entgo.io/ent/dialect"
@@ -19,15 +18,11 @@ import (
 var DB *Client
 
 func InitDB() {
-	dbug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
-
-	if dbug {
-		DB = NewClient(Driver(dialect.DebugWithContext(yiigo.EntDriver(), func(ctx context.Context, v ...interface{}) {
+	DB = NewClient(Driver(dialect.DebugWithContext(yiigo.EntDriver(), func(ctx context.Context, v ...interface{}) {
+		if cfg.ENV.Debug {
 			logger.Info(ctx, "SQL info", zap.String("SQL", fmt.Sprint(v...)))
-		})))
-	} else {
-		DB = NewClient(Driver(yiigo.EntDriver()))
-	}
+		}
+	})))
 }
 
 type TxHandler func(ctx context.Context, tx *Tx) error
