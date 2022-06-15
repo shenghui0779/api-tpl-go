@@ -6,9 +6,9 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"os"
 	"time"
 
+	"tplgo/pkg/config"
 	"tplgo/pkg/ent"
 	"tplgo/pkg/ent/user"
 	"tplgo/pkg/logger"
@@ -54,7 +54,7 @@ func (i *identity) Encrypt() (string, error) {
 		return "", errors.Wrap(err, "marshal identity")
 	}
 
-	key := []byte(os.Getenv("API_SECRET"))
+	key := []byte(config.ENV.ApiSecret)
 	iv := key[:aes.BlockSize]
 
 	cryptor := yiigo.NewCBCCrypto(key, iv, yiigo.PKCS7)
@@ -69,7 +69,7 @@ func (i *identity) Encrypt() (string, error) {
 }
 
 func (i *identity) Decrypt(cipherText []byte) error {
-	key := []byte(os.Getenv("API_SECRET"))
+	key := []byte(config.ENV.ApiSecret)
 	iv := key[:aes.BlockSize]
 
 	cryptor := yiigo.NewCBCCrypto(key, iv, yiigo.PKCS7)
