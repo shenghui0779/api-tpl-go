@@ -13,6 +13,7 @@ import (
 	"github.com/tidwall/pretty"
 	"go.uber.org/zap"
 
+	"tplgo/pkg/config"
 	"tplgo/pkg/consts"
 	"tplgo/pkg/logger"
 	"tplgo/pkg/result"
@@ -104,7 +105,7 @@ func Logger(options ...LoggerOption) func(next http.Handler) http.Handler {
 			var buf *bytes.Buffer
 
 			// 需要记录返回
-			if !cfg.noresp {
+			if !cfg.noresp && config.ENV.Debug {
 				buf = bufPool.Get().(*bytes.Buffer)
 				buf.Reset()
 
