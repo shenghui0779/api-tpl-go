@@ -136,6 +136,8 @@ func VerifyAuthToken(ctx context.Context, token string) (Identity, error) {
 		return nil, errors.New("未授权，请先登录")
 	}
 
+	logger.Info(ctx, "[AUTH] identity", zap.Int64("id", identity.ID()), zap.String("token", identity.Token()))
+
 	record, err := ent.DB.User.Query().Unique(false).Select(user.FieldID, user.FieldLoginToken).Where(user.ID(identity.ID())).First(ctx)
 
 	if err != nil {

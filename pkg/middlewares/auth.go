@@ -4,10 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"go.uber.org/zap"
-
 	"tplgo/pkg/lib"
-	"tplgo/pkg/logger"
 	"tplgo/pkg/result"
 )
 
@@ -31,8 +28,6 @@ func Auth(next http.Handler) http.Handler {
 
 			return
 		}
-
-		logger.Info(ctx, "req identity", zap.Int64("id", identity.ID()), zap.String("token", identity.Token()))
 
 		next.ServeHTTP(w, r.WithContext(context.WithValue(ctx, lib.AuthIdentityKey, identity)))
 	})
