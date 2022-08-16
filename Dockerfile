@@ -13,7 +13,7 @@ RUN CGO_ENABLED=0 go build -o ./bin/main ./cmd
 
 FROM scratch
 
-WORKDIR /data
+WORKDIR /bin
 
 COPY --from=builder /tplgo/bin/main .
 

@@ -20,10 +20,7 @@ then
 
     docker rm -f tplgo
     docker rmi -f iiinsomnia/tplgo:$tag
-    docker run -d --name=tplgo --restart=always --privileged -p 10086:8000 \
-    -v /data/tplgo/config:/data/config \
-    -v /data/tplgo/logs:/data/logs \
-    iiinsomnia/tplgo:$tag
+    docker run -d --name=tplgo --restart=always --privileged -p 10086:8000 -v /data/tplgo:/data iiinsomnia/tplgo:$tag
 
     exit 0
 fi
@@ -32,7 +29,4 @@ echo "👉 测试环境 ($tag)"
 
 docker rm -f beta_tplgo
 docker rmi -f iiinsomnia/tplgo_beta:$tag
-docker run -d --name=beta_tplgo --restart=always --privileged -p 20086:8000 \
--v /data/beta/tplgo/config:/data/config \
--v /data/beta/tplgo/logs:/data/logs \
-iiinsomnia/tplgo_beta:$tag
+docker run -d --name=beta_tplgo --restart=always --privileged -p 10086:8000 -v /data/beta/tplgo:/data iiinsomnia/tplgo_beta:$tag
