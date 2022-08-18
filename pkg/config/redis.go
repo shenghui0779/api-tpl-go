@@ -10,14 +10,8 @@ import (
 
 func Redis() *yiigo.RedisConfig {
 	cfg := &yiigo.RedisConfig{
-		Addr: os.Getenv("REDIS_ADDR"),
-		Options: &yiigo.RedisOptions{
-			ConnTimeout:  10 * time.Second,
-			ReadTimeout:  10 * time.Second,
-			WriteTimeout: 10 * time.Second,
-			PoolSize:     20,
-			IdleTimeout:  time.Minute,
-		},
+		Addr:    os.Getenv("REDIS_ADDR"),
+		Options: new(yiigo.RedisOptions),
 	}
 
 	if v := os.Getenv("REDIS_USERNAME"); len(v) != 0 {
