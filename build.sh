@@ -18,17 +18,17 @@ if [ $env = "prod" ]
 then
     echo "👉 生产环境 ($tag)"
 
-    docker rmi -f iiinsomnia/tplgo:$tag
-    docker build -t iiinsomnia/tplgo:$tag .
+    docker rmi -f tplgo:$tag
+    docker build -t tplgo:$tag .
     docker image prune -f
-    docker push iiinsomnia/tplgo:$tag
+    # docker push registry/tplgo:$tag
 
     exit 0
 fi
 
 echo "👉 测试环境 ($tag)"
 
-docker rmi -f iiinsomnia/tplgo_beta:$tag
-docker build -t iiinsomnia/tplgo_beta:$tag .
+docker rmi -f tplgo_beta:$tag
+docker build -t tplgo_beta:$tag .
 docker image prune -f
-docker push iiinsomnia/tplgo_beta:$tag
+# docker push registry/tplgo_beta:$tag

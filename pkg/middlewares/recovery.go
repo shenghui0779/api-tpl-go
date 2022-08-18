@@ -1,11 +1,13 @@
 package middlewares
 
 import (
+	"context"
 	"net/http"
 	"runtime/debug"
 
 	"go.uber.org/zap"
 
+	"tplgo/pkg/lib"
 	"tplgo/pkg/logger"
 	"tplgo/pkg/result"
 )
@@ -20,6 +22,27 @@ func Recovery(next http.Handler) http.Handler {
 				result.ErrSystem().JSON(w, r)
 			}
 		}()
+
+		token := r.Header.Get("Authorization")
+
+		if len(token) != 0 {
+			ctx := r.Context()
+
+			identity, err := lib.ParseAuthToken(token)
+
+			if err != nil {
+				logger.Err(ctx, "err middleware recovery (parse auth_token)", zap.Error(err))
+				next.ServeHTTP(w, r)
+
+				return
+			}
+
+			logger.Info(ctx, "[AUTH] identity", zap.Int64("id", identity.ID()), zap.String("token", identity.Token()))
+
+			next.ServeHTTP(w, r.WithContext(context.WithValue(ctx, lib.AuthIdentityKey, identity)))
+
+			return
+		}
 
 		next.ServeHTTP(w, r)
 	})

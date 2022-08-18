@@ -9,13 +9,9 @@ import (
 	"time"
 
 	"tplgo/pkg/config"
-	"tplgo/pkg/ent"
-	"tplgo/pkg/ent/user"
-	"tplgo/pkg/logger"
 
 	"github.com/pkg/errors"
 	"github.com/shenghui0779/yiigo"
-	"go.uber.org/zap"
 )
 
 type CtxKeyAuth int
@@ -54,7 +50,7 @@ func (i *identity) Encrypt() (string, error) {
 		return "", errors.Wrap(err, "marshal identity")
 	}
 
-	key := []byte(config.ENV.ApiSecret)
+	key := []byte(config.ENV.APISecret)
 	iv := key[:aes.BlockSize]
 
 	cryptor := yiigo.NewCBCCrypto(key, iv, yiigo.PKCS7)
@@ -69,7 +65,7 @@ func (i *identity) Encrypt() (string, error) {
 }
 
 func (i *identity) Decrypt(cipherText []byte) error {
-	key := []byte(config.ENV.ApiSecret)
+	key := []byte(config.ENV.APISecret)
 	iv := key[:aes.BlockSize]
 
 	cryptor := yiigo.NewCBCCrypto(key, iv, yiigo.PKCS7)
@@ -115,39 +111,18 @@ func GetIdentity(ctx context.Context) Identity {
 	return identity
 }
 
-func VerifyAuthToken(ctx context.Context, token string) (Identity, error) {
+// ParseAuthToken 解析授权Token
+func ParseAuthToken(token string) (Identity, error) {
 	cipherText, err := base64.StdEncoding.DecodeString(token)
 
 	if err != nil {
-		logger.Err(ctx, "err auth (base64_decode)", zap.Error(err))
-
-		return nil, errors.New("授权信息错误，请重新登录")
+		return nil, errors.Wrap(err, "base64_decode")
 	}
 
 	identity := NewEmptyIdentity()
 
 	if err := identity.Decrypt(cipherText); err != nil {
-		logger.Err(ctx, "err auth (decrypt)", zap.Error(err))
-
-		return nil, errors.New("授权信息错误，请重新登录")
-	}
-
-	if identity.ID() == 0 {
-		return nil, errors.New("未授权，请先登录")
-	}
-
-	logger.Info(ctx, "[AUTH] identity", zap.Int64("id", identity.ID()), zap.String("token", identity.Token()))
-
-	record, err := ent.DB.User.Query().Unique(false).Select(user.FieldID, user.FieldLoginToken).Where(user.ID(identity.ID())).First(ctx)
-
-	if err != nil {
-		logger.Err(ctx, "err auth (query user)", zap.Error(err))
-
-		return nil, errors.New("内部服务器错误")
-	}
-
-	if len(record.LoginToken) == 0 || record.LoginToken != identity.Token() {
-		return nil, errors.New("授权已失效")
+		return nil, errors.Wrap(err, "identity decrypt")
 	}
 
 	return identity, nil

@@ -7,12 +7,12 @@ import (
 
 type Environment struct {
 	Debug     bool
-	ApiSecret string
+	APISecret string
 }
 
 var ENV = new(Environment)
 
 func RefreshENV() {
 	ENV.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
-	ENV.ApiSecret = os.Getenv("API_SECRET")
+	ENV.APISecret = os.Getenv("API_SECRET")
 }
