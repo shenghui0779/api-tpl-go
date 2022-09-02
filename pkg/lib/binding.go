@@ -77,7 +77,7 @@ func URLQuery(r *http.Request, key string) (string, bool) {
 func URLQueryInt(r *http.Request, key string) (int64, bool) {
 	query, ok := URLQuery(r, key)
 
-	if !ok {
+	if !ok || len(query) == 0 {
 		return 0, false
 	}
 

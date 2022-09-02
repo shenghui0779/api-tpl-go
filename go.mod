@@ -9,7 +9,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.12.1
-	github.com/shenghui0779/yiigo v1.7.2
+	github.com/shenghui0779/yiigo v1.7.3
 	github.com/tidwall/pretty v1.2.0
 	go.uber.org/zap v1.22.0
 )
