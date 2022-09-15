@@ -25,11 +25,9 @@ func InitDB() {
 	})))
 }
 
-type TxHandler func(ctx context.Context, tx *Tx) error
-
 // Transaction Executes ent transaction with callback function.
 // The provided context is used until the transaction is committed or rolledback.
-func Transaction(ctx context.Context, callback TxHandler) error {
+func Transaction(ctx context.Context, f func(ctx context.Context, tx *Tx) error) error {
 	tx, err := DB.Tx(ctx)
 
 	if err != nil {
@@ -44,7 +42,7 @@ func Transaction(ctx context.Context, callback TxHandler) error {
 		}
 	}()
 
-	if err = callback(ctx, tx); err != nil {
+	if err = f(ctx, tx); err != nil {
 		rollback(ctx, tx)
 
 		return err
