@@ -9,8 +9,8 @@ func Cors(next http.Handler) http.Handler {
 		header.Set("Access-Control-Allow-Origin", "*")
 		header.Set("Access-Control-Allow-Credentials", "true")
 		header.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		header.Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		header.Set("Access-Control-Expose-Headers", "Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type, Content-Length")
+		header.Set("Access-Control-Allow-Headers", "Content-Type, Authorization, withCredentials")
+		// header.Set("Access-Control-Expose-Headers", "服务器暴露一些自定义的头信息，允许客户端问")
 
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
