@@ -2,15 +2,20 @@ package config
 
 import (
 	"os"
+	"strconv"
 
 	"github.com/shenghui0779/yiigo"
 )
 
 func Logger() *yiigo.LoggerConfig {
-	return &yiigo.LoggerConfig{
+	cfg := &yiigo.LoggerConfig{
 		Filename: os.Getenv("LOG_PATH"),
-		Options: &yiigo.LoggerOptions{
-			Stderr: true,
-		},
+		Options:  new(yiigo.LoggerOptions),
 	}
+
+	if ok, _ := strconv.ParseBool(os.Getenv("DEBUG")); ok {
+		cfg.Options.Stderr = true
+	}
+
+	return cfg
 }

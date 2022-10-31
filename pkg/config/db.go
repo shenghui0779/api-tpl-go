@@ -10,13 +10,8 @@ import (
 
 func DB() *yiigo.DBConfig {
 	cfg := &yiigo.DBConfig{
-		DSN: os.Getenv("DB_DSN"),
-		Options: &yiigo.DBOptions{
-			MaxOpenConns:    20,
-			MaxIdleConns:    10,
-			ConnMaxLifetime: 10 * time.Minute,
-			ConnMaxIdleTime: 5 * time.Minute,
-		},
+		DSN:     os.Getenv("DB_DSN"),
+		Options: new(yiigo.DBOptions),
 	}
 
 	if v := os.Getenv("DB_MAX_OPEN_CONNS"); len(v) != 0 {

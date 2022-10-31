@@ -51,7 +51,7 @@ func main() {
 func serving() {
 	r := chi.NewRouter()
 
-	r.Use(middleware.RequestID, middlewares.Recovery, middlewares.Cors)
+	r.Use(middleware.RequestID, middlewares.Cors, middlewares.Recovery)
 
 	routes.Register(r)
 
