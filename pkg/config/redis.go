@@ -59,7 +59,7 @@ func Redis() *yiigo.RedisConfig {
 	}
 
 	if v := os.Getenv("REDIS_IDLE_TIMEOUT"); len(v) != 0 {
-		if i, err := strconv.Atoi(v); err != nil && i > 0 {
+		if i, err := strconv.Atoi(v); err == nil && i > 0 {
 			cfg.Options.IdleTimeout = time.Second * time.Duration(i)
 		}
 	}
