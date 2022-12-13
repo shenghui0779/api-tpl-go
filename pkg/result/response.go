@@ -2,7 +2,6 @@ package result
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"tplgo/pkg/logger"
 
@@ -26,21 +25,10 @@ func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
 		resp.Err = true
 	}
 
-	b, err := json.Marshal(resp)
-
-	if err != nil {
-		logger.Err(ctx, "err marshal response to JSON", zap.Error(err))
-
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fmt.Sprintf("[%s] %s", logger.GetReqID(ctx), err.Error())))
-
-		return
-	}
-
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 
-	if _, err = w.Write(b); err != nil {
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		logger.Err(ctx, "err write response", zap.Error(err))
 	}
 }
