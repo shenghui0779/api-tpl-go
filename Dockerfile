@@ -1,4 +1,4 @@
-FROM golang:1.17.10 AS builder
+FROM golang:1.19.4 AS builder
 
 WORKDIR /tplgo
 
@@ -7,7 +7,7 @@ COPY . .
 RUN go env -w GOPROXY="https://goproxy.cn,direct"
 RUN go mod download
 RUN sh ent.sh
-RUN go mod tidy -compat=1.17
+RUN go mod tidy
 
 RUN CGO_ENABLED=0 go build -o ./bin/main ./cmd
 
