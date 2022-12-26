@@ -40,7 +40,7 @@ func (m *MockHTTPClient) EXPECT() *MockHTTPClientMockRecorder {
 // Do mocks base method.
 func (m *MockHTTPClient) Do(arg0 context.Context, arg1, arg2 string, arg3 []byte, arg4 ...yiigo.HTTPOption) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1, arg2, arg3}
+	varargs := []any{arg0, arg1, arg2, arg3}
 	for _, a := range arg4 {
 		varargs = append(varargs, a)
 	}
@@ -51,16 +51,16 @@ func (m *MockHTTPClient) Do(arg0 context.Context, arg1, arg2 string, arg3 []byte
 }
 
 // Do indicates an expected call of Do.
-func (mr *MockHTTPClientMockRecorder) Do(arg0, arg1, arg2, arg3 interface{}, arg4 ...interface{}) *gomock.Call {
+func (mr *MockHTTPClientMockRecorder) Do(arg0, arg1, arg2, arg3 any, arg4 ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1, arg2, arg3}, arg4...)
+	varargs := append([]any{arg0, arg1, arg2, arg3}, arg4...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockHTTPClient)(nil).Do), varargs...)
 }
 
 // Upload mocks base method.
 func (m *MockHTTPClient) Upload(arg0 context.Context, arg1 string, arg2 yiigo.UploadForm, arg3 ...yiigo.HTTPOption) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1, arg2}
+	varargs := []any{arg0, arg1, arg2}
 	for _, a := range arg3 {
 		varargs = append(varargs, a)
 	}
@@ -71,9 +71,9 @@ func (m *MockHTTPClient) Upload(arg0 context.Context, arg1 string, arg2 yiigo.Up
 }
 
 // Upload indicates an expected call of Upload.
-func (mr *MockHTTPClientMockRecorder) Upload(arg0, arg1, arg2 interface{}, arg3 ...interface{}) *gomock.Call {
+func (mr *MockHTTPClientMockRecorder) Upload(arg0, arg1, arg2 any, arg3 ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1, arg2}, arg3...)
+	varargs := append([]any{arg0, arg1, arg2}, arg3...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upload", reflect.TypeOf((*MockHTTPClient)(nil).Upload), varargs...)
 }
 
@@ -109,7 +109,7 @@ func (m *MockUploadForm) Write(arg0 *multipart.Writer) error {
 }
 
 // Write indicates an expected call of Write.
-func (mr *MockUploadFormMockRecorder) Write(arg0 interface{}) *gomock.Call {
+func (mr *MockUploadFormMockRecorder) Write(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Write", reflect.TypeOf((*MockUploadForm)(nil).Write), arg0)
 }

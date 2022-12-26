@@ -16,7 +16,7 @@ import (
 
 var Validator = yiigo.NewValidator()
 
-func BindJSON(r *http.Request, obj interface{}) error {
+func BindJSON(r *http.Request, obj any) error {
 	if r.Body != nil && r.Body != http.NoBody {
 		defer io.Copy(io.Discard, r.Body)
 
@@ -29,7 +29,7 @@ func BindJSON(r *http.Request, obj interface{}) error {
 }
 
 // BindForm 解析Form表单并校验
-func BindForm(r *http.Request, obj interface{}) error {
+func BindForm(r *http.Request, obj any) error {
 	switch yiigo.ContentType(r) {
 	case consts.MIMEForm:
 		if err := r.ParseForm(); err != nil {

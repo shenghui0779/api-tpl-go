@@ -16,7 +16,7 @@ func Err(err error) ResultOption {
 	}
 }
 
-func Data(data interface{}) ResultOption {
+func Data(data any) ResultOption {
 	return func(r *response) {
 		r.Data = data
 	}

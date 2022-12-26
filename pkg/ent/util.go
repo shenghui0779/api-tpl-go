@@ -18,7 +18,7 @@ import (
 var DB *Client
 
 func InitDB() {
-	DB = NewClient(Driver(dialect.DebugWithContext(yiigo.EntDriver(), func(ctx context.Context, v ...interface{}) {
+	DB = NewClient(Driver(dialect.DebugWithContext(yiigo.EntDriver(), func(ctx context.Context, v ...any) {
 		if cfg.ENV.Debug {
 			logger.Info(ctx, "SQL info", zap.String("SQL", fmt.Sprint(v...)))
 		}

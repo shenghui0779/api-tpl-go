@@ -10,11 +10,11 @@ import (
 )
 
 type response struct {
-	Code  int         `json:"code"`
-	Err   bool        `json:"err"`
-	Msg   string      `json:"msg"`
-	ReqID string      `json:"req_id"`
-	Data  interface{} `json:"data,omitempty"`
+	Code  int    `json:"code"`
+	Err   bool   `json:"err"`
+	Msg   string `json:"msg"`
+	ReqID string `json:"req_id"`
+	Data  any    `json:"data,omitempty"`
 }
 
 func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
