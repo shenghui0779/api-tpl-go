@@ -1,7 +1,5 @@
 package result
 
-const CodeOK = 0
-
 func OK(options ...ResultOption) Result {
 	return New(CodeOK, "OK", options...)
 }
@@ -27,9 +25,9 @@ func ErrSystem(options ...ResultOption) Result {
 }
 
 func ErrData(options ...ResultOption) Result {
-	return New(60000, "数据异常", options...)
+	return New(60000, "数据异常，请稍后重试", options...)
 }
 
 func ErrService(options ...ResultOption) Result {
-	return New(70000, "服务异常", options...)
+	return New(70000, "服务异常，请稍后重试", options...)
 }

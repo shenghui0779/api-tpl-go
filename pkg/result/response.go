@@ -3,6 +3,7 @@ package result
 import (
 	"encoding/json"
 	"net/http"
+
 	"tplgo/pkg/logger"
 
 	"go.uber.org/zap"
@@ -20,10 +21,6 @@ func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	resp.ReqID = logger.GetReqID(ctx)
-
-	if resp.Code != CodeOK {
-		resp.Err = true
-	}
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)

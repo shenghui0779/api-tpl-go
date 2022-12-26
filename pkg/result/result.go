@@ -1,8 +1,8 @@
 package result
 
-import (
-	"net/http"
-)
+import "net/http"
+
+const CodeOK = 0
 
 type Result interface {
 	JSON(w http.ResponseWriter, r *http.Request)
@@ -27,6 +27,10 @@ func New(code int, msg string, options ...ResultOption) Result {
 	resp := &response{
 		Code: code,
 		Msg:  msg,
+	}
+
+	if code != CodeOK {
+		resp.Err = true
 	}
 
 	for _, f := range options {
