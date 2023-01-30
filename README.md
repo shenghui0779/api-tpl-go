@@ -11,7 +11,7 @@ A template for building go web service with [yiigo](https://github.com/shenghui0
 ```shell
 go mod download
 sh ent.sh
-go mod tidy -compat=1.17
+go mod tidy
 ```
 
 ### 2. run
