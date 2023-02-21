@@ -1,4 +1,4 @@
-package routes
+package router
 
 import (
 	"net/http"
@@ -9,8 +9,8 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-// Register register routes
-func Register(r chi.Router) {
+// register app routes
+func App(r chi.Router) {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("☺ welcome to golang app"))
 	})
@@ -27,8 +27,8 @@ func Register(r chi.Router) {
 	// prometheus metrics
 	// r.Method(http.MethodGet, "/metrics", promhttp.Handler())
 
-	r.Route("/v1/", func(r chi.Router) {
-		r.With(middlewares.Logger()).Group(func(r chi.Router) {
+	r.With(middlewares.Log).Route("/v1/", func(r chi.Router) {
+		r.Group(func(r chi.Router) {
 			{
 				s := service.NewAuth()
 

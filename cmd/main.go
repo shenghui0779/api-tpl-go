@@ -16,7 +16,7 @@ import (
 	"tplgo/pkg/config"
 	"tplgo/pkg/ent"
 	"tplgo/pkg/middlewares"
-	"tplgo/pkg/routes"
+	"tplgo/pkg/router"
 )
 
 var envFile string
@@ -53,7 +53,7 @@ func serving() {
 
 	r.Use(middleware.RequestID, middlewares.Cors, middlewares.Recovery)
 
-	routes.Register(r)
+	router.App(r)
 
 	srv := &http.Server{
 		Addr:         ":8000",

@@ -6,12 +6,15 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"tplgo/pkg/config"
+	"tplgo/pkg/ent"
+	"tplgo/pkg/ent/user"
+	"tplgo/pkg/logger"
 
 	"github.com/pkg/errors"
 	"github.com/shenghui0779/yiigo"
+	"go.uber.org/zap"
 )
 
 type CtxKeyAuth int
@@ -22,12 +25,14 @@ const AuthIdentityKey CtxKeyAuth = 0
 type Identity interface {
 	// ID 授权ID
 	ID() int64
-	// Token 授权Token
-	Token() string
 	// Encrypt 授权加密
 	Encrypt() (string, error)
 	// Decrypt 授权解密
 	Decrypt(cipherText []byte) error
+	// Check 校验
+	Check(ctx context.Context) error
+	// String 用于日志记录
+	String() string
 }
 
 type identity struct {
@@ -37,10 +42,6 @@ type identity struct {
 
 func (i *identity) ID() int64 {
 	return i.I
-}
-
-func (i *identity) Token() string {
-	return i.T
 }
 
 func (i *identity) Encrypt() (string, error) {
@@ -53,7 +54,7 @@ func (i *identity) Encrypt() (string, error) {
 	key := []byte(config.ENV.APISecret)
 	iv := key[:aes.BlockSize]
 
-	cryptor := yiigo.NewCBCCrypto(key, iv, yiigo.PKCS7)
+	cryptor := yiigo.NewCBCCrypto(key, iv, yiigo.AES_PKCS5)
 
 	cipherText, err := cryptor.Encrypt(plainText)
 
@@ -68,7 +69,7 @@ func (i *identity) Decrypt(cipherText []byte) error {
 	key := []byte(config.ENV.APISecret)
 	iv := key[:aes.BlockSize]
 
-	cryptor := yiigo.NewCBCCrypto(key, iv, yiigo.PKCS7)
+	cryptor := yiigo.NewCBCCrypto(key, iv, yiigo.AES_PKCS5)
 
 	plainText, err := cryptor.Decrypt(cipherText)
 
@@ -83,16 +84,47 @@ func (i *identity) Decrypt(cipherText []byte) error {
 	return nil
 }
 
+func (i *identity) Check(ctx context.Context) error {
+	if i.I == 0 {
+		return errors.New("未授权，请先登录")
+	}
+
+	record, err := ent.DB.User.Query().Unique(false).Select(
+		user.FieldID,
+		user.FieldLoginToken,
+	).Where(user.ID(i.I)).First(ctx)
+
+	if err != nil {
+		logger.Err(ctx, "err auth check", zap.Error(err))
+
+		return errors.New("内部服务器错误")
+	}
+
+	if len(record.LoginToken) == 0 || record.LoginToken != i.T {
+		return errors.New("授权已失效")
+	}
+
+	return nil
+}
+
+func (i *identity) String() string {
+	if i.I == 0 {
+		return ""
+	}
+
+	return fmt.Sprintf("id:%d|token:%s", i.I, i.T)
+}
+
 // NewEmptyIdentity 空授权信息
 func NewEmptyIdentity() Identity {
 	return new(identity)
 }
 
 // NewIdentity 用户授权信息
-func NewIdentity(userID int64) Identity {
+func NewIdentity(id int64, token string) Identity {
 	return &identity{
-		I: userID,
-		T: yiigo.MD5(fmt.Sprintf("%d.%d.%s", userID, time.Now().Unix(), Nonce())),
+		I: id,
+		T: token,
 	}
 }
 
@@ -111,19 +143,23 @@ func GetIdentity(ctx context.Context) Identity {
 	return identity
 }
 
-// ParseAuthToken 解析授权Token
-func ParseAuthToken(token string) (Identity, error) {
+// AuthTokenToIdentity 解析授权Token
+func AuthTokenToIdentity(ctx context.Context, token string) Identity {
 	cipherText, err := base64.StdEncoding.DecodeString(token)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "base64_decode")
+		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
+
+		return NewEmptyIdentity()
 	}
 
 	identity := NewEmptyIdentity()
 
 	if err := identity.Decrypt(cipherText); err != nil {
-		return nil, errors.Wrap(err, "identity decrypt")
+		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
+
+		return NewEmptyIdentity()
 	}
 
-	return identity, nil
+	return identity
 }

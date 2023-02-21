@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -73,7 +74,9 @@ func (a *auth) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	identity := lib.NewIdentity(record.ID)
+	token := yiigo.MD5(fmt.Sprintf("%d.%d.%s", record.ID, time.Now().UnixMilli(), lib.Nonce()))
+
+	identity := lib.NewIdentity(record.ID, token)
 
 	authToken, err := identity.Encrypt()
 
@@ -85,7 +88,7 @@ func (a *auth) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = ent.DB.User.Update().Where(user.ID(record.ID)).
-		SetLoginToken(identity.Token()).
+		SetLoginToken(token).
 		SetLastLoginAt(time.Now().Unix()).
 		Save(ctx)
 

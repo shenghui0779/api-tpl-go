@@ -26,13 +26,13 @@ func DB() *yiigo.DBConfig {
 		}
 	}
 
-	if v := os.Getenv("DB_CONN_MAX_LIFE_TIME"); len(v) != 0 {
+	if v := os.Getenv("DB_CONN_MAX_LIFETIME"); len(v) != 0 {
 		if i, err := strconv.Atoi(v); err == nil && i > 0 {
 			cfg.Options.ConnMaxLifetime = time.Duration(i) * time.Second
 		}
 	}
 
-	if v := os.Getenv("DB_CONN_MAX_IDLE_TIME"); len(v) != 0 {
+	if v := os.Getenv("DB_CONN_MAX_IDLETIME"); len(v) != 0 {
 		if i, err := strconv.Atoi(v); err == nil && i > 0 {
 			cfg.Options.ConnMaxIdleTime = time.Duration(i) * time.Second
 		}

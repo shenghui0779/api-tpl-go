@@ -23,21 +23,9 @@ func Recovery(next http.Handler) http.Handler {
 			}
 		}()
 
-		token := r.Header.Get("Authorization")
-
-		if len(token) != 0 {
+		if token := r.Header.Get("Authorization"); len(token) != 0 {
 			ctx := r.Context()
-
-			identity, err := lib.ParseAuthToken(token)
-
-			if err != nil {
-				logger.Err(ctx, "err middleware recovery (parse auth_token)", zap.Error(err))
-				next.ServeHTTP(w, r)
-
-				return
-			}
-
-			logger.Info(ctx, "[AUTH] identity", zap.Int64("id", identity.ID()), zap.String("token", identity.Token()))
+			identity := lib.AuthTokenToIdentity(ctx, token)
 
 			next.ServeHTTP(w, r.WithContext(context.WithValue(ctx, lib.AuthIdentityKey, identity)))
 
