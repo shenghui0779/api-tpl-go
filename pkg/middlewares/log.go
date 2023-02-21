@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/shenghui0779/yiigo"
@@ -15,14 +14,6 @@ import (
 	"tplgo/pkg/lib"
 	"tplgo/pkg/logger"
 	"tplgo/pkg/result"
-)
-
-var (
-	bufPool = sync.Pool{
-		New: func() any {
-			return bytes.NewBuffer(make([]byte, 0, 4<<10)) // 4KB
-		},
-	}
 )
 
 // Log 日志中间件
