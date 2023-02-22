@@ -86,7 +86,7 @@ func (i *identity) Check(ctx context.Context) error {
 
 func (i *identity) String() string {
 	if i.I == 0 {
-		return ""
+		return "<nil>"
 	}
 
 	return fmt.Sprintf("id:%d|token:%s", i.I, i.T)
