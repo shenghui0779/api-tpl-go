@@ -121,15 +121,13 @@ func GetIdentity(ctx context.Context) Identity {
 }
 
 // AuthTokenToIdentity 解析授权Token
-func AuthTokenToIdentity(ctx context.Context, token string) (identity Identity) {
-	identity = NewEmptyIdentity()
-
+func AuthTokenToIdentity(ctx context.Context, token string) Identity {
 	cipherText, err := base64.StdEncoding.DecodeString(token)
 
 	if err != nil {
 		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
 
-		return
+		return NewEmptyIdentity()
 	}
 
 	key := []byte(config.ENV.APISecret)
@@ -140,14 +138,16 @@ func AuthTokenToIdentity(ctx context.Context, token string) (identity Identity) 
 	if err != nil {
 		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
 
-		return
+		return NewEmptyIdentity()
 	}
+
+	identity := NewEmptyIdentity()
 
 	if err = json.Unmarshal(plainText, identity); err != nil {
 		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
 
-		return
+		return NewEmptyIdentity()
 	}
 
-	return
+	return identity
 }
