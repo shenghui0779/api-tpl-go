@@ -145,7 +145,7 @@ func AuthTokenToIdentity(ctx context.Context, token string) Identity {
 
 	if err = json.Unmarshal(plainText, identity); err != nil {
 		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
-
+		// 此处应返回空Identify，因为若仅部分字段解析失败，Identity可能依然有效
 		return NewEmptyIdentity()
 	}
 
