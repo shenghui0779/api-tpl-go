@@ -72,6 +72,10 @@ func (i *identity) Check(ctx context.Context) error {
 	).Where(user.ID(i.I)).First(ctx)
 
 	if err != nil {
+		if ent.IsNotFound(err) {
+			return errors.New("授权账号无效")
+		}
+
 		logger.Err(ctx, "err auth check", zap.Error(err))
 
 		return errors.New("内部服务器错误")
