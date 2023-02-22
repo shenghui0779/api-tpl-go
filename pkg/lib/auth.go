@@ -73,7 +73,7 @@ func (i *identity) Check(ctx context.Context) error {
 
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return errors.New("授权账号无效")
+			return errors.New("无效的账号")
 		}
 
 		logger.Err(ctx, "err auth check", zap.Error(err))
