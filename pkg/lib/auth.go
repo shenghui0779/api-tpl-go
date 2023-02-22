@@ -25,10 +25,8 @@ const AuthIdentityKey CtxKeyAuth = 0
 type Identity interface {
 	// ID 授权ID
 	ID() int64
-	// Encrypt 授权加密
-	Encrypt() (string, error)
-	// Decrypt 授权解密
-	Decrypt(cipherText []byte) error
+	// AuthToken 生成auth_token
+	AuthToken() (string, error)
 	// Check 校验
 	Check(ctx context.Context) error
 	// String 用于日志记录
@@ -44,7 +42,7 @@ func (i *identity) ID() int64 {
 	return i.I
 }
 
-func (i *identity) Encrypt() (string, error) {
+func (i *identity) AuthToken() (string, error) {
 	plainText, err := json.Marshal(i)
 
 	if err != nil {
@@ -52,9 +50,7 @@ func (i *identity) Encrypt() (string, error) {
 	}
 
 	key := []byte(config.ENV.APISecret)
-	iv := key[:aes.BlockSize]
-
-	cryptor := yiigo.NewCBCCrypto(key, iv, yiigo.AES_PKCS5)
+	cryptor := yiigo.NewCBCCrypto(key, key[:aes.BlockSize], yiigo.AES_PKCS5)
 
 	cipherText, err := cryptor.Encrypt(plainText)
 
@@ -63,25 +59,6 @@ func (i *identity) Encrypt() (string, error) {
 	}
 
 	return base64.StdEncoding.EncodeToString(cipherText), nil
-}
-
-func (i *identity) Decrypt(cipherText []byte) error {
-	key := []byte(config.ENV.APISecret)
-	iv := key[:aes.BlockSize]
-
-	cryptor := yiigo.NewCBCCrypto(key, iv, yiigo.AES_PKCS5)
-
-	plainText, err := cryptor.Decrypt(cipherText)
-
-	if err != nil {
-		return errors.Wrap(err, "decrypt identity")
-	}
-
-	if err = json.Unmarshal(plainText, i); err != nil {
-		return errors.Wrap(err, "unmarshal identity")
-	}
-
-	return nil
 }
 
 func (i *identity) Check(ctx context.Context) error {
@@ -144,22 +121,33 @@ func GetIdentity(ctx context.Context) Identity {
 }
 
 // AuthTokenToIdentity 解析授权Token
-func AuthTokenToIdentity(ctx context.Context, token string) Identity {
+func AuthTokenToIdentity(ctx context.Context, token string) (identity Identity) {
+	identity = NewEmptyIdentity()
+
 	cipherText, err := base64.StdEncoding.DecodeString(token)
 
 	if err != nil {
 		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
 
-		return NewEmptyIdentity()
+		return
 	}
 
-	identity := NewEmptyIdentity()
+	key := []byte(config.ENV.APISecret)
+	cryptor := yiigo.NewCBCCrypto(key, key[:aes.BlockSize], yiigo.AES_PKCS5)
 
-	if err := identity.Decrypt(cipherText); err != nil {
+	plainText, err := cryptor.Decrypt(cipherText)
+
+	if err != nil {
 		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
 
-		return NewEmptyIdentity()
+		return
 	}
 
-	return identity
+	if err = json.Unmarshal(plainText, identity); err != nil {
+		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
+
+		return
+	}
+
+	return
 }
