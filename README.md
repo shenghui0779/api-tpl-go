@@ -1,6 +1,6 @@
 # tplgo
 
-A template for building go web service with [yiigo](https://github.com/shenghui0779/yiigo).
+Go web api 开发模板
 
 > 1. ORM [entgo.io](https://entgo.io/)
 > 2. Table `User` refers to `pkg/ent/schema/user.go`
