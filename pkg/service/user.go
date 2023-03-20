@@ -61,7 +61,7 @@ func (u *users) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	now := time.Now().Unix()
-	salt := lib.Nonce()
+	salt := lib.Nonce(16)
 
 	_, err = ent.DB.User.Create().
 		SetUsername(params.Username).

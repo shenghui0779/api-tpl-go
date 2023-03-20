@@ -29,8 +29,8 @@ func CtxCopyWithReqID(ctx context.Context) context.Context {
 	return context.WithValue(context.Background(), middleware.RequestIDKey, middleware.GetReqID(ctx))
 }
 
-func Nonce() string {
-	nonce := make([]byte, 8)
+func Nonce(size uint8) string {
+	nonce := make([]byte, size/2)
 	io.ReadFull(rand.Reader, nonce)
 
 	return hex.EncodeToString(nonce)

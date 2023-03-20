@@ -74,7 +74,7 @@ func (a *auth) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token := yiigo.MD5(fmt.Sprintf("auth.%d.%d.%s", record.ID, time.Now().UnixMilli(), lib.Nonce()))
+	token := yiigo.MD5(fmt.Sprintf("auth.%d.%d.%s", record.ID, time.Now().UnixMilli(), lib.Nonce(16)))
 
 	identity := lib.NewIdentity(record.ID, token)
 	authToken, err := identity.AuthToken()

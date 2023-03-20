@@ -31,11 +31,11 @@ func BindJSON(r *http.Request, obj any) error {
 // BindForm 解析Form表单并校验
 func BindForm(r *http.Request, obj any) error {
 	switch consts.ContentType(yiigo.ContentType(r)) {
-	case consts.MIMEForm:
+	case consts.URLEncodedForm:
 		if err := r.ParseForm(); err != nil {
 			return err
 		}
-	case consts.MIMEMultipartForm:
+	case consts.MultipartForm:
 		if err := r.ParseMultipartForm(consts.MaxFormMemory); err != nil {
 			if err != http.ErrNotMultipart {
 				return err

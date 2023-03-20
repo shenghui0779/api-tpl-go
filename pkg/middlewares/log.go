@@ -25,7 +25,7 @@ func Log(next http.Handler) http.Handler {
 		// 请求包含body
 		if r.Body != nil && r.Body != http.NoBody {
 			switch consts.ContentType(yiigo.ContentType(r)) {
-			case consts.MIMEForm:
+			case consts.URLEncodedForm:
 				if err := r.ParseForm(); err != nil {
 					result.ErrSystem(result.Err(err)).JSON(w, r)
 
@@ -33,7 +33,7 @@ func Log(next http.Handler) http.Handler {
 				}
 
 				body = r.Form.Encode()
-			case consts.MIMEMultipartForm:
+			case consts.MultipartForm:
 				if err := r.ParseMultipartForm(consts.MaxFormMemory); err != nil {
 					if err != http.ErrNotMultipart {
 						result.ErrSystem(result.Err(err)).JSON(w, r)
