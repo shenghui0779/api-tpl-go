@@ -52,6 +52,7 @@ func serving() {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID, middlewares.Cors, middlewares.Recovery)
+	r.Mount("/debug", middleware.Profiler())
 
 	router.App(r)
 
