@@ -4,7 +4,7 @@ Go web api 开发模板 ( [yiigo](https://github.com/shenghui0779/yiigo) + [chi]
 
 > 1. ORM [entgo.io](https://entgo.io/)
 > 2. Table `User` refers to `pkg/ent/schema/user.go`
-> 3. Set `GOPROXY` [ `go env -w GOPROXY="https://goproxy.cn,direct"` ]
+> 3. Set `GOPROXY` ( `go env -w GOPROXY="https://goproxy.cn,direct"` )
 
 ### 1. prepare
 
