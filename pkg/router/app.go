@@ -27,23 +27,21 @@ func App(r chi.Router) {
 	// prometheus metrics
 	// r.Method(http.MethodGet, "/metrics", promhttp.Handler())
 
-	r.With(middlewares.Log).Route("/v1/", func(r chi.Router) {
-		r.Group(func(r chi.Router) {
+	r.With(middlewares.Log).Route("/v1", func(r chi.Router) {
+		{
+			s := service.NewAuth()
+
+			r.Post("/login", s.Login)
+			r.With(middlewares.Auth).Get("/logout", s.Logout)
+		}
+
+		r.With(middlewares.Auth).Group(func(r chi.Router) {
 			{
-				s := service.NewAuth()
+				s := service.NewUser()
 
-				r.Post("/login", s.Login)
-				r.With(middlewares.Auth).Get("/logout", s.Logout)
+				r.Post("/users", s.Create)
+				r.Get("/users", s.List)
 			}
-
-			r.With(middlewares.Auth).Group(func(r chi.Router) {
-				{
-					s := service.NewUser()
-
-					r.Post("/users", s.Create)
-					r.Get("/users", s.List)
-				}
-			})
 		})
 	})
 }
