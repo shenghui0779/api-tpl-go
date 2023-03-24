@@ -36,7 +36,7 @@ func Transaction(ctx context.Context, f func(ctx context.Context, tx *Tx) error)
 
 	defer func() {
 		if r := recover(); r != nil {
-			logger.Err(ctx, "ent transaction panic", zap.Any("error", r), zap.ByteString("stack", debug.Stack()))
+			logger.Err(ctx, "ent tx panic", zap.Any("error", r), zap.ByteString("stack", debug.Stack()))
 
 			rollback(ctx, tx)
 		}
@@ -59,6 +59,6 @@ func Transaction(ctx context.Context, f func(ctx context.Context, tx *Tx) error)
 
 func rollback(ctx context.Context, tx *Tx) {
 	if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
-		logger.Err(ctx, "err ent transaction rollback", zap.Error(err))
+		logger.Err(ctx, "err ent tx rollback", zap.Error(err))
 	}
 }
