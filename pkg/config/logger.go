@@ -2,7 +2,6 @@ package config
 
 import (
 	"os"
-	"strconv"
 
 	"github.com/shenghui0779/yiigo"
 )
@@ -13,7 +12,8 @@ func Logger() *yiigo.LoggerConfig {
 		Options:  new(yiigo.LoggerOptions),
 	}
 
-	if ok, _ := strconv.ParseBool(os.Getenv("DEBUG")); ok {
+	// 开发环境允许终端输出日志
+	if os.Getenv("ENV") == "dev" {
 		cfg.Options.Stderr = true
 	}
 
