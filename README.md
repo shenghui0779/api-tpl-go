@@ -1,6 +1,6 @@
 # tplgo
 
-Go web api 开发模板 ( [yiigo](https://github.com/shenghui0779/yiigo) + [chi](https://github.com/go-chi/chi) )
+Go web api 开发模板 ( [yiigo](https://github.com/shenghui0779/yiigo) + [chi](https://github.com/go-chi/chi) ) 👉 该有的基本都有
 
 > 1. ORM [entgo.io](https://entgo.io/)
 > 2. Table `User` refers to `pkg/ent/schema/user.go`
