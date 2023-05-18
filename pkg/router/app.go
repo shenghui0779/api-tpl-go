@@ -29,7 +29,7 @@ func App(r chi.Router) {
 
 	r.With(middlewares.Log).Route("/v1", func(r chi.Router) {
 		{
-			s := service.NewAuth()
+			s := new(service.ServiceAuth)
 
 			r.Post("/login", s.Login)
 			r.With(middlewares.Auth).Get("/logout", s.Logout)
@@ -37,7 +37,7 @@ func App(r chi.Router) {
 
 		r.With(middlewares.Auth).Group(func(r chi.Router) {
 			{
-				s := service.NewUser()
+				s := new(service.ServiceUser)
 
 				r.Post("/users", s.Create)
 				r.Get("/users", s.List)

@@ -16,19 +16,8 @@ import (
 	"tplgo/pkg/result"
 )
 
-// Auth 授权服务
-type Auth interface {
-	// Login 登录
-	Login(w http.ResponseWriter, r *http.Request)
-	// Logout 注销
-	Logout(w http.ResponseWriter, r *http.Request)
-}
-
-func NewAuth() Auth {
-	return new(auth)
-}
-
-type auth struct{}
+// ServiceAuth 授权服务
+type ServiceAuth struct{}
 
 type ParamsLogin struct {
 	Username string `json:"username" valid:"required"`
@@ -39,7 +28,8 @@ type RespLogin struct {
 	AuthToken string `json:"auth_token"`
 }
 
-func (a *auth) Login(w http.ResponseWriter, r *http.Request) {
+// Login 登录
+func (s *ServiceAuth) Login(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	params := new(ParamsLogin)
@@ -85,10 +75,7 @@ func (a *auth) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = ent.DB.User.Update().Where(user.ID(record.ID)).
-		SetLoginToken(token).
-		SetLastLoginAt(time.Now().Unix()).
-		Save(ctx)
+	_, err = ent.DB.User.Update().Where(user.ID(record.ID)).SetLoginAt(time.Now().Unix()).SetLoginToken(token).Save(ctx)
 
 	if err != nil {
 		logger.Err(ctx, "err update user", zap.Error(err))
@@ -104,7 +91,8 @@ func (a *auth) Login(w http.ResponseWriter, r *http.Request) {
 	result.OK(result.Data(resp)).JSON(w, r)
 }
 
-func (a *auth) Logout(w http.ResponseWriter, r *http.Request) {
+// Logout 注销
+func (s *ServiceAuth) Logout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	identity := lib.GetIdentity(ctx)

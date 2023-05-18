@@ -28,12 +28,8 @@ func (User) Fields() []ent.Field {
 		field.String("username").Default(""),
 		field.String("password").Default(""),
 		field.String("salt").Default(""),
-		field.String("avatar").Default(""),
-		field.String("phone").Default(""),
-		field.String("email").Default(""),
-		field.Int64("registed_at").Immutable().Default(0),
+		field.Int64("login_at").Default(0),
 		field.String("login_token").Default(""),
-		field.Int64("last_login_at").Default(0),
 		field.Int64("created_at").Immutable().Default(0),
 		field.Int64("updated_at").Default(0),
 	}
