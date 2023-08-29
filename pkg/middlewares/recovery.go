@@ -1,13 +1,11 @@
 package middlewares
 
 import (
-	"context"
 	"net/http"
 	"runtime/debug"
 
 	"go.uber.org/zap"
 
-	"tplgo/pkg/lib"
 	"tplgo/pkg/logger"
 	"tplgo/pkg/result"
 )
@@ -22,15 +20,6 @@ func Recovery(next http.Handler) http.Handler {
 				result.ErrSystem().JSON(w, r)
 			}
 		}()
-
-		if token := r.Header.Get("Authorization"); len(token) != 0 {
-			ctx := r.Context()
-			identity := lib.AuthTokenToIdentity(ctx, token)
-
-			next.ServeHTTP(w, r.WithContext(context.WithValue(ctx, lib.AuthIdentityKey, identity)))
-
-			return
-		}
 
 		next.ServeHTTP(w, r)
 	})
