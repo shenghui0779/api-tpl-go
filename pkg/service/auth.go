@@ -9,11 +9,11 @@ import (
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 
-	"tplgo/pkg/ent"
-	"tplgo/pkg/ent/user"
-	"tplgo/pkg/lib"
-	"tplgo/pkg/logger"
-	"tplgo/pkg/result"
+	"api/pkg/ent"
+	"api/pkg/ent/user"
+	"api/pkg/lib"
+	"api/pkg/logger"
+	"api/pkg/result"
 )
 
 // ServiceAuth 授权服务

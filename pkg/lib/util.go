@@ -10,7 +10,7 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"tplgo/pkg/logger"
+	"api/pkg/logger"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"

@@ -3,8 +3,8 @@ package middlewares
 import (
 	"net/http"
 
-	"tplgo/pkg/lib"
-	"tplgo/pkg/result"
+	"api/pkg/lib"
+	"api/pkg/result"
 )
 
 // Auth App授权中间件

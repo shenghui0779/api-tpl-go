@@ -1,6 +1,6 @@
 FROM golang:1.19.4 AS builder
 
-WORKDIR /tplgo
+WORKDIR /api
 
 COPY . .
 
@@ -15,7 +15,7 @@ FROM scratch
 
 WORKDIR /bin
 
-COPY --from=builder /tplgo/bin/main .
+COPY --from=builder /api/bin/main .
 
 EXPOSE 8000
 

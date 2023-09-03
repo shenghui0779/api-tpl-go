@@ -10,10 +10,10 @@ import (
 	"github.com/tidwall/pretty"
 	"go.uber.org/zap"
 
-	"tplgo/pkg/consts"
-	"tplgo/pkg/lib"
-	"tplgo/pkg/logger"
-	"tplgo/pkg/result"
+	"api/pkg/consts"
+	"api/pkg/lib"
+	"api/pkg/logger"
+	"api/pkg/result"
 )
 
 // Log 日志中间件

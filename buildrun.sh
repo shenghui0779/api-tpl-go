@@ -1,8 +1,8 @@
 #!/bin/bash
-docker rm -f tplgo
-docker rmi -f img_tplgo
+docker rm -f api
+docker rmi -f img_api
 
-docker build -t img_tplgo .
+docker build -t img_api .
 docker image prune -f
 
-docker run -d --name=tplgo --restart=always --privileged -p 10086:8000 -v /data/tplgo:/data img_tplgo
+docker run -d --name=api --restart=always --privileged -p 10086:8000 -v /data/api:/data img_api

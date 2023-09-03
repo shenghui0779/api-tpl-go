@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"tplgo/pkg/consts"
-	"tplgo/pkg/logger"
+	"api/pkg/consts"
+	"api/pkg/logger"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/shenghui0779/yiigo"

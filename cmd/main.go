@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,24 +10,22 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/shenghui0779/yiigo"
+	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
-	"tplgo/pkg/config"
-	"tplgo/pkg/ent"
-	"tplgo/pkg/middlewares"
-	"tplgo/pkg/router"
+	"api/pkg/config"
+	"api/pkg/ent"
+	"api/pkg/middlewares"
+	"api/pkg/router"
+	"api/pkg/scripts"
 )
 
 var envFile string
 
 func main() {
-	flag.StringVar(&envFile, "envfile", ".env", "设置ENV配置文件")
-
-	flag.Parse()
-
 	yiigo.LoadEnv(yiigo.WithEnvFile(envFile), yiigo.WithEnvWatcher(func(e fsnotify.Event) {
 		yiigo.Logger().Info("env change ok", zap.String("event", e.String()))
-		config.RefreshENV()
+		config.Refresh()
 	}))
 
 	yiigo.Init(
@@ -36,16 +33,35 @@ func main() {
 		yiigo.WithLogger(yiigo.Default, config.Logger()),
 	)
 
-	config.RefreshENV()
+	config.Refresh()
 	ent.InitDB()
 
-	// make sure we have a working tempdir in minimal containers, because:
-	// os.TempDir(): The directory is neither guaranteed to exist nor have accessible permissions.
-	if err := os.MkdirAll(os.TempDir(), 0775); err != nil {
-		yiigo.Logger().Error("err create temp dir", zap.Error(err))
+	var rootCmd = &cobra.Command{
+		Use:         "api",
+		Short:       "Go应用服务API",
+		Long:        "Go应用服务API(build with yiigo & chi)",
+		Annotations: map[string]string{},
+		Version:     "v1.0.0",
+		Run: func(cmd *cobra.Command, args []string) {
+			// make sure we have a working tempdir in minimal containers, because:
+			// os.TempDir(): The directory is neither guaranteed to exist nor have accessible permissions.
+			if err := os.MkdirAll(os.TempDir(), 0775); err != nil {
+				yiigo.Logger().Error("err create temp dir", zap.Error(err))
+			}
+
+			serving()
+		},
 	}
 
-	serving()
+	// 注册变量
+	rootCmd.Flags().StringVarP(&envFile, "envfile", "E", ".env", "设置ENV配置文件")
+
+	// 注册命令
+	rootCmd.AddCommand(scripts.CmdHello)
+
+	if err := rootCmd.Execute(); err != nil {
+		yiigo.Logger().Error("err cmd execute", zap.Error(err))
+	}
 }
 
 func serving() {

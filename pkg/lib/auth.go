@@ -7,10 +7,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"tplgo/pkg/config"
-	"tplgo/pkg/ent"
-	"tplgo/pkg/ent/user"
-	"tplgo/pkg/logger"
+	"api/pkg/config"
+	"api/pkg/ent"
+	"api/pkg/ent/user"
+	"api/pkg/logger"
 
 	"github.com/pkg/errors"
 	"github.com/shenghui0779/yiigo"

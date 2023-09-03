@@ -12,7 +12,7 @@ type Environment struct {
 
 var ENV = new(Environment)
 
-func RefreshENV() {
+func Refresh() {
 	ENV.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
 	ENV.APISecret = os.Getenv("API_SECRET")
 }

@@ -3,8 +3,8 @@ package router
 import (
 	"net/http"
 
-	"tplgo/pkg/middlewares"
-	"tplgo/pkg/service"
+	"api/pkg/middlewares"
+	"api/pkg/service"
 
 	"github.com/go-chi/chi/v5"
 )
