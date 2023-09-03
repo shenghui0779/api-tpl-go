@@ -17,6 +17,6 @@ go mod tidy
 ### 2. run
 
 ```shell
-mv .env.example => cmd/.env
-cd cmd          => go run main.go
+mv .env.example env
+go run main.go
 ```
