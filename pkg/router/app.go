@@ -5,6 +5,7 @@ import (
 
 	"api/pkg/middlewares"
 	"api/pkg/service"
+	"api/pkg/service/user"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -28,19 +29,14 @@ func App(r chi.Router) {
 	// r.Method(http.MethodGet, "/metrics", promhttp.Handler())
 
 	r.With(middlewares.Log).Route("/v1", func(r chi.Router) {
-		{
-			s := new(service.ServiceAuth)
-
-			r.Post("/login", s.Login)
-			r.With(middlewares.Auth).Get("/logout", s.Logout)
-		}
+		r.Post("/login", service.Login)
 
 		r.With(middlewares.Auth).Group(func(r chi.Router) {
-			{
-				s := new(service.ServiceUser)
+			r.Get("/logout", service.Logout)
 
-				r.Post("/users", s.Create)
-				r.Get("/users", s.List)
+			{
+				r.Get("/users", user.List)
+				r.Post("/users", user.Create)
 			}
 		})
 	})

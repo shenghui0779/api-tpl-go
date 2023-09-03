@@ -1,54 +1,15 @@
-package lib
+package internal
 
 import (
-	"encoding/json"
-	"io"
-	"net/http"
-	"strconv"
-
-	"api/consts"
 	"api/logger"
+	"net/http"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 )
-
-var Validator = yiigo.NewValidator()
-
-func BindJSON(r *http.Request, obj any) error {
-	if r.Body != nil && r.Body != http.NoBody {
-		defer io.Copy(io.Discard, r.Body)
-
-		if err := json.NewDecoder(r.Body).Decode(obj); err != nil {
-			return err
-		}
-	}
-
-	return Validator.ValidateStruct(obj)
-}
-
-// BindForm 解析Form表单并校验
-func BindForm(r *http.Request, obj any) error {
-	switch consts.ContentType(yiigo.ContentType(r)) {
-	case consts.URLEncodedForm:
-		if err := r.ParseForm(); err != nil {
-			return err
-		}
-	case consts.MultipartForm:
-		if err := r.ParseMultipartForm(consts.MaxFormMemory); err != nil {
-			if err != http.ErrNotMultipart {
-				return err
-			}
-		}
-	}
-
-	if err := yiigo.MapForm(obj, r.Form); err != nil {
-		return err
-	}
-
-	return Validator.ValidateStruct(obj)
-}
 
 func URLParamInt(r *http.Request, key string) int64 {
 	param := chi.URLParam(r, key)
@@ -90,4 +51,42 @@ func URLQueryInt(r *http.Request, key string) (int64, bool) {
 	}
 
 	return v, true
+}
+
+func QueryPage(r *http.Request) (offset, limit int) {
+	limit = 20
+
+	if v, ok := URLQueryInt(r, "size"); ok && v > 0 {
+		limit = int(v)
+	}
+
+	if limit > 100 {
+		limit = 100
+	}
+
+	if v, ok := URLQueryInt(r, "page"); ok && v > 0 {
+		offset = (int(v) - 1) * limit
+	}
+
+	return
+}
+
+func ExcelColumnIndex(name string) int {
+	name = strings.ToUpper(name)
+
+	if ok, err := regexp.MatchString(`^[A-Z]{1,2}$`, name); err != nil || !ok {
+		return -1
+	}
+
+	index := 0
+
+	for i, v := range name {
+		if i != 0 {
+			index = (index + 1) * 26
+		}
+
+		index += int(v - 'A')
+	}
+
+	return index
 }

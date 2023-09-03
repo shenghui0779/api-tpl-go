@@ -14,10 +14,8 @@ import (
 	"api/lib"
 	"api/logger"
 	"api/pkg/result"
+	"api/pkg/service/internal"
 )
-
-// ServiceAuth 授权服务
-type ServiceAuth struct{}
 
 type ParamsLogin struct {
 	Username string `json:"username" valid:"required"`
@@ -29,12 +27,12 @@ type RespLogin struct {
 }
 
 // Login 登录
-func (s *ServiceAuth) Login(w http.ResponseWriter, r *http.Request) {
+func Login(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	params := new(ParamsLogin)
 
-	err := lib.BindJSON(r, params)
+	err := internal.BindJSON(r, params)
 
 	if err != nil {
 		logger.Err(ctx, "err params", zap.Error(err))
@@ -92,7 +90,7 @@ func (s *ServiceAuth) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 // Logout 注销
-func (s *ServiceAuth) Logout(w http.ResponseWriter, r *http.Request) {
+func Logout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	identity := lib.GetIdentity(ctx)
