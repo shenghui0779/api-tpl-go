@@ -78,7 +78,7 @@ func (i *identity) Check(ctx context.Context) error {
 
 		logger.Err(ctx, "err auth check", zap.Error(err))
 
-		return errors.New("内部服务器错误")
+		return errors.New("授权校验失败")
 	}
 
 	if len(record.LoginToken) == 0 || record.LoginToken != i.T {
