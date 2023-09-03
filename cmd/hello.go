@@ -1,4 +1,4 @@
-package scripts
+package cmd
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var CmdHello = &cobra.Command{
+var cmdHello = &cobra.Command{
 	Use:     "hello",
 	Short:   "命令示例",
 	Long:    "命令示例",

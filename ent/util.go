@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	cfg "api/pkg/config"
-	"api/pkg/logger"
+	cfg "api/config"
+	"api/logger"
 
 	"entgo.io/ent/dialect"
 	"github.com/shenghui0779/yiigo"

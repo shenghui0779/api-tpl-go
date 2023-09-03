@@ -10,9 +10,9 @@ import (
 	"github.com/tidwall/pretty"
 	"go.uber.org/zap"
 
-	"api/pkg/consts"
-	"api/pkg/lib"
-	"api/pkg/logger"
+	"api/consts"
+	"api/lib"
+	"api/logger"
 	"api/pkg/result"
 )
 

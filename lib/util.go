@@ -10,9 +10,10 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"api/pkg/logger"
+	"api/logger"
 
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
@@ -21,6 +22,11 @@ func Recover(ctx context.Context) {
 	if err := recover(); err != nil {
 		logger.Err(ctx, "Goroutine Panic", zap.Any("error", err), zap.ByteString("stack", debug.Stack()))
 	}
+}
+
+// CtxNewWithReqID returns a new context with request_id
+func CtxNewWithReqID() context.Context {
+	return context.WithValue(context.Background(), middleware.RequestIDKey, uuid.NewString())
 }
 
 // CtxCopyWithReqID returns a new context with request_id from origin context.

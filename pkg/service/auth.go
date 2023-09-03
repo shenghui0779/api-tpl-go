@@ -9,10 +9,10 @@ import (
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 
-	"api/pkg/ent"
-	"api/pkg/ent/user"
-	"api/pkg/lib"
-	"api/pkg/logger"
+	"api/ent"
+	"api/ent/user"
+	"api/lib"
+	"api/logger"
 	"api/pkg/result"
 )
 

@@ -4,12 +4,12 @@ WORKDIR /api
 
 COPY . .
 
-RUN go env -w GOPROXY="https://goproxy.cn,direct"
+RUN go env -w GOPROXY="https://proxy.golang.com.cn,direct"
 RUN go mod download
 RUN sh ent.sh
 RUN go mod tidy
 
-RUN CGO_ENABLED=0 go build -o ./bin/main ./cmd
+RUN CGO_ENABLED=0 go build -o ./bin/main
 
 FROM scratch
 
@@ -21,4 +21,4 @@ EXPOSE 8000
 
 ENTRYPOINT ["./main"]
 
-CMD ["-envfile", "/data/config/.env"]
+CMD ["--envfile", "/data/config/.env"]

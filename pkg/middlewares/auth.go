@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 
-	"api/pkg/lib"
+	"api/lib"
 	"api/pkg/result"
 )
 

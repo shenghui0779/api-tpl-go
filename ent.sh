@@ -1,1 +1,1 @@
-go generate ./pkg/ent
+go generate ./ent

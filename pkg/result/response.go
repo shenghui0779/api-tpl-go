@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"api/pkg/logger"
+	"api/logger"
 
 	"go.uber.org/zap"
 )
