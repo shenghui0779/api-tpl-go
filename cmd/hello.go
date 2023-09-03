@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var cmdHello = &cobra.Command{
+var helloCmd = &cobra.Command{
 	Use:     "hello",
 	Short:   "命令示例",
 	Long:    "命令示例",

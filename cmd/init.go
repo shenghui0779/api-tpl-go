@@ -7,7 +7,7 @@ import (
 
 func Init() {
 	// 注册命令
-	root.AddCommand(cmdHello)
+	root.AddCommand(helloCmd)
 
 	// 注册变量
 	root.Flags().StringVarP(&envFile, "envfile", "E", ".env", "设置ENV配置文件")
