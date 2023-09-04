@@ -7,12 +7,12 @@ import (
 
 func Init() {
 	// 注册命令
-	root.AddCommand(helloCmd)
+	rootCmd.AddCommand(helloCmd)
 
 	// 注册变量
-	root.Flags().StringVarP(&envFile, "envfile", "E", ".env", "设置ENV配置文件")
+	rootCmd.Flags().StringVarP(&envFile, "envfile", "E", ".env", "设置ENV配置文件")
 
-	if err := root.Execute(); err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		yiigo.Logger().Error("err cmd execute", zap.Error(err))
 	}
 }

@@ -21,7 +21,7 @@ import (
 
 var envFile string
 
-var root = &cobra.Command{
+var rootCmd = &cobra.Command{
 	Use:         "api",
 	Short:       "应用服务API",
 	Long:        "应用服务API(build with yiigo & chi)",
