@@ -15,7 +15,6 @@ func URLParamInt(r *http.Request, key string) int64 {
 	param := chi.URLParam(r, key)
 
 	v, err := strconv.ParseInt(param, 10, 64)
-
 	if err != nil {
 		logger.Err(r.Context(), "err url param to int64", zap.Error(err), zap.String("key", key), zap.String("value", param))
 
@@ -27,7 +26,6 @@ func URLParamInt(r *http.Request, key string) int64 {
 
 func URLQuery(r *http.Request, key string) (string, bool) {
 	query := r.URL.Query()
-
 	if !query.Has(key) {
 		return "", false
 	}
@@ -37,13 +35,11 @@ func URLQuery(r *http.Request, key string) (string, bool) {
 
 func URLQueryInt(r *http.Request, key string) (int64, bool) {
 	query, ok := URLQuery(r, key)
-
 	if !ok || len(query) == 0 {
 		return 0, false
 	}
 
 	v, err := strconv.ParseInt(query, 10, 64)
-
 	if err != nil {
 		logger.Err(r.Context(), "err url query to int64", zap.Error(err), zap.String("key", key), zap.String("value", query))
 

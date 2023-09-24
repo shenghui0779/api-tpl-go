@@ -31,10 +31,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	params := new(ParamsLogin)
-
-	err := internal.BindJSON(r, params)
-
-	if err != nil {
+	if err := internal.BindJSON(r, params); err != nil {
 		logger.Err(ctx, "err params", zap.Error(err))
 		result.ErrParams().JSON(w, r)
 
@@ -42,7 +39,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	record, err := ent.DB.User.Query().Unique(false).Where(user.Username(params.Username)).First(ctx)
-
 	if err != nil {
 		if ent.IsNotFound(err) {
 			result.ErrAuth(result.Err(errors.New("用户不存在"))).JSON(w, r)
@@ -65,7 +61,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	token := yiigo.MD5(fmt.Sprintf("auth.%d.%d.%s", record.ID, time.Now().UnixMicro(), lib.Nonce(16)))
 
 	authToken, err := lib.NewIdentity(record.ID, token).AuthToken()
-
 	if err != nil {
 		logger.Err(ctx, "err auth_token", zap.Error(err))
 		result.ErrAuth(result.Err(errors.New("登录失败"))).JSON(w, r)
@@ -74,7 +69,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = ent.DB.User.Update().Where(user.ID(record.ID)).SetLoginAt(time.Now().Unix()).SetLoginToken(token).Save(ctx)
-
 	if err != nil {
 		logger.Err(ctx, "err update user", zap.Error(err))
 		result.ErrSystem(result.Err(errors.New("登录失败"))).JSON(w, r)
@@ -94,7 +88,6 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	identity := lib.GetIdentity(ctx)
-
 	if identity.ID() == 0 {
 		result.OK().JSON(w, r)
 
@@ -105,7 +98,6 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		SetLoginToken("").
 		SetUpdatedAt(time.Now().Unix()).
 		Save(ctx)
-
 	if err != nil {
 		logger.Err(ctx, "err update user", zap.Error(err))
 		result.ErrSystem().JSON(w, r)

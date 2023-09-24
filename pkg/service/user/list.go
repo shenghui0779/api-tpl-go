@@ -6,6 +6,7 @@ import (
 	"api/logger"
 	"api/pkg/result"
 	"api/pkg/service/internal"
+
 	"net/http"
 
 	"github.com/shenghui0779/yiigo"
@@ -36,7 +37,6 @@ func List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	total := 0
-
 	offset, limit := internal.QueryPage(r)
 
 	// 仅第一页返回数量并由前端保存
@@ -59,7 +59,6 @@ func List(w http.ResponseWriter, r *http.Request) {
 		user.FieldLoginAt,
 		user.FieldCreatedAt,
 	).Order(ent.Desc(user.FieldID)).Offset(offset).Limit(limit).All(ctx)
-
 	if err != nil {
 		logger.Err(ctx, "err query user", zap.Error(err))
 		result.ErrSystem().JSON(w, r)
