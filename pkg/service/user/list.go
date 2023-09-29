@@ -44,7 +44,6 @@ func List(w http.ResponseWriter, r *http.Request) {
 		var err error
 
 		total, err = builder.Clone().Unique(false).Count(ctx)
-
 		if err != nil {
 			logger.Err(ctx, "err count user", zap.Error(err))
 			result.ErrSystem().JSON(w, r)
