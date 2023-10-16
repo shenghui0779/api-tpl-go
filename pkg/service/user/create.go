@@ -32,7 +32,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	records, err := ent.DB.User.Query().Unique(false).Select(user.FieldID).Where(user.Username(params.Username)).All(ctx)
+	records, err := ent.DB().User.Query().Unique(false).Select(user.FieldID).Where(user.Username(params.Username)).All(ctx)
 	if err != nil {
 		logger.Err(ctx, "err query user", zap.Error(err))
 		result.ErrParams().JSON(w, r)
@@ -49,7 +49,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().Unix()
 	salt := lib.Nonce(16)
 
-	_, err = ent.DB.User.Create().
+	_, err = ent.DB().User.Create().
 		SetUsername(params.Username).
 		SetPassword(yiigo.MD5(params.Password + salt)).
 		SetSalt(salt).

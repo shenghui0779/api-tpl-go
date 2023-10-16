@@ -30,7 +30,7 @@ type UserInfo struct {
 func List(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	builder := ent.DB.User.Query()
+	builder := ent.DB().User.Query()
 
 	if v, ok := internal.URLQuery(r, "username"); ok && len(v) != 0 {
 		builder.Where(user.UsernameContains(v))

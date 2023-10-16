@@ -53,7 +53,7 @@ func preInit() {
 	)
 
 	config.Refresh()
-	ent.InitDB()
+	ent.Init()
 }
 
 func serving() {

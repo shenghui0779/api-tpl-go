@@ -38,7 +38,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	record, err := ent.DB.User.Query().Unique(false).Where(user.Username(params.Username)).First(ctx)
+	record, err := ent.DB().User.Query().Unique(false).Where(user.Username(params.Username)).First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			result.ErrAuth(result.Err(errors.New("用户不存在"))).JSON(w, r)
@@ -68,7 +68,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = ent.DB.User.Update().Where(user.ID(record.ID)).SetLoginAt(time.Now().Unix()).SetLoginToken(token).Save(ctx)
+	_, err = ent.DB().User.Update().Where(user.ID(record.ID)).SetLoginAt(time.Now().Unix()).SetLoginToken(token).Save(ctx)
 	if err != nil {
 		logger.Err(ctx, "err update user", zap.Error(err))
 		result.ErrSystem(result.Err(errors.New("登录失败"))).JSON(w, r)
@@ -94,7 +94,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := ent.DB.User.Update().Where(user.ID(identity.ID())).
+	_, err := ent.DB().User.Update().Where(user.ID(identity.ID())).
 		SetLoginToken("").
 		SetUpdatedAt(time.Now().Unix()).
 		Save(ctx)

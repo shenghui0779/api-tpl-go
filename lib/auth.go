@@ -64,7 +64,7 @@ func (i *identity) Check(ctx context.Context) error {
 		return errors.New("未授权，请先登录")
 	}
 
-	record, err := ent.DB.User.Query().Unique(false).Select(
+	record, err := ent.DB().User.Query().Unique(false).Select(
 		user.FieldID,
 		user.FieldLoginToken,
 	).Where(user.ID(i.I)).First(ctx)
