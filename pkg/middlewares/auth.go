@@ -14,8 +14,7 @@ func Auth(next http.Handler) http.Handler {
 
 		identity := lib.GetIdentity(ctx)
 		if err := identity.Check(ctx); err != nil {
-			result.ErrAuth(result.Err(err)).JSON(w, r)
-
+			result.ErrAuth(result.M(err.Error())).JSON(w, r)
 			return
 		}
 

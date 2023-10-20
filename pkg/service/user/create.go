@@ -1,7 +1,6 @@
 package user
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
@@ -41,8 +40,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(records) != 0 {
-		result.ErrParams(result.Err(errors.New("该用户名已被使用"))).JSON(w, r)
-
+		result.ErrParams(result.M("该用户名已被使用")).JSON(w, r)
 		return
 	}
 

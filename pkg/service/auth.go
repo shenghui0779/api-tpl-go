@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -41,19 +40,19 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	record, err := ent.DB().User.Query().Unique(false).Where(user.Username(params.Username)).First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			result.ErrAuth(result.Err(errors.New("用户不存在"))).JSON(w, r)
+			result.ErrAuth(result.M("用户不存在")).JSON(w, r)
 
 			return
 		}
 
 		logger.Err(ctx, "err query user", zap.Error(err))
-		result.ErrSystem(result.Err(errors.New("登录失败"))).JSON(w, r)
+		result.ErrSystem(result.M("登录失败")).JSON(w, r)
 
 		return
 	}
 
 	if yiigo.MD5(params.Password+record.Salt) != record.Password {
-		result.ErrAuth(result.Err(errors.New("密码错误"))).JSON(w, r)
+		result.ErrAuth(result.M("密码错误")).JSON(w, r)
 
 		return
 	}
@@ -63,7 +62,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	authToken, err := lib.NewIdentity(record.ID, token).AuthToken()
 	if err != nil {
 		logger.Err(ctx, "err auth_token", zap.Error(err))
-		result.ErrAuth(result.Err(errors.New("登录失败"))).JSON(w, r)
+		result.ErrAuth(result.M("登录失败")).JSON(w, r)
 
 		return
 	}
@@ -71,7 +70,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	_, err = ent.DB().User.Update().Where(user.ID(record.ID)).SetLoginAt(time.Now().Unix()).SetLoginToken(token).Save(ctx)
 	if err != nil {
 		logger.Err(ctx, "err update user", zap.Error(err))
-		result.ErrSystem(result.Err(errors.New("登录失败"))).JSON(w, r)
+		result.ErrSystem(result.M("登录失败")).JSON(w, r)
 
 		return
 	}
@@ -80,7 +79,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		AuthToken: authToken,
 	}
 
-	result.OK(result.Data(resp)).JSON(w, r)
+	result.OK(result.V(resp)).JSON(w, r)
 }
 
 // Logout 注销

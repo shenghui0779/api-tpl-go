@@ -125,7 +125,6 @@ func AuthTokenToIdentity(ctx context.Context, token string) Identity {
 	cipherText, err := base64.StdEncoding.DecodeString(token)
 	if err != nil {
 		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
-
 		return NewEmptyIdentity()
 	}
 
@@ -135,7 +134,6 @@ func AuthTokenToIdentity(ctx context.Context, token string) Identity {
 	plainText, err := cryptor.Decrypt(cipherText)
 	if err != nil {
 		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
-
 		return NewEmptyIdentity()
 	}
 

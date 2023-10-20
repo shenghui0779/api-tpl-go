@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -27,8 +27,7 @@ func Log(next http.Handler) http.Handler {
 			switch consts.ContentType(yiigo.ContentType(r)) {
 			case consts.URLEncodedForm:
 				if err := r.ParseForm(); err != nil {
-					result.ErrSystem(result.Err(err)).JSON(w, r)
-
+					result.ErrSystem(result.M(err.Error())).JSON(w, r)
 					return
 				}
 
@@ -36,8 +35,7 @@ func Log(next http.Handler) http.Handler {
 			case consts.MultipartForm:
 				if err := r.ParseMultipartForm(consts.MaxFormMemory); err != nil {
 					if err != http.ErrNotMultipart {
-						result.ErrSystem(result.Err(err)).JSON(w, r)
-
+						result.ErrSystem(result.M(err.Error())).JSON(w, r)
 						return
 					}
 				}
@@ -45,20 +43,18 @@ func Log(next http.Handler) http.Handler {
 				body = r.Form.Encode()
 			case consts.ContentJSON:
 				// 取出Body
-				b, err := ioutil.ReadAll(r.Body)
-
+				b, err := io.ReadAll(r.Body)
 				if err != nil {
-					result.ErrSystem(result.Err(err)).JSON(w, r)
-
+					result.ErrSystem(result.M(err.Error())).JSON(w, r)
 					return
 				}
-
 				// 关闭原Body
 				r.Body.Close()
 
 				body = string(pretty.Ugly(b))
 
-				r.Body = ioutil.NopCloser(bytes.NewReader(b))
+				// 重新赋值Body
+				r.Body = io.NopCloser(bytes.NewReader(b))
 			}
 		}
 

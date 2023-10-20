@@ -86,5 +86,5 @@ func List(w http.ResponseWriter, r *http.Request) {
 		resp.List = append(resp.List, data)
 	}
 
-	result.OK(result.Data(resp)).JSON(w, r)
+	result.OK(result.V(resp)).JSON(w, r)
 }
