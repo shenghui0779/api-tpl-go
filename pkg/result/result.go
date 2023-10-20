@@ -11,6 +11,7 @@ import (
 
 const CodeOK = 0
 
+// Result API结果
 type Result interface {
 	JSON(w http.ResponseWriter, r *http.Request)
 }
@@ -32,16 +33,17 @@ func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Option API结果选项
 type Option func(r *response)
 
-// M 指定返回的Msg
+// M 指定返回的msg
 func M(m string) Option {
 	return func(r *response) {
 		r.x["msg"] = m
 	}
 }
 
-// V 指定返回的Data
+// V 指定返回的data
 func V(v any) Option {
 	return func(r *response) {
 		r.x["data"] = v
@@ -55,7 +57,7 @@ func KV(k string, v any) Option {
 	}
 }
 
-// New returns a new Result
+// New 返回一个Result
 func New(code int, msg string, options ...Option) Result {
 	resp := &response{
 		x: yiigo.X{
