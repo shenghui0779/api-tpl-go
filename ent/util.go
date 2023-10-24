@@ -10,6 +10,7 @@ import (
 	"api/logger"
 
 	"entgo.io/ent/dialect"
+	entsql "entgo.io/ent/dialect/sql"
 	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 )
@@ -18,9 +19,11 @@ var cli *Client
 
 // Init 初始化DB实例
 func Init() {
+	db := yiigo.MustDB()
+
 	cli = NewClient(
 		Driver(dialect.DebugWithContext(
-			yiigo.EntDriver(),
+			entsql.OpenDB(db.DriverName(), db.DB),
 			func(ctx context.Context, v ...any) {
 				if cfg.ENV.Debug {
 					logger.Info(ctx, "SQL info", zap.String("SQL", fmt.Sprint(v...)))
