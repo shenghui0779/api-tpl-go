@@ -2,9 +2,7 @@ package ent
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
-	"runtime/debug"
 
 	cfg "api/config"
 	"api/logger"
@@ -47,12 +45,9 @@ func Transaction(ctx context.Context, f func(ctx context.Context, tx *Tx) error)
 	}
 
 	defer func() {
-		if r := recover(); r != nil {
-			logger.Err(ctx, "executing transaction panic", zap.Any("error", r), zap.ByteString("stack", debug.Stack()))
-
-			if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
-				logger.Err(ctx, "err rolling back transaction when panic", zap.Error(err))
-			}
+		if v := recover(); v != nil {
+			tx.Rollback()
+			panic(v)
 		}
 	}()
 
