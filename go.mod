@@ -1,6 +1,6 @@
 module api
 
-go 1.18
+go 1.20
 
 require (
 	entgo.io/ent v0.12.4
@@ -9,14 +9,14 @@ require (
 	github.com/google/uuid v1.3.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.17.0
-	github.com/shenghui0779/yiigo v1.8.5
+	github.com/shenghui0779/yiigo v1.9.0
 	github.com/spf13/cobra v1.7.0
 	github.com/tidwall/pretty v1.2.1
 	go.uber.org/zap v1.26.0
 )
 
 require (
-	ariga.io/atlas v0.14.2 // indirect
+	ariga.io/atlas v0.15.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect

@@ -6,6 +6,7 @@ import (
 	"api/logger"
 	"api/pkg/result"
 	"api/pkg/service/internal"
+	"time"
 
 	"net/http"
 
@@ -76,11 +77,11 @@ func List(w http.ResponseWriter, r *http.Request) {
 			Username:     v.Username,
 			LoginAt:      v.LoginAt,
 			CreatedAt:    v.CreatedAt,
-			CreatedAtStr: yiigo.Date(v.CreatedAt),
+			CreatedAtStr: yiigo.TimeToStr(v.CreatedAt, time.DateTime),
 		}
 
 		if v.LoginAt != 0 {
-			data.LoginAtStr = yiigo.Date(v.LoginAt)
+			data.LoginAtStr = yiigo.TimeToStr(v.LoginAt, time.DateTime)
 		}
 
 		resp.List = append(resp.List, data)
