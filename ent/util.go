@@ -9,16 +9,14 @@ import (
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
-	"github.com/shenghui0779/yiigo"
+	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 )
 
 var cli *Client
 
 // Init 初始化DB实例
-func Init() {
-	db := yiigo.MustDB()
-
+func Init(db *sqlx.DB) {
 	cli = NewClient(
 		Driver(dialect.DebugWithContext(
 			entsql.OpenDB(db.DriverName(), db.DB),
@@ -45,6 +43,7 @@ func Transaction(ctx context.Context, f func(ctx context.Context, tx *Tx) error)
 	}
 
 	defer func() {
+		// if panic, should rollback
 		if v := recover(); v != nil {
 			tx.Rollback()
 			panic(v)

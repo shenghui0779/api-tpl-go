@@ -23,8 +23,8 @@ var envFile string
 
 var rootCmd = &cobra.Command{
 	Use:         "api",
-	Short:       "应用服务API",
-	Long:        "应用服务API(build with yiigo & chi)",
+	Short:       "Go应用服务API",
+	Long:        "Go应用服务API(build with yiigo & chi)",
 	Annotations: map[string]string{},
 	Version:     "v1.0.0",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
@@ -53,7 +53,8 @@ func preInit() {
 	)
 
 	config.Refresh()
-	ent.Init()
+
+	ent.Init(yiigo.MustDB())
 }
 
 func serving() {
