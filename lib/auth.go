@@ -43,14 +43,14 @@ func (i *identity) ID() int64 {
 }
 
 func (i *identity) AuthToken() (string, error) {
-	plainText, err := json.Marshal(i)
+	b, err := json.Marshal(i)
 	if err != nil {
 		return "", errors.Wrap(err, "marshal identity")
 	}
 
 	key := []byte(config.ENV.APISecret)
 
-	ct, err := yiigo.AESEncryptCBC(key, key[:aes.BlockSize], plainText)
+	ct, err := yiigo.AESEncryptCBC(key, key[:aes.BlockSize], b)
 	if err != nil {
 		return "", errors.Wrap(err, "encrypt identity")
 	}
