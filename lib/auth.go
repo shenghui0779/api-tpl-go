@@ -49,14 +49,13 @@ func (i *identity) AuthToken() (string, error) {
 	}
 
 	key := []byte(config.ENV.APISecret)
-	cryptor := yiigo.NewAesCBC(key, key[:aes.BlockSize], yiigo.AES_PKCS5)
 
-	cipherText, err := cryptor.Encrypt(plainText)
+	ct, err := yiigo.AESEncryptCBC(key, key[:aes.BlockSize], plainText)
 	if err != nil {
 		return "", errors.Wrap(err, "encrypt identity")
 	}
 
-	return base64.StdEncoding.EncodeToString(cipherText), nil
+	return ct.String(), nil
 }
 
 func (i *identity) Check(ctx context.Context) error {
@@ -129,16 +128,14 @@ func AuthTokenToIdentity(ctx context.Context, token string) Identity {
 	}
 
 	key := []byte(config.ENV.APISecret)
-	cryptor := yiigo.NewAesCBC(key, key[:aes.BlockSize], yiigo.AES_PKCS5)
 
-	plainText, err := cryptor.Decrypt(cipherText)
+	plainText, err := yiigo.AESDecryptCBC(key, key[:aes.BlockSize], cipherText)
 	if err != nil {
 		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
 		return NewEmptyIdentity()
 	}
 
 	identity := NewEmptyIdentity()
-
 	if err = json.Unmarshal(plainText, identity); err != nil {
 		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
 		// 此处应返回空Identify，因为若仅部分字段解析失败，Identity可能依然有效

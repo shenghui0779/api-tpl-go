@@ -6,11 +6,11 @@ require (
 	entgo.io/ent v0.12.4
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/go-chi/chi/v5 v5.0.10
-	github.com/google/uuid v1.3.1
+	github.com/google/uuid v1.4.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.17.0
-	github.com/shenghui0779/yiigo v1.9.0
+	github.com/shenghui0779/yiigo v1.9.2
 	github.com/spf13/cobra v1.7.0
 	github.com/tidwall/pretty v1.2.1
 	go.uber.org/zap v1.26.0
