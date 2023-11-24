@@ -5,62 +5,85 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/shenghui0779/yiigo"
+	"github.com/redis/go-redis/v9"
 )
 
-func Redis() *yiigo.RedisConfig {
-	cfg := &yiigo.RedisConfig{
-		Addr:    os.Getenv("REDIS_ADDR"),
-		Options: new(yiigo.RedisOptions),
+func Redis() *redis.UniversalOptions {
+	cfg := &redis.UniversalOptions{
+		Addrs: []string{os.Getenv("REDIS_ADDR")},
 	}
 
 	if v := os.Getenv("REDIS_USERNAME"); len(v) != 0 {
-		cfg.Options.Username = v
+		cfg.Username = v
 	}
 
 	if v := os.Getenv("REDIS_PASSWORD"); len(v) != 0 {
-		cfg.Options.Password = v
+		cfg.Password = v
 	}
 
 	if v := os.Getenv("REDIS_DB"); len(v) != 0 {
 		if i, err := strconv.Atoi(v); err == nil && i >= 0 {
-			cfg.Options.Database = i
+			cfg.DB = i
 		}
 	}
 
 	if v := os.Getenv("REDIS_CONN_TIMEOUT"); len(v) != 0 {
 		if i, err := strconv.Atoi(v); err == nil && i > 0 {
-			cfg.Options.ConnTimeout = time.Second * time.Duration(i)
+			cfg.DialTimeout = time.Second * time.Duration(i)
 		}
 	}
 
 	if v := os.Getenv("REDIS_READ_TIMEOUT"); len(v) != 0 {
 		if i, err := strconv.Atoi(v); err == nil && i > 0 {
-			cfg.Options.ReadTimeout = time.Second * time.Duration(i)
+			cfg.ReadTimeout = time.Second * time.Duration(i)
 		}
 	}
 
 	if v := os.Getenv("REDIS_WRITE_TIMEOUT"); len(v) != 0 {
 		if i, err := strconv.Atoi(v); err == nil && i > 0 {
-			cfg.Options.WriteTimeout = time.Second * time.Duration(i)
+			cfg.WriteTimeout = time.Second * time.Duration(i)
 		}
 	}
 
 	if v := os.Getenv("REDIS_POOL_SIZE"); len(v) != 0 {
 		if i, err := strconv.Atoi(v); err == nil && i > 0 {
-			cfg.Options.PoolSize = i
+			cfg.PoolSize = i
 		}
 	}
 
-	if v := os.Getenv("REDIS_POOL_PREFILL"); len(v) != 0 {
-		if i, err := strconv.Atoi(v); err == nil && i >= 0 {
-			cfg.Options.PoolPrefill = i
-		}
-	}
-
-	if v := os.Getenv("REDIS_IDLE_TIMEOUT"); len(v) != 0 {
+	if v := os.Getenv("REDIS_POOL_TIMEOUT"); len(v) != 0 {
 		if i, err := strconv.Atoi(v); err == nil && i > 0 {
-			cfg.Options.IdleTimeout = time.Second * time.Duration(i)
+			cfg.PoolTimeout = time.Second * time.Duration(i)
+		}
+	}
+
+	if v := os.Getenv("REDIS_MIN_IDLE_CONNS"); len(v) != 0 {
+		if i, err := strconv.Atoi(v); err == nil && i > 0 {
+			cfg.MinIdleConns = i
+		}
+	}
+
+	if v := os.Getenv("REDIS_MAX_IDLE_CONNS"); len(v) != 0 {
+		if i, err := strconv.Atoi(v); err == nil && i > 0 {
+			cfg.MaxIdleConns = i
+		}
+	}
+
+	if v := os.Getenv("REDIS_MAX_ACTIVE_CONNS"); len(v) != 0 {
+		if i, err := strconv.Atoi(v); err == nil && i > 0 {
+			cfg.MaxActiveConns = i
+		}
+	}
+
+	if v := os.Getenv("REDIS_CONN_MAX_LIFETIME"); len(v) != 0 {
+		if i, err := strconv.Atoi(v); err == nil && i > 0 {
+			cfg.ConnMaxLifetime = time.Second * time.Duration(i)
+		}
+	}
+
+	if v := os.Getenv("REDIS_CONN_MAX_IDLETIME"); len(v) != 0 {
+		if i, err := strconv.Atoi(v); err == nil && i > 0 {
+			cfg.ConnMaxIdleTime = time.Second * time.Duration(i)
 		}
 	}
 
