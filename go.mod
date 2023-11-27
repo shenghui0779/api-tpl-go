@@ -11,7 +11,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.17.0
 	github.com/redis/go-redis/v9 v9.3.0
-	github.com/shenghui0779/yiigo v1.10.0
+	github.com/shenghui0779/yiigo v1.10.1
 	github.com/spf13/cobra v1.8.0
 	github.com/tidwall/pretty v1.2.1
 	go.uber.org/zap v1.26.0

@@ -100,8 +100,8 @@ github.com/redis/go-redis/v9 v9.3.0/go.mod h1:hdY0cQFCN4fnSYT6TkisLufl/4W5UIXyv0
 github.com/rogpeppe/go-internal v1.11.0 h1:cWPaGQEPrBb5/AsnsZesgZZ9yb1OQ+GOISoDNXVBh4M=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/sergi/go-diff v1.0.0 h1:Kpca3qRNrduNnOQeazBd0ysaKrUJiIuISHxogkT9RPQ=
-github.com/shenghui0779/yiigo v1.10.0 h1:O16dXO7htMa6rY/o8uLzVaaheMwJn1/HuWabJyvXrKE=
-github.com/shenghui0779/yiigo v1.10.0/go.mod h1:eue2Wc470InEuhsZzJDOumjnc7avMo9fAz5ZQYBW5wU=
+github.com/shenghui0779/yiigo v1.10.1 h1:RyRVJxjL+i9HB6FxErvf/Ybh4avF3X/3xt/a+AytMLY=
+github.com/shenghui0779/yiigo v1.10.1/go.mod h1:fC6gEJ++YjTtTOu4Ifh/MNmaeCI/TqkILHNBzw7Cvps=
 github.com/spf13/cobra v1.8.0 h1:7aJaZx1B85qltLMc546zn58BxxfZdR/W22ej9CFoEf0=
 github.com/spf13/cobra v1.8.0/go.mod h1:WXLWApfZ71AjXPya3WOlMsY9yMs7YeiHhFVlvLyhcho=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
