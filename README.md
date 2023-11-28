@@ -1,6 +1,6 @@
 # api-tpl-go
 
-简单好用的 Go API 项目框架
+轻量好用的 Go API 项目框架
 
 > 1. Table `User` refers to `ent/schema/user.go`
 > 2. Set `GOPROXY` ( `go env -w GOPROXY="https://proxy.golang.com.cn,direct"` )
