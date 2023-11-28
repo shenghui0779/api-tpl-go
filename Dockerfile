@@ -21,4 +21,4 @@ EXPOSE 8000
 
 ENTRYPOINT ["./main"]
 
-CMD ["--envfile", "/data/config/.env"]
+CMD ["--config", "/data/config/.yml"]

@@ -21,12 +21,13 @@ func refresh() {
 	ENV.APISecret = viper.GetString("app.secret")
 }
 
-func Init() {
-	viper.SetConfigFile(".yml")
+func Init(path string) {
+	viper.SetConfigFile(path)
 	if err := viper.ReadInConfig(); err != nil {
 		logger.Panic(context.Background(), "err read config file", zap.Error(err))
 	}
 
+	refresh()
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		refresh()
 	})

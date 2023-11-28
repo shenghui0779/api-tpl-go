@@ -28,3 +28,7 @@ func Err(ctx context.Context, msg string, fields ...zap.Field) {
 func Panic(ctx context.Context, msg string, fields ...zap.Field) {
 	logger.Panic(msg, append(fields, zap.String("req_id", util.GetReqID(ctx)))...)
 }
+
+func Fatal(ctx context.Context, msg string, fields ...zap.Field) {
+	logger.Fatal(msg, append(fields, zap.String("req_id", util.GetReqID(ctx)))...)
+}

@@ -1,7 +1,9 @@
 package cmd
 
 import (
-	"github.com/shenghui0779/yiigo"
+	"api/logger"
+	"context"
+
 	"go.uber.org/zap"
 )
 
@@ -10,9 +12,9 @@ func Init() {
 	rootCmd.AddCommand(helloCmd)
 
 	// 注册变量
-	rootCmd.Flags().StringVarP(&envFile, "envfile", "E", ".env", "设置ENV配置文件")
+	rootCmd.Flags().StringVarP(&cfgFile, "config", "C", ".yml", "设置配置文件")
 
 	if err := rootCmd.Execute(); err != nil {
-		yiigo.Logger().Error("err cmd execute", zap.Error(err))
+		logger.Err(context.Background(), "err cmd execute", zap.Error(err))
 	}
 }

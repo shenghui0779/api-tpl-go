@@ -15,7 +15,6 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 )
 
@@ -52,7 +51,7 @@ func (i *identity) AuthToken() (string, error) {
 
 	key := []byte(config.ENV.APISecret)
 
-	ct, err := yiigo.AESEncryptCBC(key, key[:aes.BlockSize], b)
+	ct, err := libaes.EncryptCBC(key, key[:aes.BlockSize], b)
 	if err != nil {
 		return "", errors.Wrap(err, "encrypt identity")
 	}

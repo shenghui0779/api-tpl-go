@@ -1,6 +1,6 @@
 # api-tpl-go
 
-Go API 项目框架 ( [yiigo](https://github.com/shenghui0779/yiigo) + [ent](https://entgo.io) + [chi](https://github.com/go-chi/chi) ) 👉 你想要的基本都有
+简单好用的 Go API 项目框架
 
 > 1. Table `User` refers to `ent/schema/user.go`
 > 2. Set `GOPROXY` ( `go env -w GOPROXY="https://proxy.golang.com.cn,direct"` )
