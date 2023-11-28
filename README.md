@@ -14,5 +14,6 @@
 - MQ使用 [nsq](https://github.com/nsqio/nsq)
 - Websocket使用 [gorilla](https://github.com/gorilla/websocket)
 - 能够自定义参数验证器
+- 包含基础的登录授权功能
 - 包含基于 Redis 的简单分布式锁
 - 包含 HTTP、AES、RSA 等众多实用的工具方法
