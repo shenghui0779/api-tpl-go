@@ -1,16 +1,17 @@
 package user
 
 import (
-	"api/ent"
-	"api/ent/user"
+	"api/db"
+	"api/db/ent"
+	"api/db/ent/user"
+	"api/lib/util"
 	"api/logger"
 	"api/pkg/result"
 	"api/pkg/service/internal"
-	"time"
 
 	"net/http"
+	"time"
 
-	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 )
 
@@ -31,7 +32,7 @@ type UserInfo struct {
 func List(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	builder := ent.DB().User.Query()
+	builder := db.Client().User.Query()
 
 	if v, ok := internal.URLQuery(r, "username"); ok && len(v) != 0 {
 		builder.Where(user.UsernameContains(v))
@@ -77,11 +78,11 @@ func List(w http.ResponseWriter, r *http.Request) {
 			Username:     v.Username,
 			LoginAt:      v.LoginAt,
 			CreatedAt:    v.CreatedAt,
-			CreatedAtStr: yiigo.TimeToStr(v.CreatedAt, time.DateTime),
+			CreatedAtStr: util.TimeToStr(v.CreatedAt, time.DateTime),
 		}
 
 		if v.LoginAt != 0 {
-			data.LoginAtStr = yiigo.TimeToStr(v.LoginAt, time.DateTime)
+			data.LoginAtStr = util.TimeToStr(v.LoginAt, time.DateTime)
 		}
 
 		resp.List = append(resp.List, data)

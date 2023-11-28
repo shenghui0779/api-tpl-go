@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"context"
@@ -7,8 +7,8 @@ import (
 
 	"go.uber.org/zap"
 
-	"api/lib"
 	"api/logger"
+	"api/pkg/auth"
 	"api/pkg/result"
 )
 
@@ -25,9 +25,9 @@ func Recovery(next http.Handler) http.Handler {
 
 		if token := r.Header.Get("Authorization"); len(token) != 0 {
 			ctx := r.Context()
-			identity := lib.AuthTokenToIdentity(ctx, token)
+			identity := auth.AuthTokenToIdentity(ctx, token)
 
-			next.ServeHTTP(w, r.WithContext(context.WithValue(ctx, lib.AuthIdentityKey, identity)))
+			next.ServeHTTP(w, r.WithContext(context.WithValue(ctx, auth.AuthIdentityKey, identity)))
 
 			return
 		}

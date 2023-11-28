@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 
-	"api/ent"
-	"api/ent/user"
-	"api/lib"
+	"api/db"
+	"api/db/ent/user"
+	"api/lib/hash"
+	"api/lib/util"
 	"api/logger"
 	"api/pkg/result"
 	"api/pkg/service/internal"
@@ -31,7 +31,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	records, err := ent.DB().User.Query().Unique(false).Select(user.FieldID).Where(user.Username(params.Username)).All(ctx)
+	records, err := db.Client().User.Query().Unique(false).Select(user.FieldID).Where(user.Username(params.Username)).All(ctx)
 	if err != nil {
 		logger.Err(ctx, "err query user", zap.Error(err))
 		result.ErrParams().JSON(w, r)
@@ -45,11 +45,11 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	now := time.Now().Unix()
-	salt := lib.Nonce(16)
+	salt := util.Nonce(16)
 
-	_, err = ent.DB().User.Create().
+	_, err = db.Client().User.Create().
 		SetUsername(params.Username).
-		SetPassword(yiigo.MD5(params.Password + salt)).
+		SetPassword(hash.MD5(params.Password + salt)).
 		SetSalt(salt).
 		SetCreatedAt(now).
 		SetUpdatedAt(now).

@@ -1,9 +1,9 @@
-package middlewares
+package middleware
 
 import (
 	"net/http"
 
-	"api/lib"
+	"api/pkg/auth"
 	"api/pkg/result"
 )
 
@@ -12,7 +12,7 @@ func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		identity := lib.GetIdentity(ctx)
+		identity := auth.GetIdentity(ctx)
 		if err := identity.Check(ctx); err != nil {
 			result.ErrAuth(result.M(err.Error())).JSON(w, r)
 			return

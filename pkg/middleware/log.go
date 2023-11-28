@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"bytes"
@@ -6,13 +6,14 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/shenghui0779/yiigo"
 	"github.com/tidwall/pretty"
 	"go.uber.org/zap"
 
 	"api/consts"
-	"api/lib"
+	libhttp "api/lib/http"
+	"api/lib/util"
 	"api/logger"
+	"api/pkg/auth"
 	"api/pkg/result"
 )
 
@@ -24,15 +25,15 @@ func Log(next http.Handler) http.Handler {
 
 		// 请求包含body
 		if r.Body != nil && r.Body != http.NoBody {
-			switch consts.ContentType(yiigo.ContentType(r)) {
-			case consts.URLEncodedForm:
+			switch util.ContentType(r) {
+			case libhttp.ContentForm:
 				if err := r.ParseForm(); err != nil {
 					result.ErrSystem(result.M(err.Error())).JSON(w, r)
 					return
 				}
 
 				body = r.Form.Encode()
-			case consts.MultipartForm:
+			case libhttp.MultipartForm:
 				if err := r.ParseMultipartForm(consts.MaxFormMemory); err != nil {
 					if err != http.ErrNotMultipart {
 						result.ErrSystem(result.M(err.Error())).JSON(w, r)
@@ -41,7 +42,7 @@ func Log(next http.Handler) http.Handler {
 				}
 
 				body = r.Form.Encode()
-			case consts.ContentJSON:
+			case libhttp.ContentJSON:
 				// 取出Body
 				b, err := io.ReadAll(r.Body)
 				if err != nil {
@@ -65,7 +66,7 @@ func Log(next http.Handler) http.Handler {
 			zap.String("uri", r.URL.String()),
 			zap.String("ip", r.RemoteAddr),
 			zap.String("body", body),
-			zap.String("identity", lib.GetIdentity(r.Context()).String()),
+			zap.String("identity", auth.GetIdentity(r.Context()).String()),
 			zap.String("duration", time.Since(now).String()),
 		)
 	})

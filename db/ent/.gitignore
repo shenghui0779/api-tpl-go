@@ -3,4 +3,3 @@
 !schema/
 !schema/*.go
 !generate.go
-!util.go

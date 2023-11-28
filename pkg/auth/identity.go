@@ -1,16 +1,18 @@
-package lib
+package auth
 
 import (
+	"api/config"
+	"api/db"
+	"api/db/ent"
+	"api/db/ent/user"
+	libaes "api/lib/aes"
+	"api/logger"
+
 	"context"
 	"crypto/aes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-
-	"api/config"
-	"api/ent"
-	"api/ent/user"
-	"api/logger"
 
 	"github.com/pkg/errors"
 	"github.com/shenghui0779/yiigo"
@@ -63,7 +65,7 @@ func (i *identity) Check(ctx context.Context) error {
 		return errors.New("未授权，请先登录")
 	}
 
-	record, err := ent.DB().User.Query().Unique(false).Select(
+	record, err := db.Client().User.Query().Unique(false).Select(
 		user.FieldID,
 		user.FieldLoginToken,
 	).Where(user.ID(i.I)).First(ctx)
@@ -129,7 +131,7 @@ func AuthTokenToIdentity(ctx context.Context, token string) Identity {
 
 	key := []byte(config.ENV.APISecret)
 
-	plainText, err := yiigo.AESDecryptCBC(key, key[:aes.BlockSize], cipherText)
+	plainText, err := libaes.DecryptCBC(key, key[:aes.BlockSize], cipherText)
 	if err != nil {
 		logger.Err(ctx, "err invalid auth_token", zap.Error(err))
 		return NewEmptyIdentity()

@@ -5,13 +5,15 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 
-	"api/ent"
-	"api/ent/user"
-	"api/lib"
+	"api/db"
+	"api/db/ent"
+	"api/db/ent/user"
+	"api/lib/hash"
+	"api/lib/util"
 	"api/logger"
+	"api/pkg/auth"
 	"api/pkg/result"
 	"api/pkg/service/internal"
 )
@@ -37,7 +39,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	record, err := ent.DB().User.Query().Unique(false).Where(user.Username(params.Username)).First(ctx)
+	record, err := db.Client().User.Query().Unique(false).Where(user.Username(params.Username)).First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			result.ErrAuth(result.M("用户不存在")).JSON(w, r)
@@ -51,15 +53,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if yiigo.MD5(params.Password+record.Salt) != record.Password {
+	if hash.MD5(params.Password+record.Salt) != record.Password {
 		result.ErrAuth(result.M("密码错误")).JSON(w, r)
 
 		return
 	}
 
-	token := yiigo.MD5(fmt.Sprintf("auth.%d.%d.%s", record.ID, time.Now().UnixMicro(), lib.Nonce(16)))
+	token := hash.MD5(fmt.Sprintf("auth.%d.%d.%s", record.ID, time.Now().UnixMicro(), util.Nonce(16)))
 
-	authToken, err := lib.NewIdentity(record.ID, token).AuthToken()
+	authToken, err := auth.NewIdentity(record.ID, token).AuthToken()
 	if err != nil {
 		logger.Err(ctx, "err auth_token", zap.Error(err))
 		result.ErrAuth(result.M("登录失败")).JSON(w, r)
@@ -67,7 +69,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = ent.DB().User.Update().Where(user.ID(record.ID)).SetLoginAt(time.Now().Unix()).SetLoginToken(token).Save(ctx)
+	_, err = db.Client().User.Update().Where(user.ID(record.ID)).SetLoginAt(time.Now().Unix()).SetLoginToken(token).Save(ctx)
 	if err != nil {
 		logger.Err(ctx, "err update user", zap.Error(err))
 		result.ErrSystem(result.M("登录失败")).JSON(w, r)
@@ -86,14 +88,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 func Logout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	identity := lib.GetIdentity(ctx)
+	identity := auth.GetIdentity(ctx)
 	if identity.ID() == 0 {
 		result.OK().JSON(w, r)
 
 		return
 	}
 
-	_, err := ent.DB().User.Update().Where(user.ID(identity.ID())).
+	_, err := db.Client().User.Update().Where(user.ID(identity.ID())).
 		SetLoginToken("").
 		SetUpdatedAt(time.Now().Unix()).
 		Save(ctx)

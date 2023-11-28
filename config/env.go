@@ -1,8 +1,12 @@
 package config
 
 import (
-	"os"
-	"strconv"
+	"api/logger"
+	"context"
+
+	"github.com/fsnotify/fsnotify"
+	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 type Environment struct {
@@ -12,7 +16,19 @@ type Environment struct {
 
 var ENV = new(Environment)
 
-func Refresh() {
-	ENV.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
-	ENV.APISecret = os.Getenv("API_SECRET")
+func refresh() {
+	ENV.Debug = viper.GetBool("app.debug")
+	ENV.APISecret = viper.GetString("app.secret")
+}
+
+func Init() {
+	viper.SetConfigFile(".yml")
+	if err := viper.ReadInConfig(); err != nil {
+		logger.Panic(context.Background(), "err read config file", zap.Error(err))
+	}
+
+	viper.OnConfigChange(func(e fsnotify.Event) {
+		refresh()
+	})
+	viper.WatchConfig()
 }

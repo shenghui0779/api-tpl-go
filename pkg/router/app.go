@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"api/pkg/middlewares"
+	"api/pkg/middleware"
 	"api/pkg/service"
 	"api/pkg/service/user"
 
@@ -28,7 +28,7 @@ func App(r chi.Router) {
 	// prometheus metrics
 	// r.Method(http.MethodGet, "/metrics", promhttp.Handler())
 
-	r.With(middlewares.Log).Group(func(r chi.Router) {
+	r.With(middleware.Log).Group(func(r chi.Router) {
 		// v1
 		r.Route("/v1", func(r chi.Router) {
 			v1(r)
@@ -39,7 +39,7 @@ func App(r chi.Router) {
 func v1(r chi.Router) {
 	r.Post("/login", service.Login)
 
-	r.With(middlewares.Auth).Group(func(r chi.Router) {
+	r.With(middleware.Auth).Group(func(r chi.Router) {
 		r.Get("/logout", service.Logout)
 
 		{

@@ -2,20 +2,22 @@ package cmd
 
 import (
 	"api/config"
-	"api/ent"
-	"api/pkg/middlewares"
+	"api/db"
+	"api/pkg/middleware"
 	"api/pkg/router"
+	"api/redis"
 
 	"fmt"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/fsnotify/fsnotify"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	chimidware "github.com/go-chi/chi/v5/middleware"
+	goredis "github.com/redis/go-redis/v9"
 	"github.com/shenghui0779/yiigo"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
@@ -42,31 +44,47 @@ var rootCmd = &cobra.Command{
 }
 
 func preInit() {
-	yiigo.LoadEnv(yiigo.WithEnvFile(envFile), yiigo.WithEnvWatcher(func(e fsnotify.Event) {
-		yiigo.Logger().Info("env change ok", zap.String("event", e.String()))
-		config.Refresh()
-	}))
+	config.Init()
 
-	yiigo.Init(
-		yiigo.WithMySQL(yiigo.Default, config.DB()),
-		yiigo.WithLogger(yiigo.Default, config.Logger()),
-	)
+	db.Init(&db.Config{
+		Driver: viper.GetString("db.driver"),
+		DSN:    viper.GetString("db.dsn"),
+		Options: &db.Options{
+			MaxOpenConns:    viper.GetInt("db.max_open_conns"),
+			MaxIdleConns:    viper.GetInt("db.max_idle_conns"),
+			ConnMaxLifetime: viper.GetDuration("db.conn_max_lifetime") * time.Second,
+			ConnMaxIdleTime: viper.GetDuration("db.conn_max_idle_time") * time.Second,
+		},
+	})
 
-	config.Refresh()
-
-	ent.Init(yiigo.MustDB())
+	redis.Init(&goredis.UniversalOptions{
+		Addrs:           []string{viper.GetString("redis.addr")},
+		DB:              viper.GetInt("redis.db"),
+		Username:        viper.GetString("redis.username"),
+		Password:        viper.GetString("redis.password"),
+		DialTimeout:     viper.GetDuration("redis.conn_timeout") * time.Second,
+		ReadTimeout:     viper.GetDuration("redis.read_timeout") * time.Second,
+		WriteTimeout:    viper.GetDuration("redis.write_timeout") * time.Second,
+		PoolSize:        viper.GetInt("redis.pool_size"),
+		PoolTimeout:     viper.GetDuration("redis.pool_timeout") * time.Second,
+		MinIdleConns:    viper.GetInt("redis.min_idle_conns"),
+		MaxIdleConns:    viper.GetInt("redis.max_idle_conns"),
+		MaxActiveConns:  viper.GetInt("max_active_conns"),
+		ConnMaxIdleTime: viper.GetDuration("redis.conn_max_idle_time") * time.Second,
+		ConnMaxLifetime: viper.GetDuration("redis.conn_max_lifetime") * time.Second,
+	})
 }
 
 func serving() {
 	r := chi.NewRouter()
 
-	r.Use(middleware.RequestID, middlewares.Cors, middlewares.Recovery)
-	r.Mount("/debug", middleware.Profiler())
+	r.Use(chimidware.RequestID, middleware.Cors, middleware.Recovery)
+	r.Mount("/debug", chimidware.Profiler())
 
 	router.App(r)
 
 	srv := &http.Server{
-		Addr:         ":8000",
+		Addr:         ":" + viper.GetString("app.port"),
 		Handler:      r,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
