@@ -17,6 +17,8 @@ import (
 	"api/pkg/result"
 )
 
+const ContentJSON = "application/json"
+
 // Log 日志中间件
 func Log(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -42,20 +44,16 @@ func Log(next http.Handler) http.Handler {
 				}
 
 				body = r.Form.Encode()
-			case libhttp.ContentJSON:
-				// 取出Body
-				b, err := io.ReadAll(r.Body)
+			case ContentJSON:
+				b, err := io.ReadAll(r.Body) // 取出Body
 				if err != nil {
 					result.ErrSystem(result.M(err.Error())).JSON(w, r)
 					return
 				}
-				// 关闭原Body
-				r.Body.Close()
+				r.Body.Close() // 关闭原Body
 
 				body = string(pretty.Ugly(b))
-
-				// 重新赋值Body
-				r.Body = io.NopCloser(bytes.NewReader(b))
+				r.Body = io.NopCloser(bytes.NewReader(b)) // 重新赋值Body
 			}
 		}
 

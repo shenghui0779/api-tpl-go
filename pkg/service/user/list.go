@@ -33,7 +33,6 @@ func List(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	builder := db.Client().User.Query()
-
 	if v, ok := internal.URLQuery(r, "username"); ok && len(v) != 0 {
 		builder.Where(user.UsernameContains(v))
 	}
@@ -47,8 +46,8 @@ func List(w http.ResponseWriter, r *http.Request) {
 
 		total, err = builder.Clone().Unique(false).Count(ctx)
 		if err != nil {
-			logger.Err(ctx, "err count user", zap.Error(err))
-			result.ErrSystem().JSON(w, r)
+			logger.Err(ctx, "error count user", zap.Error(err))
+			result.ErrSystem(result.E(err)).JSON(w, r)
 
 			return
 		}
@@ -61,8 +60,8 @@ func List(w http.ResponseWriter, r *http.Request) {
 		user.FieldCreatedAt,
 	).Order(ent.Desc(user.FieldID)).Offset(offset).Limit(limit).All(ctx)
 	if err != nil {
-		logger.Err(ctx, "err query user", zap.Error(err))
-		result.ErrSystem().JSON(w, r)
+		logger.Err(ctx, "error query user", zap.Error(err))
+		result.ErrSystem(result.E(err)).JSON(w, r)
 
 		return
 	}

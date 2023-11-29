@@ -69,7 +69,7 @@ func preInit(ctx context.Context) {
 		},
 	})
 	if err != nil {
-		logger.Panic(ctx, "db init error", zap.Error(err))
+		logger.Panic(ctx, "error db init", zap.Error(err))
 	}
 
 	err = redis.Init(&goredis.UniversalOptions{
@@ -89,7 +89,7 @@ func preInit(ctx context.Context) {
 		ConnMaxLifetime: viper.GetDuration("redis.conn_max_lifetime") * time.Second,
 	})
 	if err != nil {
-		logger.Panic(ctx, "db init error", zap.Error(err))
+		logger.Panic(ctx, "error redis init", zap.Error(err))
 	}
 }
 

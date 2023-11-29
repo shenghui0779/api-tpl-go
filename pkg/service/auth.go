@@ -18,7 +18,7 @@ import (
 	"api/pkg/service/internal"
 )
 
-type ParamsLogin struct {
+type ReqLogin struct {
 	Username string `json:"username" valid:"required"`
 	Password string `json:"password" valid:"required"`
 }
@@ -31,10 +31,10 @@ type RespLogin struct {
 func Login(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	params := new(ParamsLogin)
+	params := new(ReqLogin)
 	if err := internal.BindJSON(r, params); err != nil {
-		logger.Err(ctx, "err params", zap.Error(err))
-		result.ErrParams().JSON(w, r)
+		logger.Err(ctx, "error params", zap.Error(err))
+		result.ErrParams(result.E(err)).JSON(w, r)
 
 		return
 	}
@@ -43,19 +43,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if ent.IsNotFound(err) {
 			result.ErrAuth(result.M("用户不存在")).JSON(w, r)
-
-			return
+		} else {
+			logger.Err(ctx, "error query user", zap.Error(err))
+			result.ErrSystem(result.E(err)).JSON(w, r)
 		}
-
-		logger.Err(ctx, "err query user", zap.Error(err))
-		result.ErrSystem(result.M("登录失败")).JSON(w, r)
 
 		return
 	}
 
 	if hash.MD5(params.Password+record.Salt) != record.Password {
 		result.ErrAuth(result.M("密码错误")).JSON(w, r)
-
 		return
 	}
 
@@ -63,16 +60,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	authToken, err := auth.NewIdentity(record.ID, token).AuthToken()
 	if err != nil {
-		logger.Err(ctx, "err auth_token", zap.Error(err))
-		result.ErrAuth(result.M("登录失败")).JSON(w, r)
+		logger.Err(ctx, "error auth_token", zap.Error(err))
+		result.ErrAuth(result.E(err)).JSON(w, r)
 
 		return
 	}
 
 	_, err = db.Client().User.Update().Where(user.ID(record.ID)).SetLoginAt(time.Now().Unix()).SetLoginToken(token).Save(ctx)
 	if err != nil {
-		logger.Err(ctx, "err update user", zap.Error(err))
-		result.ErrSystem(result.M("登录失败")).JSON(w, r)
+		logger.Err(ctx, "error update user", zap.Error(err))
+		result.ErrSystem(result.E(err)).JSON(w, r)
 
 		return
 	}
@@ -100,8 +97,8 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		SetUpdatedAt(time.Now().Unix()).
 		Save(ctx)
 	if err != nil {
-		logger.Err(ctx, "err update user", zap.Error(err))
-		result.ErrSystem().JSON(w, r)
+		logger.Err(ctx, "error update user", zap.Error(err))
+		result.ErrSystem(result.E(err)).JSON(w, r)
 
 		return
 	}

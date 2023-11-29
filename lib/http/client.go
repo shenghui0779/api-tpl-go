@@ -17,7 +17,7 @@ const (
 )
 
 const (
-	ContentJSON   = "application/json;charset=utf-8"
+	ContentJSON   = "application/json; charset=utf-8"
 	ContentForm   = "application/x-www-form-urlencoded"
 	MultipartForm = "multipart/form-data"
 )

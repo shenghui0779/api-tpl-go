@@ -15,7 +15,7 @@ import (
 	"api/pkg/service/internal"
 )
 
-type ParamsCreate struct {
+type ReqCreate struct {
 	Username string `json:"username" valid:"required"`
 	Password string `json:"password" valid:"required"`
 }
@@ -23,24 +23,24 @@ type ParamsCreate struct {
 func Create(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	params := new(ParamsCreate)
+	params := new(ReqCreate)
 	if err := internal.BindJSON(r, params); err != nil {
 		logger.Err(ctx, "err params", zap.Error(err))
-		result.ErrParams().JSON(w, r)
+		result.ErrParams(result.E(err)).JSON(w, r)
 
 		return
 	}
 
 	records, err := db.Client().User.Query().Unique(false).Select(user.FieldID).Where(user.Username(params.Username)).All(ctx)
 	if err != nil {
-		logger.Err(ctx, "err query user", zap.Error(err))
-		result.ErrParams().JSON(w, r)
+		logger.Err(ctx, "error query user", zap.Error(err))
+		result.ErrSystem(result.E(err)).JSON(w, r)
 
 		return
 	}
 
 	if len(records) != 0 {
-		result.ErrParams(result.M("该用户名已被使用")).JSON(w, r)
+		result.ErrPerm(result.M("该用户名已被使用")).JSON(w, r)
 		return
 	}
 
@@ -55,8 +55,8 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		SetUpdatedAt(now).
 		Save(ctx)
 	if err != nil {
-		logger.Err(ctx, "err create user", zap.Error(err))
-		result.ErrSystem().JSON(w, r)
+		logger.Err(ctx, "error create user", zap.Error(err))
+		result.ErrSystem(result.E(err)).JSON(w, r)
 
 		return
 	}

@@ -1,6 +1,7 @@
 package result
 
 import (
+	libhttp "api/lib/http"
 	"api/lib/util"
 	"api/logger"
 
@@ -26,7 +27,7 @@ func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
 
 	resp.x["req_id"] = util.GetReqID(ctx)
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Type", libhttp.ContentJSON)
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(resp.x); err != nil {
@@ -41,6 +42,13 @@ type Option func(r *response)
 func M(m string) Option {
 	return func(r *response) {
 		r.x["msg"] = m
+	}
+}
+
+// E 指定err为返回的msg
+func E(err error) Option {
+	return func(r *response) {
+		r.x["msg"] = err.Error()
 	}
 }
 
