@@ -5,7 +5,7 @@ import (
 	"api/db/ent"
 	"api/db/ent/user"
 	"api/lib/util"
-	"api/logger"
+	"api/log"
 	"api/pkg/result"
 	"api/pkg/service/internal"
 
@@ -46,7 +46,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 
 		total, err = builder.Clone().Unique(false).Count(ctx)
 		if err != nil {
-			logger.Err(ctx, "error count user", zap.Error(err))
+			log.Err(ctx, "error count user", zap.Error(err))
 			result.ErrSystem(result.E(err)).JSON(w, r)
 
 			return
@@ -60,7 +60,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 		user.FieldCreatedAt,
 	).Order(ent.Desc(user.FieldID)).Offset(offset).Limit(limit).All(ctx)
 	if err != nil {
-		logger.Err(ctx, "error query user", zap.Error(err))
+		log.Err(ctx, "error query user", zap.Error(err))
 		result.ErrSystem(result.E(err)).JSON(w, r)
 
 		return

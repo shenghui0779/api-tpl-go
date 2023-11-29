@@ -1,11 +1,12 @@
 package validator
 
 import (
-	"api/logger"
 	"context"
 	"database/sql"
 	"strconv"
 	"testing"
+
+	"api/log"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
@@ -46,7 +47,7 @@ func TestValidator(t *testing.T) {
 	}
 	err := v.ValidateStruct(params1)
 	assert.NotNil(t, err)
-	logger.Info(context.Background(), "err validate params", zap.Error(err))
+	log.Info(context.Background(), "err validate params", zap.Error(err))
 
 	params2 := &ParamsValidate{
 		ID: sql.NullInt64{

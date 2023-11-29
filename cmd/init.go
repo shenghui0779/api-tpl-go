@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"api/logger"
-
 	"context"
+
+	"api/log"
 
 	"go.uber.org/zap"
 )
@@ -16,6 +16,6 @@ func Init() {
 	rootCmd.Flags().StringVarP(&cfgFile, "config", "C", ".yml", "设置配置文件")
 
 	if err := rootCmd.Execute(); err != nil {
-		logger.Err(context.Background(), "err cmd execute", zap.Error(err))
+		log.Err(context.Background(), "err cmd execute", zap.Error(err))
 	}
 }

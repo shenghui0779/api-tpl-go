@@ -3,7 +3,7 @@ package cmd
 import (
 	"api/config"
 	"api/db"
-	"api/logger"
+	"api/log"
 	"api/pkg/middleware"
 	"api/pkg/router"
 	"api/redis"
@@ -37,7 +37,7 @@ var rootCmd = &cobra.Command{
 		// make sure we have a working tempdir in minimal containers, because:
 		// os.TempDir(): The directory is neither guaranteed to exist nor have accessible permissions.
 		if err := os.MkdirAll(os.TempDir(), 0775); err != nil {
-			logger.Err(context.Background(), "err create temp dir", zap.Error(err))
+			log.Err(context.Background(), "err create temp dir", zap.Error(err))
 		}
 
 		serving()
@@ -47,9 +47,9 @@ var rootCmd = &cobra.Command{
 func preInit(ctx context.Context) {
 	config.Init(cfgFile)
 
-	logger.Init(&logger.Config{
+	log.Init(&log.Config{
 		Filename: viper.GetString("log.filename"),
-		Options: &logger.Options{
+		Options: &log.Options{
 			MaxSize:    viper.GetInt("log.max_size"),
 			MaxAge:     viper.GetInt("log.max_age"),
 			MaxBackups: viper.GetInt("log.max_backups"),
@@ -69,7 +69,7 @@ func preInit(ctx context.Context) {
 		},
 	})
 	if err != nil {
-		logger.Panic(ctx, "error db init", zap.Error(err))
+		log.Panic(ctx, "error db init", zap.Error(err))
 	}
 
 	err = redis.Init(&goredis.UniversalOptions{
@@ -89,7 +89,7 @@ func preInit(ctx context.Context) {
 		ConnMaxLifetime: viper.GetDuration("redis.conn_max_lifetime") * time.Second,
 	})
 	if err != nil {
-		logger.Panic(ctx, "error redis init", zap.Error(err))
+		log.Panic(ctx, "error redis init", zap.Error(err))
 	}
 }
 
@@ -112,6 +112,6 @@ func serving() {
 	fmt.Println("listening on", srv.Addr)
 
 	if err := srv.ListenAndServe(); err != nil {
-		logger.Fatal(context.Background(), "serving error", zap.Error(err))
+		log.Fatal(context.Background(), "serving error", zap.Error(err))
 	}
 }

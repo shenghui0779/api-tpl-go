@@ -1,11 +1,12 @@
 package nsq
 
 import (
-	"api/logger"
 	"context"
 	"errors"
 	"fmt"
 	"time"
+
+	"api/log"
 
 	"github.com/nsqio/go-nsq"
 	"go.uber.org/zap"
@@ -18,7 +19,7 @@ type Logger struct{}
 
 // Output nsq错误输出
 func (l *Logger) Output(calldepth int, s string) error {
-	logger.Err(context.Background(), fmt.Sprintf("err nsq: %s", s), zap.Int("call_depth", calldepth))
+	log.Err(context.Background(), fmt.Sprintf("err nsq: %s", s), zap.Int("call_depth", calldepth))
 
 	return nil
 }

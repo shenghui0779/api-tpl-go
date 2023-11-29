@@ -12,7 +12,7 @@ import (
 	"api/consts"
 	libhttp "api/lib/http"
 	"api/lib/util"
-	"api/logger"
+	"api/log"
 	"api/pkg/auth"
 	"api/pkg/result"
 )
@@ -59,7 +59,7 @@ func Log(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 
-		logger.Info(r.Context(), "request info",
+		log.Info(r.Context(), "request info",
 			zap.String("method", r.Method),
 			zap.String("uri", r.URL.String()),
 			zap.String("ip", r.RemoteAddr),

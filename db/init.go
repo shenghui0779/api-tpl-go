@@ -8,7 +8,7 @@ import (
 
 	"api/config"
 	"api/db/ent"
-	"api/logger"
+	"api/log"
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
@@ -113,7 +113,7 @@ func Init(cfg *Config) error {
 			entsql.OpenDB(cfg.Driver, db),
 			func(ctx context.Context, v ...any) {
 				if config.ENV.Debug {
-					logger.Info(ctx, "SQL info", zap.String("SQL", fmt.Sprint(v...)))
+					log.Info(ctx, "SQL info", zap.String("SQL", fmt.Sprint(v...)))
 				}
 			}),
 		),

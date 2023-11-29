@@ -12,7 +12,7 @@ import (
 	"api/db/ent/user"
 	"api/lib/hash"
 	"api/lib/util"
-	"api/logger"
+	"api/log"
 	"api/pkg/auth"
 	"api/pkg/result"
 	"api/pkg/service/internal"
@@ -33,7 +33,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	params := new(ReqLogin)
 	if err := internal.BindJSON(r, params); err != nil {
-		logger.Err(ctx, "error params", zap.Error(err))
+		log.Err(ctx, "error params", zap.Error(err))
 		result.ErrParams(result.E(err)).JSON(w, r)
 
 		return
@@ -44,7 +44,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		if ent.IsNotFound(err) {
 			result.ErrAuth(result.M("用户不存在")).JSON(w, r)
 		} else {
-			logger.Err(ctx, "error query user", zap.Error(err))
+			log.Err(ctx, "error query user", zap.Error(err))
 			result.ErrSystem(result.E(err)).JSON(w, r)
 		}
 
@@ -60,7 +60,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	authToken, err := auth.NewIdentity(record.ID, token).AuthToken()
 	if err != nil {
-		logger.Err(ctx, "error auth_token", zap.Error(err))
+		log.Err(ctx, "error auth_token", zap.Error(err))
 		result.ErrAuth(result.E(err)).JSON(w, r)
 
 		return
@@ -68,7 +68,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Client().User.Update().Where(user.ID(record.ID)).SetLoginAt(time.Now().Unix()).SetLoginToken(token).Save(ctx)
 	if err != nil {
-		logger.Err(ctx, "error update user", zap.Error(err))
+		log.Err(ctx, "error update user", zap.Error(err))
 		result.ErrSystem(result.E(err)).JSON(w, r)
 
 		return
@@ -97,7 +97,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		SetUpdatedAt(time.Now().Unix()).
 		Save(ctx)
 	if err != nil {
-		logger.Err(ctx, "error update user", zap.Error(err))
+		log.Err(ctx, "error update user", zap.Error(err))
 		result.ErrSystem(result.E(err)).JSON(w, r)
 
 		return

@@ -1,9 +1,8 @@
 package config
 
 import (
-	"api/logger"
-
 	"context"
+	"log"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
@@ -25,7 +24,7 @@ func refresh() {
 func Init(path string) {
 	viper.SetConfigFile(path)
 	if err := viper.ReadInConfig(); err != nil {
-		logger.Panic(context.Background(), "err read config file", zap.Error(err))
+		log.Panic(context.Background(), "err read config file", zap.Error(err))
 	}
 
 	refresh()

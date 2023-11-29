@@ -3,7 +3,7 @@ package result
 import (
 	libhttp "api/lib/http"
 	"api/lib/util"
-	"api/logger"
+	"api/log"
 
 	"encoding/json"
 	"net/http"
@@ -31,7 +31,7 @@ func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(resp.x); err != nil {
-		logger.Err(ctx, "err write response", zap.Error(err))
+		log.Err(ctx, "err write response", zap.Error(err))
 	}
 }
 

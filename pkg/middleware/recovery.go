@@ -7,7 +7,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"api/logger"
+	"api/log"
 	"api/pkg/auth"
 	"api/pkg/result"
 )
@@ -18,7 +18,7 @@ func Recovery(next http.Handler) http.Handler {
 		defer func() {
 			// panic 捕获
 			if err := recover(); err != nil {
-				logger.Err(r.Context(), "Server Panic", zap.Any("error", err), zap.ByteString("stack", debug.Stack()))
+				log.Err(r.Context(), "Server Panic", zap.Any("error", err), zap.ByteString("stack", debug.Stack()))
 				result.ErrSystem().JSON(w, r)
 			}
 		}()
