@@ -17,7 +17,7 @@ func URLParamInt(r *http.Request, key string) int64 {
 
 	v, err := strconv.ParseInt(param, 10, 64)
 	if err != nil {
-		log.Err(r.Context(), "err url param to int64", zap.Error(err), zap.String("key", key), zap.String("value", param))
+		log.Error(r.Context(), "err url param to int64", zap.Error(err), zap.String("key", key), zap.String("value", param))
 		return 0
 	}
 
@@ -41,7 +41,7 @@ func URLQueryInt(r *http.Request, key string) (int64, bool) {
 
 	v, err := strconv.ParseInt(query, 10, 64)
 	if err != nil {
-		log.Err(r.Context(), "err url query to int64", zap.Error(err), zap.String("key", key), zap.String("value", query))
+		log.Error(r.Context(), "err url query to int64", zap.Error(err), zap.String("key", key), zap.String("value", query))
 		return 0, false
 	}
 

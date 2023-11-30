@@ -31,7 +31,7 @@ func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(resp.x); err != nil {
-		log.Err(ctx, "err write response", zap.Error(err))
+		log.Error(ctx, "err write response", zap.Error(err))
 	}
 }
 

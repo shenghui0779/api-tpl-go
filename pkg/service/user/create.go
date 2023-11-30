@@ -25,7 +25,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 
 	params := new(ReqCreate)
 	if err := internal.BindJSON(r, params); err != nil {
-		log.Err(ctx, "err params", zap.Error(err))
+		log.Error(ctx, "err params", zap.Error(err))
 		result.ErrParams(result.E(err)).JSON(w, r)
 
 		return
@@ -33,7 +33,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 
 	records, err := db.Client().User.Query().Unique(false).Select(user.FieldID).Where(user.Username(params.Username)).All(ctx)
 	if err != nil {
-		log.Err(ctx, "error query user", zap.Error(err))
+		log.Error(ctx, "error query user", zap.Error(err))
 		result.ErrSystem(result.E(err)).JSON(w, r)
 
 		return
@@ -55,7 +55,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		SetUpdatedAt(now).
 		Save(ctx)
 	if err != nil {
-		log.Err(ctx, "error create user", zap.Error(err))
+		log.Error(ctx, "error create user", zap.Error(err))
 		result.ErrSystem(result.E(err)).JSON(w, r)
 
 		return

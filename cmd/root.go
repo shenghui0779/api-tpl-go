@@ -37,7 +37,7 @@ var rootCmd = &cobra.Command{
 		// make sure we have a working tempdir in minimal containers, because:
 		// os.TempDir(): The directory is neither guaranteed to exist nor have accessible permissions.
 		if err := os.MkdirAll(os.TempDir(), 0775); err != nil {
-			log.Err(context.Background(), "err create temp dir", zap.Error(err))
+			log.Error(context.Background(), "err create temp dir", zap.Error(err))
 		}
 
 		serving()

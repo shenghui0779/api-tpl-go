@@ -22,7 +22,7 @@ func Warn(ctx context.Context, msg string, fields ...zap.Field) {
 	logger.Warn(msg, append(fields, zap.String("req_id", util.GetReqID(ctx)))...)
 }
 
-func Err(ctx context.Context, msg string, fields ...zap.Field) {
+func Error(ctx context.Context, msg string, fields ...zap.Field) {
 	logger.Error(msg, append(fields, zap.String("req_id", util.GetReqID(ctx)))...)
 }
 

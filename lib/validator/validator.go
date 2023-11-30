@@ -85,7 +85,7 @@ func New(opts ...Option) *Validator {
 	trans, _ := ut.New(zhTrans, zhTrans).GetTranslator("zh")
 
 	if err := zhcn.RegisterDefaultTranslations(validate, trans); err != nil {
-		log.Err(context.Background(), "err validator translation", zap.Error(err))
+		log.Error(context.Background(), "err validator translation", zap.Error(err))
 	}
 
 	for _, f := range opts {

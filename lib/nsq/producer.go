@@ -19,7 +19,7 @@ type Logger struct{}
 
 // Output nsq错误输出
 func (l *Logger) Output(calldepth int, s string) error {
-	log.Err(context.Background(), fmt.Sprintf("err nsq: %s", s), zap.Int("call_depth", calldepth))
+	log.Error(context.Background(), fmt.Sprintf("err nsq: %s", s), zap.Int("call_depth", calldepth))
 
 	return nil
 }

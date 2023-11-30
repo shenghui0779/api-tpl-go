@@ -46,7 +46,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 
 		total, err = builder.Clone().Unique(false).Count(ctx)
 		if err != nil {
-			log.Err(ctx, "error count user", zap.Error(err))
+			log.Error(ctx, "error count user", zap.Error(err))
 			result.ErrSystem(result.E(err)).JSON(w, r)
 
 			return
@@ -60,7 +60,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 		user.FieldCreatedAt,
 	).Order(ent.Desc(user.FieldID)).Offset(offset).Limit(limit).All(ctx)
 	if err != nil {
-		log.Err(ctx, "error query user", zap.Error(err))
+		log.Error(ctx, "error query user", zap.Error(err))
 		result.ErrSystem(result.E(err)).JSON(w, r)
 
 		return
