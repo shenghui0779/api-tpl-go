@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 
-	"api/consts"
 	libhttp "api/lib/http"
 	"api/lib/util"
 	"api/lib/validator"
@@ -33,7 +32,7 @@ func BindForm(r *http.Request, obj any) error {
 			return err
 		}
 	case libhttp.MultipartForm:
-		if err := r.ParseMultipartForm(consts.MaxFormMemory); err != nil {
+		if err := r.ParseMultipartForm(libhttp.MaxFormMemory); err != nil {
 			if err != http.ErrNotMultipart {
 				return err
 			}

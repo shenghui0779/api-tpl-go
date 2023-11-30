@@ -1,10 +1,10 @@
 package lib
 
 import (
+	"api/lib/log"
+
 	"context"
 	"runtime/debug"
-
-	"api/log"
 
 	"go.uber.org/zap"
 )

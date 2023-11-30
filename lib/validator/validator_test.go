@@ -1,12 +1,12 @@
 package validator
 
 import (
+	"api/lib/log"
+
 	"context"
 	"database/sql"
 	"strconv"
 	"testing"
-
-	"api/log"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"

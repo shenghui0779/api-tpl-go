@@ -1,12 +1,12 @@
 package cmd
 
 import (
-	"api/config"
-	"api/db"
-	"api/log"
+	"api/lib/config"
+	"api/lib/db"
+	"api/lib/log"
+	"api/lib/redis"
 	"api/pkg/middleware"
 	"api/pkg/router"
-	"api/redis"
 
 	"context"
 	"fmt"

@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"context"
+	"api/lib/log"
 
-	"api/log"
+	"context"
 
 	"go.uber.org/zap"
 )

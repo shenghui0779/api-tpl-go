@@ -7,7 +7,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"api/log"
+	"api/lib/log"
 	"api/pkg/auth"
 	"api/pkg/result"
 )

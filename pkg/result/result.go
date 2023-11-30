@@ -2,8 +2,8 @@ package result
 
 import (
 	libhttp "api/lib/http"
+	"api/lib/log"
 	"api/lib/util"
-	"api/log"
 
 	"encoding/json"
 	"net/http"

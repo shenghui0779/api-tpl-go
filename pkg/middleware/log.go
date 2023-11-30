@@ -9,10 +9,9 @@ import (
 	"github.com/tidwall/pretty"
 	"go.uber.org/zap"
 
-	"api/consts"
 	libhttp "api/lib/http"
+	"api/lib/log"
 	"api/lib/util"
-	"api/log"
 	"api/pkg/auth"
 	"api/pkg/result"
 )
@@ -36,7 +35,7 @@ func Log(next http.Handler) http.Handler {
 
 				body = r.Form.Encode()
 			case libhttp.MultipartForm:
-				if err := r.ParseMultipartForm(consts.MaxFormMemory); err != nil {
+				if err := r.ParseMultipartForm(libhttp.MaxFormMemory); err != nil {
 					if err != http.ErrNotMultipart {
 						result.ErrSystem(result.M(err.Error())).JSON(w, r)
 						return

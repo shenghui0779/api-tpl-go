@@ -1,12 +1,12 @@
 package validator
 
 import (
+	"api/lib/log"
+
 	"context"
 	"errors"
 	"reflect"
 	"strings"
-
-	"api/log"
 
 	"github.com/go-playground/locales/zh"
 	ut "github.com/go-playground/universal-translator"

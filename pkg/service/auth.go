@@ -1,21 +1,21 @@
 package service
 
 import (
+	"api/ent"
+	"api/ent/user"
+	"api/lib/db"
+	"api/lib/hash"
+	"api/lib/log"
+	"api/lib/util"
+	"api/pkg/auth"
+	"api/pkg/result"
+	"api/pkg/service/internal"
+
 	"fmt"
 	"net/http"
 	"time"
 
 	"go.uber.org/zap"
-
-	"api/db"
-	"api/db/ent"
-	"api/db/ent/user"
-	"api/lib/hash"
-	"api/lib/util"
-	"api/log"
-	"api/pkg/auth"
-	"api/pkg/result"
-	"api/pkg/service/internal"
 )
 
 type ReqLogin struct {

@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const MaxFormMemory = 32 << 20
+
 const (
 	HeaderAuthorization = "Authorization"
 	HeaderContentType   = "Content-Type"

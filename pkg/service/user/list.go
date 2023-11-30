@@ -1,11 +1,11 @@
 package user
 
 import (
-	"api/db"
-	"api/db/ent"
-	"api/db/ent/user"
+	"api/ent"
+	"api/ent/user"
+	"api/lib/db"
+	"api/lib/log"
 	"api/lib/util"
-	"api/log"
 	"api/pkg/result"
 	"api/pkg/service/internal"
 

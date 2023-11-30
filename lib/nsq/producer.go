@@ -1,12 +1,12 @@
 package nsq
 
 import (
+	"api/lib/log"
+
 	"context"
 	"errors"
 	"fmt"
 	"time"
-
-	"api/log"
 
 	"github.com/nsqio/go-nsq"
 	"go.uber.org/zap"

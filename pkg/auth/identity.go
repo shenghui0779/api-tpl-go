@@ -1,12 +1,12 @@
 package auth
 
 import (
-	"api/config"
-	"api/db"
-	"api/db/ent"
-	"api/db/ent/user"
+	"api/ent"
+	"api/ent/user"
 	libaes "api/lib/aes"
-	"api/log"
+	"api/lib/config"
+	"api/lib/db"
+	"api/lib/log"
 
 	"context"
 	"crypto/aes"

@@ -1,1 +1,1 @@
-go generate ./db/ent
+go generate ./ent

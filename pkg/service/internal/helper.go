@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"api/log"
+	"api/lib/log"
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"

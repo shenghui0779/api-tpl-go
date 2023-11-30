@@ -1,18 +1,18 @@
 package user
 
 import (
+	"api/ent/user"
+	"api/lib/db"
+	"api/lib/hash"
+	"api/lib/log"
+	"api/lib/util"
+	"api/pkg/result"
+	"api/pkg/service/internal"
+
 	"net/http"
 	"time"
 
 	"go.uber.org/zap"
-
-	"api/db"
-	"api/db/ent/user"
-	"api/lib/hash"
-	"api/lib/util"
-	"api/log"
-	"api/pkg/result"
-	"api/pkg/service/internal"
 )
 
 type ReqCreate struct {
