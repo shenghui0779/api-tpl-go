@@ -27,7 +27,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:         "api",
 	Short:       "Go应用服务API",
-	Long:        "Go应用服务API(build with yiigo & chi)",
+	Long:        "Go应用服务API(build with ent & chi)",
 	Annotations: map[string]string{},
 	Version:     "v1.0.0",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
