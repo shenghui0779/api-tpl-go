@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	chimidware "github.com/go-chi/chi/v5/middleware"
+	chiware "github.com/go-chi/chi/v5/middleware"
 	goredis "github.com/redis/go-redis/v9"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -96,8 +96,8 @@ func preInit(ctx context.Context) {
 func serving() {
 	r := chi.NewRouter()
 
-	r.Use(chimidware.RequestID, middleware.Cors, middleware.Recovery)
-	r.Mount("/debug", chimidware.Profiler())
+	r.Use(chiware.RequestID, middleware.Cors, middleware.Recovery)
+	r.Mount("/debug", chiware.Profiler())
 
 	router.App(r)
 

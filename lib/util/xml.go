@@ -2,11 +2,22 @@ package util
 
 import (
 	"api/lib/value"
+
 	"bytes"
 	"encoding/xml"
 	"io"
 	"strings"
 )
+
+// CDATA XML `CDATA` 标记
+type CDATA string
+
+// MarshalXML XML 带 `CDATA` 标记序列化
+func (c CDATA) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return e.EncodeElement(struct {
+		string `xml:",cdata"`
+	}{string(c)}, start)
+}
 
 // FormatVToXML format map to xml
 func FormatVToXML(vals value.V) ([]byte, error) {
