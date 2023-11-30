@@ -3,7 +3,8 @@
 轻量好用的 Go API 项目框架
 
 > 1. Table `User` refers to `ent/schema/user.go`
-> 2. Set `GOPROXY` ( `go env -w GOPROXY="https://proxy.golang.com.cn,direct"` )
+> 2. 执行 `ent.sh` 生成ORM代码 (只要 `ent/schema` 目录下有变动都需要执行)
+> 3. Set `GOPROXY` ( `go env -w GOPROXY="https://proxy.golang.com.cn,direct"` )
 
 - 路由使用 [chi](https://github.com/go-chi/chi)
 - ORM使用 [ent](https://github.com/ent/ent)
