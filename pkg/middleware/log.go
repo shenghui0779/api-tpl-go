@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/tidwall/pretty"
 	"go.uber.org/zap"
 
@@ -29,7 +30,7 @@ func Log(next http.Handler) http.Handler {
 			switch util.ContentType(r) {
 			case libhttp.ContentForm:
 				if err := r.ParseForm(); err != nil {
-					result.ErrSystem(result.M(err.Error())).JSON(w, r)
+					result.ErrSystem(result.E(errors.WithMessage(err, "表单解析失败"))).JSON(w, r)
 					return
 				}
 
@@ -37,7 +38,7 @@ func Log(next http.Handler) http.Handler {
 			case libhttp.MultipartForm:
 				if err := r.ParseMultipartForm(libhttp.MaxFormMemory); err != nil {
 					if err != http.ErrNotMultipart {
-						result.ErrSystem(result.M(err.Error())).JSON(w, r)
+						result.ErrSystem(result.E(errors.WithMessage(err, "表单解析失败"))).JSON(w, r)
 						return
 					}
 				}
@@ -46,7 +47,7 @@ func Log(next http.Handler) http.Handler {
 			case ContentJSON:
 				b, err := io.ReadAll(r.Body) // 取出Body
 				if err != nil {
-					result.ErrSystem(result.M(err.Error())).JSON(w, r)
+					result.ErrSystem(result.E(errors.WithMessage(err, "请求Body读取失败"))).JSON(w, r)
 					return
 				}
 				r.Body.Close() // 关闭原Body

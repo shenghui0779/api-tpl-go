@@ -5,6 +5,8 @@ import (
 
 	"api/pkg/auth"
 	"api/pkg/result"
+
+	"github.com/pkg/errors"
 )
 
 // Auth App授权中间件
@@ -14,7 +16,7 @@ func Auth(next http.Handler) http.Handler {
 
 		identity := auth.GetIdentity(ctx)
 		if err := identity.Check(ctx); err != nil {
-			result.ErrAuth(result.M(err.Error())).JSON(w, r)
+			result.ErrAuth(result.E(errors.WithMessage(err, "授权校验失败"))).JSON(w, r)
 			return
 		}
 
