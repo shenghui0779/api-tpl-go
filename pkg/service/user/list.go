@@ -6,12 +6,13 @@ import (
 	"api/lib/db"
 	"api/lib/log"
 	"api/lib/util"
+	"api/pkg/internal"
 	"api/pkg/result"
-	"api/pkg/service/internal"
 
 	"net/http"
 	"time"
 
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
 
@@ -47,7 +48,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 		total, err = builder.Clone().Unique(false).Count(ctx)
 		if err != nil {
 			log.Error(ctx, "error count user", zap.Error(err))
-			result.ErrSystem(result.E(err)).JSON(w, r)
+			result.ErrSystem(result.E(errors.WithMessage(err, "用户Count失败"))).JSON(w, r)
 
 			return
 		}
@@ -61,7 +62,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 	).Order(ent.Desc(user.FieldID)).Offset(offset).Limit(limit).All(ctx)
 	if err != nil {
 		log.Error(ctx, "error query user", zap.Error(err))
-		result.ErrSystem(result.E(err)).JSON(w, r)
+		result.ErrSystem(result.E(errors.WithMessage(err, "用户查询失败"))).JSON(w, r)
 
 		return
 	}

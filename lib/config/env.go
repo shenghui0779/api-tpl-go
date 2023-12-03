@@ -10,15 +10,15 @@ import (
 )
 
 type Environment struct {
-	Debug     bool
-	APISecret string
+	AppDebug  bool
+	AppSecret string
 }
 
 var ENV = new(Environment)
 
 func refresh() {
-	ENV.Debug = viper.GetBool("app.debug")
-	ENV.APISecret = viper.GetString("app.secret")
+	ENV.AppDebug = viper.GetBool("app.debug")
+	ENV.AppSecret = viper.GetString("app.secret")
 }
 
 func Init(path string) {

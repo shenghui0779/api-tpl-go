@@ -70,7 +70,7 @@ func Init(cfg *Config) error {
 		ent.Driver(dialect.DebugWithContext(
 			entsql.OpenDB(cfg.Driver, db),
 			func(ctx context.Context, v ...any) {
-				if config.ENV.Debug {
+				if config.ENV.AppDebug {
 					log.Info(ctx, "SQL info", zap.String("SQL", fmt.Sprint(v...)))
 				}
 			}),

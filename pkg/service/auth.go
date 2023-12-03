@@ -8,8 +8,8 @@ import (
 	"api/lib/log"
 	"api/lib/util"
 	"api/pkg/auth"
+	"api/pkg/internal"
 	"api/pkg/result"
-	"api/pkg/service/internal"
 
 	"fmt"
 	"net/http"

@@ -50,11 +50,9 @@ func URLQueryInt(r *http.Request, key string) (int64, bool) {
 
 func QueryPage(r *http.Request) (offset, limit int) {
 	limit = 20
-
 	if v, ok := URLQueryInt(r, "size"); ok && v > 0 {
 		limit = int(v)
 	}
-
 	if limit > 100 {
 		limit = 100
 	}
@@ -68,18 +66,15 @@ func QueryPage(r *http.Request) (offset, limit int) {
 
 func ExcelColumnIndex(name string) int {
 	name = strings.ToUpper(name)
-
 	if ok, err := regexp.MatchString(`^[A-Z]{1,2}$`, name); err != nil || !ok {
 		return -1
 	}
 
 	index := 0
-
 	for i, v := range name {
 		if i != 0 {
 			index = (index + 1) * 26
 		}
-
 		index += int(v - 'A')
 	}
 

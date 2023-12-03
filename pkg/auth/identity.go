@@ -49,7 +49,7 @@ func (i *identity) AuthToken() (string, error) {
 		return "", errors.Wrap(err, "marshal identity")
 	}
 
-	key := []byte(config.ENV.APISecret)
+	key := []byte(config.ENV.AppSecret)
 
 	ct, err := libaes.EncryptCBC(key, key[:aes.BlockSize], b)
 	if err != nil {
@@ -128,7 +128,7 @@ func AuthTokenToIdentity(ctx context.Context, token string) Identity {
 		return NewEmptyIdentity()
 	}
 
-	key := []byte(config.ENV.APISecret)
+	key := []byte(config.ENV.AppSecret)
 
 	plainText, err := libaes.DecryptCBC(key, key[:aes.BlockSize], cipherText)
 	if err != nil {

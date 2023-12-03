@@ -6,12 +6,13 @@ import (
 	"api/lib/hash"
 	"api/lib/log"
 	"api/lib/util"
+	"api/pkg/internal"
 	"api/pkg/result"
-	"api/pkg/service/internal"
 
 	"net/http"
 	"time"
 
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
 
@@ -26,7 +27,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	params := new(ReqCreate)
 	if err := internal.BindJSON(r, params); err != nil {
 		log.Error(ctx, "err params", zap.Error(err))
-		result.ErrParams(result.E(err)).JSON(w, r)
+		result.ErrParams(result.E(errors.WithMessage(err, "参数错误"))).JSON(w, r)
 
 		return
 	}
@@ -34,11 +35,10 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	records, err := db.Client().User.Query().Unique(false).Select(user.FieldID).Where(user.Username(params.Username)).All(ctx)
 	if err != nil {
 		log.Error(ctx, "error query user", zap.Error(err))
-		result.ErrSystem(result.E(err)).JSON(w, r)
+		result.ErrSystem(result.E(errors.WithMessage(err, "用户查询失败"))).JSON(w, r)
 
 		return
 	}
-
 	if len(records) != 0 {
 		result.ErrPerm(result.M("该用户名已被使用")).JSON(w, r)
 		return
@@ -56,7 +56,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		Save(ctx)
 	if err != nil {
 		log.Error(ctx, "error create user", zap.Error(err))
-		result.ErrSystem(result.E(err)).JSON(w, r)
+		result.ErrSystem(result.E(errors.WithMessage(err, "用户创建失败"))).JSON(w, r)
 
 		return
 	}
