@@ -33,7 +33,7 @@ func Client() redis.UniversalClient {
 
 func buildOpts(addrs []string, options map[string]any) *redis.UniversalOptions {
 	cfg := &redis.UniversalOptions{
-		Addrs: []string{viper.GetString("redis.addr")},
+		Addrs: addrs,
 	}
 
 	if len(options) != 0 {
@@ -71,9 +71,9 @@ func buildOpts(addrs []string, options map[string]any) *redis.UniversalOptions {
 		// Only cluster clients.
 
 		cfg.MaxRedirects = cast.ToInt(options["max_redirects"])
-		cfg.ReadOnly = cast.ToBool("read_only")
-		cfg.RouteByLatency = cast.ToBool("route_by_latency")
-		cfg.RouteRandomly = cast.ToBool("route_randomly")
+		cfg.ReadOnly = cast.ToBool(options["read_only"])
+		cfg.RouteByLatency = cast.ToBool(options["route_by_latency"])
+		cfg.RouteRandomly = cast.ToBool(options["route_randomly"])
 
 		// The sentinel master name.
 		// Only failover clients.

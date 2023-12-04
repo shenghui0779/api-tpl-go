@@ -12,18 +12,15 @@ type Consumer interface {
 
 	// Topic 指定消费的Topic
 	Topic() string
-
 	// Channel 设置消费通道
 	Channel() string
-
 	// Attempts 设置重试次数
 	Attempts() uint16
-
 	// Config nsq相关配置
 	Config() *nsq.Config
 }
 
-func setConsumers(lookupd []string, consumers ...Consumer) error {
+func consumerSet(lookupd []string, consumers ...Consumer) error {
 	for _, c := range consumers {
 		cfg := c.Config()
 

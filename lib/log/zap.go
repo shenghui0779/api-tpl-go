@@ -91,11 +91,11 @@ func buildCfg(filename string, options map[string]any) *Config {
 
 	if len(options) != 0 {
 		cfg.Options = &Options{
-			MaxSize:    cast.ToInt("max_size"),
-			MaxAge:     cast.ToInt("log.max_age"),
-			MaxBackups: cast.ToInt("log.max_backups"),
-			Compress:   cast.ToBool("log.compress"),
-			Stderr:     cast.ToBool("log.stderr"),
+			MaxSize:    cast.ToInt(options["max_size"]),
+			MaxAge:     cast.ToInt(options["log.max_age"]),
+			MaxBackups: cast.ToInt(options["log.max_backups"]),
+			Compress:   cast.ToBool(options["log.compress"]),
+			Stderr:     cast.ToBool(options["log.stderr"]),
 		}
 	}
 

@@ -61,10 +61,10 @@ func buildCfg(driver, dsn string, options map[string]any) *Config {
 
 	if len(options) != 0 {
 		cfg.Options = &Options{
-			MaxOpenConns:    cast.ToInt("db.max_open_conns"),
-			MaxIdleConns:    cast.ToInt("db.max_idle_conns"),
-			ConnMaxLifetime: cast.ToDuration("db.conn_max_lifetime") * time.Second,
-			ConnMaxIdleTime: cast.ToDuration("db.conn_max_idle_time") * time.Second,
+			MaxOpenConns:    cast.ToInt(options["max_open_conns"]),
+			MaxIdleConns:    cast.ToInt(options["max_idle_conns"]),
+			ConnMaxLifetime: cast.ToDuration(options["conn_max_lifetime"]) * time.Second,
+			ConnMaxIdleTime: cast.ToDuration(options["conn_max_idle_time"]) * time.Second,
 		}
 	}
 

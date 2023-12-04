@@ -45,7 +45,7 @@ func InitWithCfg(cfg *nsq.Config, consumers ...Consumer) error {
 	producer.SetLogger(&Logger{}, nsq.LogLevelError)
 
 	// set consumers
-	if err = setConsumers(viper.GetStringSlice("nsq.lookupd"), consumers...); err != nil {
+	if err = consumerSet(viper.GetStringSlice("nsq.lookupd"), consumers...); err != nil {
 		return err
 	}
 
