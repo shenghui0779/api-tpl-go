@@ -13,7 +13,7 @@ var logger = debug()
 
 // Init 初始化日志实例(如有多个实例，在此方法中初始化)
 func Init() {
-	logger = New(buildCfg(viper.GetString("log.filename"), viper.GetStringMap("log.options")))
+	logger = New(buildCfg(viper.GetString("log.path"), viper.GetStringMap("log.options")))
 }
 
 func Info(ctx context.Context, msg string, fields ...zap.Field) {

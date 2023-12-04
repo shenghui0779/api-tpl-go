@@ -2,7 +2,6 @@ package db
 
 import (
 	"api/ent"
-	"api/lib/config"
 	"api/lib/log"
 
 	"context"
@@ -29,9 +28,7 @@ func Init() error {
 		ent.Driver(dialect.DebugWithContext(
 			entsql.OpenDB(cfg.Driver, db),
 			func(ctx context.Context, v ...any) {
-				if config.ENV.AppDebug {
-					log.Info(ctx, "SQL info", zap.String("SQL", fmt.Sprint(v...)))
-				}
+				log.Info(ctx, "SQL info", zap.String("SQL", fmt.Sprint(v...)))
 			}),
 		),
 	)

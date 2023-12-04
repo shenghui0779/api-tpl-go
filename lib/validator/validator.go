@@ -97,3 +97,16 @@ func New(opts ...Option) *Validator {
 		translator: trans,
 	}
 }
+
+// v 默认验证器
+var v = New()
+
+// ValidateStruct 验证结构体
+func ValidateStruct(obj any) error {
+	return v.ValidateStruct(obj)
+}
+
+// ValidateStructCtx 验证结构体，带Context
+func ValidateStructCtx(ctx context.Context, obj any) error {
+	return v.ValidateStructCtx(ctx, obj)
+}

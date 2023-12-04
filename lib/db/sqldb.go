@@ -16,21 +16,21 @@ type Config struct {
 	// [-- MySQL] username:password@tcp(localhost:3306)/dbname?timeout=10s&charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=True&loc=Local
 	// [Postgres] host=localhost port=5432 user=root password=secret dbname=test connect_timeout=10 sslmode=disable
 	// [- SQLite] file::memory:?cache=shared
-	DSN string `json:"dsn"`
+	DSN string
 	// Options 配置选项
-	Options *Options `json:"options"`
+	Options *Options
 }
 
 // Options 数据库配置选项
 type Options struct {
 	// MaxOpenConns 设置最大可打开的连接数
-	MaxOpenConns int `json:"max_open_conns"`
+	MaxOpenConns int
 	// MaxIdleConns 连接池最大闲置连接数
-	MaxIdleConns int `json:"max_idle_conns"`
+	MaxIdleConns int
 	// ConnMaxLifetime 连接的最大生命时长
-	ConnMaxLifetime time.Duration `json:"conn_max_lifetime"`
+	ConnMaxLifetime time.Duration
 	// ConnMaxIdleTime 连接最大闲置时间
-	ConnMaxIdleTime time.Duration `json:"conn_max_idle_time"`
+	ConnMaxIdleTime time.Duration
 }
 
 func New(cfg *Config) (*sql.DB, error) {
@@ -53,18 +53,18 @@ func New(cfg *Config) (*sql.DB, error) {
 	return db, nil
 }
 
-func buildCfg(driver, dsn string, options map[string]any) *Config {
+func buildCfg(driver, dsn string, opts map[string]any) *Config {
 	cfg := &Config{
 		Driver: driver,
 		DSN:    dsn,
 	}
 
-	if len(options) != 0 {
+	if len(opts) != 0 {
 		cfg.Options = &Options{
-			MaxOpenConns:    cast.ToInt(options["max_open_conns"]),
-			MaxIdleConns:    cast.ToInt(options["max_idle_conns"]),
-			ConnMaxLifetime: cast.ToDuration(options["conn_max_lifetime"]) * time.Second,
-			ConnMaxIdleTime: cast.ToDuration(options["conn_max_idle_time"]) * time.Second,
+			MaxOpenConns:    cast.ToInt(opts["max_open_conns"]),
+			MaxIdleConns:    cast.ToInt(opts["max_idle_conns"]),
+			ConnMaxLifetime: cast.ToDuration(opts["conn_max_lifetime"]) * time.Second,
+			ConnMaxIdleTime: cast.ToDuration(opts["conn_max_idle_time"]) * time.Second,
 		}
 	}
 

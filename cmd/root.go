@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"api/lib/config"
 	"api/lib/db"
 	"api/lib/log"
 	"api/lib/redis"
@@ -30,6 +29,12 @@ var rootCmd = &cobra.Command{
 	Annotations: map[string]string{},
 	Version:     "v1.0.0",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		viper.SetConfigFile(cfgFile)
+		if err := viper.ReadInConfig(); err != nil {
+			log.Panic(context.Background(), "配置读取失败", zap.Error(err))
+		}
+		viper.WatchConfig()
+
 		preInit(context.Background())
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -44,8 +49,6 @@ var rootCmd = &cobra.Command{
 }
 
 func preInit(ctx context.Context) {
-	// 初始化配置
-	config.Init(cfgFile)
 	// 初始化日志
 	log.Init()
 	// 初始化数据库

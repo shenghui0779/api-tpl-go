@@ -4,7 +4,6 @@ import (
 	"api/ent"
 	"api/ent/user"
 	libaes "api/lib/aes"
-	"api/lib/config"
 	"api/lib/db"
 	"api/lib/log"
 
@@ -15,6 +14,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
@@ -49,7 +49,7 @@ func (i *identity) AuthToken() (string, error) {
 		return "", errors.Wrap(err, "marshal identity")
 	}
 
-	key := []byte(config.ENV.AppSecret)
+	key := []byte(viper.GetString("app.secret"))
 
 	ct, err := libaes.EncryptCBC(key, key[:aes.BlockSize], b)
 	if err != nil {
@@ -128,7 +128,7 @@ func AuthTokenToIdentity(ctx context.Context, token string) Identity {
 		return NewEmptyIdentity()
 	}
 
-	key := []byte(config.ENV.AppSecret)
+	key := []byte(viper.GetString("app.secret"))
 
 	plainText, err := libaes.DecryptCBC(key, key[:aes.BlockSize], cipherText)
 	if err != nil {

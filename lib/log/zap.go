@@ -13,25 +13,25 @@ import (
 // Config 日志初始化配置
 type Config struct {
 	// Filename 日志名称
-	Filename string `json:"filename"`
+	Filename string
 	// Options 日志选项
-	Options *Options `json:"options"`
+	Options *Options
 }
 
 // Options 日志配置选项
 type Options struct {
 	// MaxSize 当前文件多大时轮替；默认：100MB
-	MaxSize int `json:"max_size"`
+	MaxSize int
 	// MaxAge 轮替的旧文件最大保留时长；默认：不限
-	MaxAge int `json:"max_age"`
+	MaxAge int
 	// MaxBackups 轮替的旧文件最大保留数量；默认：不限
-	MaxBackups int `json:"max_backups"`
+	MaxBackups int
 	// Compress 轮替的旧文件是否压缩；默认：不压缩
-	Compress bool `json:"compress"`
+	Compress bool
 	// Stderr 是否输出到控制台
-	Stderr bool `json:"stderr"`
+	Stderr bool
 	// ZapOptions Zap日志选项
-	ZapOptions []zap.Option `json:"zap_options"`
+	ZapOptions []zap.Option
 }
 
 func debug(options ...zap.Option) *zap.Logger {
@@ -42,9 +42,9 @@ func debug(options ...zap.Option) *zap.Logger {
 	cfg.EncoderConfig.EncodeTime = MyTimeEncoder
 	cfg.EncoderConfig.EncodeCaller = zapcore.FullCallerEncoder
 
-	l, _ := cfg.Build(options...)
+	logger, _ := cfg.Build(options...)
 
-	return l
+	return logger
 }
 
 func New(cfg *Config) *zap.Logger {
@@ -52,10 +52,12 @@ func New(cfg *Config) *zap.Logger {
 		return debug(cfg.Options.ZapOptions...)
 	}
 
-	c := zap.NewProductionEncoderConfig()
-	c.TimeKey = "time"
-	c.EncodeTime = MyTimeEncoder
-	c.EncodeCaller = zapcore.FullCallerEncoder
+	ec := zap.NewProductionEncoderConfig()
+	ec.TimeKey = "time"
+	ec.EncodeTime = MyTimeEncoder
+	ec.EncodeCaller = zapcore.FullCallerEncoder
+
+	var zapOpts []zap.Option
 
 	w := &lumberjack.Logger{
 		Filename:  cfg.Filename,
@@ -63,6 +65,8 @@ func New(cfg *Config) *zap.Logger {
 	}
 	ws := make([]zapcore.WriteSyncer, 0, 2)
 	if cfg.Options != nil {
+		zapOpts = cfg.Options.ZapOptions
+
 		w.MaxSize = cfg.Options.MaxSize
 		w.MaxAge = cfg.Options.MaxAge
 		w.MaxBackups = cfg.Options.MaxBackups
@@ -74,9 +78,7 @@ func New(cfg *Config) *zap.Logger {
 	}
 	ws = append(ws, zapcore.AddSync(w))
 
-	core := zapcore.NewCore(zapcore.NewJSONEncoder(c), zapcore.NewMultiWriteSyncer(ws...), zap.DebugLevel)
-
-	return zap.New(core, cfg.Options.ZapOptions...)
+	return zap.New(zapcore.NewCore(zapcore.NewJSONEncoder(ec), zapcore.NewMultiWriteSyncer(ws...), zap.DebugLevel), zapOpts...)
 }
 
 // MyTimeEncoder 自定义时间格式化
@@ -84,18 +86,18 @@ func MyTimeEncoder(t time.Time, e zapcore.PrimitiveArrayEncoder) {
 	e.AppendString(t.In(time.FixedZone("CST", 8*3600)).Format(time.DateTime))
 }
 
-func buildCfg(filename string, options map[string]any) *Config {
+func buildCfg(path string, opts map[string]any) *Config {
 	cfg := &Config{
-		Filename: filename,
+		Filename: path,
 	}
 
-	if len(options) != 0 {
+	if len(opts) != 0 {
 		cfg.Options = &Options{
-			MaxSize:    cast.ToInt(options["max_size"]),
-			MaxAge:     cast.ToInt(options["log.max_age"]),
-			MaxBackups: cast.ToInt(options["log.max_backups"]),
-			Compress:   cast.ToBool(options["log.compress"]),
-			Stderr:     cast.ToBool(options["log.stderr"]),
+			MaxSize:    cast.ToInt(opts["max_size"]),
+			MaxAge:     cast.ToInt(opts["max_age"]),
+			MaxBackups: cast.ToInt(opts["max_backups"]),
+			Compress:   cast.ToBool(opts["compress"]),
+			Stderr:     cast.ToBool(opts["stderr"]),
 		}
 	}
 

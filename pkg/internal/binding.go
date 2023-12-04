@@ -10,8 +10,6 @@ import (
 	"api/lib/validator"
 )
 
-var v = validator.New()
-
 func BindJSON(r *http.Request, obj any) error {
 	if r.Body != nil && r.Body != http.NoBody {
 		defer io.Copy(io.Discard, r.Body)
@@ -21,7 +19,7 @@ func BindJSON(r *http.Request, obj any) error {
 		}
 	}
 
-	return v.ValidateStruct(obj)
+	return validator.ValidateStruct(obj)
 }
 
 // BindForm 解析Form表单并校验
@@ -43,5 +41,5 @@ func BindForm(r *http.Request, obj any) error {
 		return err
 	}
 
-	return v.ValidateStruct(obj)
+	return validator.ValidateStruct(obj)
 }
