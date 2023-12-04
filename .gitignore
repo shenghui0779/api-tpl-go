@@ -21,3 +21,4 @@ logs/
 *.log
 .env
 .yml
+config.toml

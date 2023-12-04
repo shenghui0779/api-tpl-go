@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/nsqio/go-nsq"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
@@ -24,14 +25,16 @@ func (l *Logger) Output(calldepth int, s string) error {
 	return nil
 }
 
-func Init(nsqd string, lookupd []string, cfg *nsq.Config, consumers ...Consumer) error {
-	if cfg == nil {
-		cfg = nsq.NewConfig()
-	}
+// Init 使用默认配置初始化
+func Init(consumers ...Consumer) error {
+	return InitWithCfg(nsq.NewConfig(), consumers...)
+}
 
+// InitWithCfg 指定配置初始化
+func InitWithCfg(cfg *nsq.Config, consumers ...Consumer) error {
 	var err error
 
-	producer, err = nsq.NewProducer(nsqd, cfg)
+	producer, err = nsq.NewProducer(viper.GetString("nsq.nsqd"), cfg)
 	if err != nil {
 		return err
 	}
@@ -42,7 +45,7 @@ func Init(nsqd string, lookupd []string, cfg *nsq.Config, consumers ...Consumer)
 	producer.SetLogger(&Logger{}, nsq.LogLevelError)
 
 	// set consumers
-	if err = setConsumers(lookupd, consumers...); err != nil {
+	if err = setConsumers(viper.GetStringSlice("nsq.lookupd"), consumers...); err != nil {
 		return err
 	}
 

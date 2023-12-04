@@ -19,10 +19,8 @@ func SetUpgrader(up *websocket.Upgrader) {
 type Conn interface {
 	// Read 读消息
 	Read(ctx context.Context, handler func(ctx context.Context, msg *Message) (*Message, error)) error
-
 	// Write 写消息
 	Write(ctx context.Context, msg *Message) error
-
 	// Close 关闭连接
 	Close(ctx context.Context) error
 }

@@ -5,13 +5,15 @@ import (
 
 	"context"
 
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
 var logger = debug()
 
-func Init(cfg *Config) {
-	logger = New(cfg)
+// Init 初始化日志实例(如有多个实例，在此方法中初始化)
+func Init() {
+	logger = New(buildCfg(viper.GetString("log.filename"), viper.GetStringMap("log.options")))
 }
 
 func Info(ctx context.Context, msg string, fields ...zap.Field) {
