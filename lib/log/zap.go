@@ -30,8 +30,8 @@ type Options struct {
 	Compress bool
 	// Stderr 是否输出到控制台
 	Stderr bool
-	// ZapOptions Zap日志选项
-	ZapOptions []zap.Option
+	// ZapOpts Zap日志选项
+	ZapOpts []zap.Option
 }
 
 func debug(options ...zap.Option) *zap.Logger {
@@ -49,7 +49,7 @@ func debug(options ...zap.Option) *zap.Logger {
 
 func New(cfg *Config) *zap.Logger {
 	if len(cfg.Filename) == 0 {
-		return debug(cfg.Options.ZapOptions...)
+		return debug(cfg.Options.ZapOpts...)
 	}
 
 	ec := zap.NewProductionEncoderConfig()
@@ -65,7 +65,7 @@ func New(cfg *Config) *zap.Logger {
 	}
 	ws := make([]zapcore.WriteSyncer, 0, 2)
 	if cfg.Options != nil {
-		zapOpts = cfg.Options.ZapOptions
+		zapOpts = cfg.Options.ZapOpts
 
 		w.MaxSize = cfg.Options.MaxSize
 		w.MaxAge = cfg.Options.MaxAge
