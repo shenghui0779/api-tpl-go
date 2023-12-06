@@ -1,25 +1,25 @@
 package value
 
-// EmptyEncMode 值为空时的Encode模式
-type EmptyEncMode int
+// EmptyMode 值为空时的Encode模式
+type EmptyMode int
 
 const (
-	EmptyEncDefault EmptyEncMode = iota // 默认：bar=baz&foo=
-	EmptyEncIgnore                      // 忽略：bar=baz
-	EmptyEncOnlyKey                     // 仅保留Key：bar=baz&foo
+	EmptyDefault EmptyMode = iota // 默认：bar=baz&foo=
+	EmptyIgnore                   // 忽略：bar=baz
+	EmptyOnlyKey                  // 仅保留Key：bar=baz&foo
 )
 
 type options struct {
 	escape     bool
-	emptyMode  EmptyEncMode
+	emptyMode  EmptyMode
 	ignoreKeys map[string]struct{}
 }
 
 // Option V Encode 选项
 type Option func(o *options)
 
-// WithEmptyEncMode 设置值为空时的Encode模式
-func WithEmptyEncMode(mode EmptyEncMode) Option {
+// WithEmptyMode 设置值为空时的Encode模式
+func WithEmptyMode(mode EmptyMode) Option {
 	return func(o *options) {
 		o.emptyMode = mode
 	}

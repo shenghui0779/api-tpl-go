@@ -24,17 +24,13 @@ func FormatVToXML(vals value.V) ([]byte, error) {
 	var builder strings.Builder
 
 	builder.WriteString("<xml>")
-
 	for k, v := range vals {
 		builder.WriteString("<" + k + ">")
-
 		if err := xml.EscapeText(&builder, []byte(v)); err != nil {
 			return nil, err
 		}
-
 		builder.WriteString("</" + k + ">")
 	}
-
 	builder.WriteString("</xml>")
 
 	return []byte(builder.String()), nil

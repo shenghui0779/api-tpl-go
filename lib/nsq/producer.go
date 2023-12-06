@@ -31,25 +31,24 @@ func Init(consumers ...Consumer) error {
 }
 
 // InitWithCfg 指定配置初始化
-func InitWithCfg(cfg *nsq.Config, consumers ...Consumer) error {
-	var err error
-
+func InitWithCfg(cfg *nsq.Config, consumers ...Consumer) (err error) {
 	producer, err = nsq.NewProducer(viper.GetString("nsq.nsqd"), cfg)
 	if err != nil {
-		return err
+		return
 	}
 	if err = producer.Ping(); err != nil {
-		return err
+		return
 	}
-
 	producer.SetLogger(&Logger{}, nsq.LogLevelError)
 
 	// set consumers
-	if err = consumerSet(viper.GetStringSlice("nsq.lookupd"), consumers...); err != nil {
-		return err
+	if len(consumers) != 0 {
+		if err = consumerSet(viper.GetStringSlice("nsq.lookupd"), consumers...); err != nil {
+			return
+		}
 	}
 
-	return nil
+	return
 }
 
 // Publish 同步推送消息到指定Topic

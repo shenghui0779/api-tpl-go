@@ -59,7 +59,7 @@ func (v V) Encode(sym, sep string, opts ...Option) string {
 	for _, k := range keys {
 		val := v[k]
 
-		if len(val) == 0 && o.emptyMode == EmptyEncIgnore {
+		if len(val) == 0 && o.emptyMode == EmptyIgnore {
 			continue
 		}
 
@@ -86,7 +86,7 @@ func (v V) Encode(sym, sep string, opts ...Option) string {
 		}
 
 		// 保留符号
-		if o.emptyMode != EmptyEncOnlyKey {
+		if o.emptyMode != EmptyOnlyKey {
 			buf.WriteString(sym)
 		}
 	}
