@@ -23,7 +23,6 @@ func WithHeader(key string, vals ...string) Option {
 	return func(o *options) {
 		if len(vals) == 1 {
 			o.header.Set(key, vals[0])
-
 			return
 		}
 
