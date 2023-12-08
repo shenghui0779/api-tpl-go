@@ -11,9 +11,7 @@ type TWOption func(tw *timewheel)
 // WithLogger 指定时间轮日志
 func WithLogger(fn func(ctx context.Context, v ...any)) TWOption {
 	return func(tw *timewheel) {
-		if fn != nil {
-			tw.log = fn
-		}
+		tw.log = fn
 	}
 }
 

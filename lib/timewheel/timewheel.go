@@ -88,7 +88,7 @@ func (tw *timewheel) requeue(task *Task) {
 
 	select {
 	case <-tw.stop:
-		tw.log(task.ctx, "task attempted failed because of timewheel has stopped", "task_id="+task.uniqID, "attempts="+strconv.Itoa(int(task.attempts+1)))
+		tw.log(task.ctx, "task requeued failed because of timewheel has stopped", "task_id="+task.uniqID, "attempts="+strconv.Itoa(int(task.attempts+1)))
 		return
 	default:
 	}
