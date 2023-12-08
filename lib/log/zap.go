@@ -49,7 +49,7 @@ func debug(options ...zap.Option) *zap.Logger {
 
 func New(cfg *Config) *zap.Logger {
 	if len(cfg.Filename) == 0 {
-		return debug(cfg.Options.ZapOpts...)
+		return debug()
 	}
 
 	ec := zap.NewProductionEncoderConfig()
