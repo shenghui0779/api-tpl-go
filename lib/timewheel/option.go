@@ -8,8 +8,8 @@ import (
 // TWOption 时间轮选项
 type TWOption func(tw *timewheel)
 
-// WithLogger 指定时间轮日志
-func WithLogger(fn func(ctx context.Context, v ...any)) TWOption {
+// WithErrLog 指定时间轮日志
+func WithErrLog(fn func(ctx context.Context, v ...any)) TWOption {
 	return func(tw *timewheel) {
 		tw.log = fn
 	}

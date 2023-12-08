@@ -29,7 +29,6 @@ type HTTPClient interface {
 	// Do 发送HTTP请求
 	// 注意：应该使用Context设置请求超时时间
 	Do(ctx context.Context, method, reqURL string, body []byte, opts ...Option) (*http.Response, error)
-
 	// Upload 上传文件
 	// 注意：应该使用Context设置请求超时时间
 	Upload(ctx context.Context, reqURL string, form UploadForm, opts ...Option) (*http.Response, error)

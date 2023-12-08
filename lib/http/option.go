@@ -50,7 +50,6 @@ func WithClose() Option {
 type UploadForm interface {
 	// Field 返回表单普通字段
 	Field(name string) string
-
 	// Write 将表单文件写入流
 	Write(w *multipart.Writer) error
 }
