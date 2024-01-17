@@ -16,26 +16,44 @@ func (m *Message) V() []byte {
 	return m.v
 }
 
-// NewMessage 返回一个websocket消息
-func NewMessage(t int, v []byte) *Message {
+func NewMessage(t int, b []byte) *Message {
 	return &Message{
 		t: t,
-		v: v,
+		v: b,
 	}
 }
 
-// NewTextMsg 返回一个websocket.TextMessage
-func NewTextMsg(s string) *Message {
+func TextMessage(s string) *Message {
 	return &Message{
 		t: websocket.TextMessage,
 		v: []byte(s),
 	}
 }
 
-// NewBinaryMsg 返回一个websocket.BinaryMessage
-func NewBinaryMsg(v []byte) *Message {
+func BinaryMessage(b []byte) *Message {
 	return &Message{
 		t: websocket.BinaryMessage,
-		v: v,
+		v: b,
+	}
+}
+
+func CloseMessage(code int, text string) *Message {
+	return &Message{
+		t: websocket.PingMessage,
+		v: websocket.FormatCloseMessage(code, text),
+	}
+}
+
+func PingMessage(b []byte) *Message {
+	return &Message{
+		t: websocket.PingMessage,
+		v: b,
+	}
+}
+
+func PongMessage(b []byte) *Message {
+	return &Message{
+		t: websocket.PongMessage,
+		v: b,
 	}
 }
