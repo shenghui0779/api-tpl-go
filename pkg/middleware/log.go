@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	yiigo_http "github.com/shenghui0779/yiigo/http"
+	yiigo_util "github.com/shenghui0779/yiigo/util"
 	"github.com/tidwall/pretty"
 	"go.uber.org/zap"
 
-	libhttp "api/lib/http"
 	"api/lib/log"
-	"api/lib/util"
 	"api/pkg/auth"
 	"api/pkg/result"
 )
@@ -27,16 +27,16 @@ func Log(next http.Handler) http.Handler {
 
 		// 请求包含body
 		if r.Body != nil && r.Body != http.NoBody {
-			switch util.ContentType(r) {
-			case libhttp.ContentForm:
+			switch yiigo_util.ContentType(r) {
+			case yiigo_http.ContentForm:
 				if err := r.ParseForm(); err != nil {
 					result.ErrSystem(result.E(errors.WithMessage(err, "表单解析失败"))).JSON(w, r)
 					return
 				}
 
 				body = r.Form.Encode()
-			case libhttp.MultipartForm:
-				if err := r.ParseMultipartForm(libhttp.MaxFormMemory); err != nil {
+			case yiigo_http.ContentFormData:
+				if err := r.ParseMultipartForm(yiigo_http.MaxFormMemory); err != nil {
 					if err != http.ErrNotMultipart {
 						result.ErrSystem(result.E(errors.WithMessage(err, "表单解析失败"))).JSON(w, r)
 						return

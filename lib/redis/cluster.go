@@ -9,36 +9,34 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cli *redis.Client
+var cluster *redis.ClusterClient
 
-// Init 初始化Redis(如有多个实例，在此方法中初始化)
-func Init() error {
-	cli = redis.NewClient(buildCliOpts(viper.GetString("redis.addr"), viper.GetStringMap("redis.options")))
+// Init 初始化Redis集群
+func InitCluster() error {
+	cluster = redis.NewClusterClient(buildClusterOpts(viper.GetStringSlice("redis-cluster.addrs"), viper.GetStringMap("redis-cluster.options")))
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	// verify connection
-	if err := cli.Ping(ctx).Err(); err != nil {
-		cli.Close()
+	if err := cluster.Ping(ctx).Err(); err != nil {
+		cluster.Close()
 		return err
 	}
 
 	return nil
 }
 
-func Client() redis.UniversalClient {
-	return cli
+func Cluster() *redis.ClusterClient {
+	return cluster
 }
 
-func buildCliOpts(addr string, opts map[string]any) *redis.Options {
-	cfg := &redis.Options{
-		Addr: addr,
+func buildClusterOpts(addrs []string, opts map[string]any) *redis.ClusterOptions {
+	cfg := &redis.ClusterOptions{
+		Addrs: addrs,
 	}
 
 	if len(opts) != 0 {
-		cfg.DB = cast.ToInt(opts["db"])
-
 		cfg.Username = cast.ToString(opts["username"])
 		cfg.Password = cast.ToString(opts["password"])
 
@@ -61,6 +59,11 @@ func buildCliOpts(addr string, opts map[string]any) *redis.Options {
 		cfg.MaxActiveConns = cast.ToInt(opts["max_active_conns"])
 		cfg.ConnMaxIdleTime = cast.ToDuration(opts["conn_max_idle_time"]) * time.Second
 		cfg.ConnMaxLifetime = cast.ToDuration(opts["conn_max_lifetime"]) * time.Second
+
+		cfg.MaxRedirects = cast.ToInt(opts["max_redirects"])
+		cfg.ReadOnly = cast.ToBool(opts["read_only"])
+		cfg.RouteByLatency = cast.ToBool(opts["route_by_latency"])
+		cfg.RouteRandomly = cast.ToBool(opts["route_randomly"])
 
 		cfg.DisableIndentity = cast.ToBool(opts["disable_indentity"])
 	}

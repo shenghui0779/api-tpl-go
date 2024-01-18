@@ -3,7 +3,6 @@ package auth
 import (
 	"api/ent"
 	"api/ent/user"
-	libaes "api/lib/aes"
 	"api/lib/db"
 	"api/lib/log"
 
@@ -14,6 +13,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+	"github.com/shenghui0779/yiigo/crypto"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
@@ -51,7 +51,7 @@ func (i *identity) AuthToken() (string, error) {
 
 	key := []byte(viper.GetString("app.secret"))
 
-	ct, err := libaes.EncryptCBC(key, key[:aes.BlockSize], b)
+	ct, err := crypto.AESEncryptCBC(key, key[:aes.BlockSize], b)
 	if err != nil {
 		return "", errors.Wrap(err, "encrypt identity")
 	}
@@ -130,7 +130,7 @@ func AuthTokenToIdentity(ctx context.Context, token string) Identity {
 
 	key := []byte(viper.GetString("app.secret"))
 
-	plainText, err := libaes.DecryptCBC(key, key[:aes.BlockSize], cipherText)
+	plainText, err := crypto.AESDecryptCBC(key, key[:aes.BlockSize], cipherText)
 	if err != nil {
 		log.Error(ctx, "err invalid auth_token", zap.Error(err))
 		return NewEmptyIdentity()

@@ -1,13 +1,14 @@
 package result
 
 import (
-	libhttp "api/lib/http"
 	"api/lib/log"
 	"api/lib/util"
 
 	"encoding/json"
 	"net/http"
 
+	yiigo_http "github.com/shenghui0779/yiigo/http"
+	yiigo_util "github.com/shenghui0779/yiigo/util"
 	"go.uber.org/zap"
 )
 
@@ -19,7 +20,7 @@ type Result interface {
 }
 
 type response struct {
-	x util.X
+	x yiigo_util.X
 }
 
 func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +28,7 @@ func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
 
 	resp.x["req_id"] = util.GetReqID(ctx)
 
-	w.Header().Set("Content-Type", libhttp.ContentJSON)
+	w.Header().Set(yiigo_http.HeaderContentType, yiigo_http.ContentJSON)
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(resp.x); err != nil {
@@ -69,7 +70,7 @@ func KV(k string, v any) Option {
 // New 返回一个Result
 func New(code int, msg string, options ...Option) Result {
 	resp := &response{
-		x: util.X{
+		x: yiigo_util.X{
 			"code": code,
 			"err":  false,
 			"msg":  msg,

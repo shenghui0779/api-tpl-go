@@ -3,9 +3,7 @@ package user
 import (
 	"api/ent/user"
 	"api/lib/db"
-	"api/lib/hash"
 	"api/lib/log"
-	"api/lib/util"
 	"api/pkg/internal"
 	"api/pkg/result"
 
@@ -13,6 +11,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/shenghui0779/yiigo/hash"
+	yiigo_util "github.com/shenghui0779/yiigo/util"
 	"go.uber.org/zap"
 )
 
@@ -45,7 +45,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	now := time.Now().Unix()
-	salt := util.Nonce(16)
+	salt := yiigo_util.Nonce(16)
 
 	_, err = db.Client().User.Create().
 		SetUsername(params.Username).

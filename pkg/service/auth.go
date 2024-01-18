@@ -4,9 +4,7 @@ import (
 	"api/ent"
 	"api/ent/user"
 	"api/lib/db"
-	"api/lib/hash"
 	"api/lib/log"
-	"api/lib/util"
 	"api/pkg/auth"
 	"api/pkg/internal"
 	"api/pkg/result"
@@ -15,6 +13,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/shenghui0779/yiigo/hash"
+	yiigo_util "github.com/shenghui0779/yiigo/util"
 	"go.uber.org/zap"
 )
 
@@ -56,7 +56,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token := hash.MD5(fmt.Sprintf("auth.%d.%d.%s", record.ID, time.Now().UnixMicro(), util.Nonce(16)))
+	token := hash.MD5(fmt.Sprintf("auth.%d.%d.%s", record.ID, time.Now().UnixMicro(), yiigo_util.Nonce(16)))
 
 	authToken, err := auth.NewIdentity(record.ID, token).AuthToken()
 	if err != nil {
