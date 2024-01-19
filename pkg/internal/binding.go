@@ -29,7 +29,7 @@ func BindForm(r *http.Request, obj any) error {
 		if err := r.ParseForm(); err != nil {
 			return err
 		}
-	case yiigo_http.ContentFormData:
+	case yiigo_http.ContentFormMultipart:
 		if err := r.ParseMultipartForm(yiigo_http.MaxFormMemory); err != nil {
 			if err != http.ErrNotMultipart {
 				return err

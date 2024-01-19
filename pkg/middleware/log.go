@@ -35,7 +35,7 @@ func Log(next http.Handler) http.Handler {
 				}
 
 				body = r.Form.Encode()
-			case yiigo_http.ContentFormData:
+			case yiigo_http.ContentFormMultipart:
 				if err := r.ParseMultipartForm(yiigo_http.MaxFormMemory); err != nil {
 					if err != http.ErrNotMultipart {
 						result.ErrSystem(result.E(errors.WithMessage(err, "表单解析失败"))).JSON(w, r)
