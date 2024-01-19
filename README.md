@@ -1,6 +1,6 @@
 # api-tpl-go
 
-轻量好用的 Go API 服务框架
+Go API 服务框架
 
 > 1. `config.toml.example` => `config.toml`
 > 2. Table `User` refers to `ent/schema/user.go`
