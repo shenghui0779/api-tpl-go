@@ -10,14 +10,11 @@ var log = logger.Debug()
 
 // Init 初始化日志实例(如有多个实例，在此方法中初始化)
 func Init() {
-	log = logger.New(buildCfg(viper.GetString("log.path"), viper.GetStringMap("log.options")))
-}
-
-func buildCfg(path string, opts map[string]any) *logger.Config {
 	cfg := &logger.Config{
-		Filename: path,
+		Filename: viper.GetString("log.path"),
 	}
 
+	opts := viper.GetStringMap("log.options")
 	if len(opts) != 0 {
 		cfg.Options = &logger.Options{
 			MaxSize:    cast.ToInt(opts["max_size"]),
@@ -28,5 +25,5 @@ func buildCfg(path string, opts map[string]any) *logger.Config {
 		}
 	}
 
-	return cfg
+	log = logger.New(cfg)
 }

@@ -3,9 +3,8 @@ package router
 import (
 	"net/http"
 
+	"api/pkg/controller"
 	"api/pkg/middleware"
-	"api/pkg/service"
-	"api/pkg/service/user"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -37,14 +36,14 @@ func App(r chi.Router) {
 }
 
 func v1(r chi.Router) {
-	r.Post("/login", service.Login)
+	r.Post("/login", controller.Login)
 
 	r.With(middleware.Auth).Group(func(r chi.Router) {
-		r.Get("/logout", service.Logout)
+		r.Get("/logout", controller.Logout)
 
 		{
-			r.Get("/users", user.List)
-			r.Post("/users", user.Create)
+			r.Get("/users", controller.UserList)
+			r.Post("/users", controller.UserCreate)
 		}
 	})
 }

@@ -2,7 +2,6 @@ package result
 
 import (
 	"api/lib/log"
-	"api/lib/util"
 
 	"encoding/json"
 	"net/http"
@@ -26,7 +25,7 @@ type response struct {
 func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	resp.x["req_id"] = util.GetReqID(ctx)
+	resp.x["req_id"] = log.GetReqID(ctx)
 
 	w.Header().Set(yiigo_http.HeaderContentType, yiigo_http.ContentJSON)
 	w.WriteHeader(http.StatusOK)

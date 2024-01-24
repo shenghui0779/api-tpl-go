@@ -20,36 +20,12 @@ var cli *ent.Client
 
 // Init 初始化Ent实例(如有多个实例，在此方法中初始化)
 func Init() error {
-	cfg := buildCfg(viper.GetString("db.driver"), viper.GetString("db.dsn"), viper.GetStringMap("db.options"))
-
-	db, err := db.New(cfg)
-	if err != nil {
-		return err
-	}
-
-	cli = ent.NewClient(
-		ent.Driver(dialect.DebugWithContext(
-			entsql.OpenDB(cfg.Driver, db),
-			func(ctx context.Context, v ...any) {
-				log.Info(ctx, "SQL info", zap.String("SQL", fmt.Sprint(v...)))
-			}),
-		),
-	)
-
-	return nil
-}
-
-// Client 返回Ent实例
-func Client() *ent.Client {
-	return cli
-}
-
-func buildCfg(driver, dsn string, opts map[string]any) *db.Config {
 	cfg := &db.Config{
-		Driver: driver,
-		DSN:    dsn,
+		Driver: viper.GetString("db.driver"),
+		DSN:    viper.GetString("db.dsn"),
 	}
 
+	opts := viper.GetStringMap("db.options")
 	if len(opts) != 0 {
 		cfg.Options = &db.Options{
 			MaxOpenConns:    cast.ToInt(opts["max_open_conns"]),
@@ -59,5 +35,25 @@ func buildCfg(driver, dsn string, opts map[string]any) *db.Config {
 		}
 	}
 
-	return cfg
+	db, err := db.New(cfg)
+	if err != nil {
+		return err
+	}
+
+	driver := entsql.OpenDB(cfg.Driver, db)
+
+	var iDriver dialect.Driver = driver
+	if viper.GetBool("debug") {
+		iDriver = dialect.DebugWithContext(driver, func(ctx context.Context, v ...any) {
+			log.Info(ctx, "SQL info", zap.String("SQL", fmt.Sprint(v...)))
+		})
+	}
+	cli = ent.NewClient(ent.Driver(iDriver))
+
+	return nil
+}
+
+// Client 返回Ent实例
+func Client() *ent.Client {
+	return cli
 }

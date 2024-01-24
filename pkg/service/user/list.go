@@ -7,8 +7,9 @@ import (
 	"api/lib/log"
 	"api/pkg/internal"
 	"api/pkg/result"
+	"context"
 
-	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/pkg/errors"
@@ -30,16 +31,14 @@ type UserInfo struct {
 	CreatedAtStr string `json:"created_at_str"`
 }
 
-func List(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
+func List(ctx context.Context, query url.Values) result.Result {
 	builder := db.Client().User.Query()
-	if v, ok := internal.URLQuery(r, "username"); ok && len(v) != 0 {
+	if v, ok := internal.URLQuery(query, "username"); ok && len(v) != 0 {
 		builder.Where(user.UsernameContains(v))
 	}
 
 	total := 0
-	offset, limit := internal.QueryPage(r)
+	offset, limit := internal.QueryPage(ctx, query)
 
 	// 仅第一页返回数量并由前端保存
 	if offset == 0 {
@@ -48,9 +47,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 		total, err = builder.Clone().Unique(false).Count(ctx)
 		if err != nil {
 			log.Error(ctx, "error count user", zap.Error(err))
-			result.ErrSystem(result.E(errors.WithMessage(err, "用户Count失败"))).JSON(w, r)
-
-			return
+			return result.ErrSystem(result.E(errors.WithMessage(err, "用户Count失败")))
 		}
 	}
 
@@ -62,9 +59,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 	).Order(ent.Desc(user.FieldID)).Offset(offset).Limit(limit).All(ctx)
 	if err != nil {
 		log.Error(ctx, "error query user", zap.Error(err))
-		result.ErrSystem(result.E(errors.WithMessage(err, "用户查询失败"))).JSON(w, r)
-
-		return
+		return result.ErrSystem(result.E(errors.WithMessage(err, "用户查询失败")))
 	}
 
 	resp := &RespList{
@@ -88,5 +83,5 @@ func List(w http.ResponseWriter, r *http.Request) {
 		resp.List = append(resp.List, data)
 	}
 
-	result.OK(result.V(resp)).JSON(w, r)
+	return result.OK(result.V(resp))
 }
