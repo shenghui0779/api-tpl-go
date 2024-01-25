@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/shenghui0779/yiigo"
 	"github.com/shenghui0779/yiigo/hash"
-	yiigo_util "github.com/shenghui0779/yiigo/util"
 	"go.uber.org/zap"
 )
 
@@ -42,7 +42,7 @@ func Login(ctx context.Context, req *ReqLogin) result.Result {
 		return result.ErrAuth(result.M("密码错误"))
 	}
 
-	token := hash.MD5(fmt.Sprintf("auth.%d.%d.%s", record.ID, time.Now().UnixMicro(), yiigo_util.Nonce(16)))
+	token := hash.MD5(fmt.Sprintf("auth.%d.%d.%s", record.ID, time.Now().UnixMicro(), yiigo.Nonce(16)))
 
 	authToken, err := auth.NewIdentity(record.ID, token).AuthToken()
 	if err != nil {

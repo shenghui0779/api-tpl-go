@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/shenghui0779/yiigo"
 	yiigo_http "github.com/shenghui0779/yiigo/http"
-	yiigo_util "github.com/shenghui0779/yiigo/util"
 	"github.com/tidwall/pretty"
 	"go.uber.org/zap"
 
@@ -27,7 +27,7 @@ func Log(next http.Handler) http.Handler {
 
 		// 请求包含body
 		if r.Body != nil && r.Body != http.NoBody {
-			switch yiigo_util.ContentType(r) {
+			switch yiigo.ContentType(r) {
 			case yiigo_http.ContentForm:
 				if err := r.ParseForm(); err != nil {
 					result.ErrSystem(result.E(errors.WithMessage(err, "表单解析失败"))).JSON(w, r)

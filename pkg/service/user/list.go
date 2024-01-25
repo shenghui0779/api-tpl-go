@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	yiigo_util "github.com/shenghui0779/yiigo/util"
+	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 )
 
@@ -73,11 +73,11 @@ func List(ctx context.Context, query url.Values) result.Result {
 			Username:     v.Username,
 			LoginAt:      v.LoginAt,
 			CreatedAt:    v.CreatedAt,
-			CreatedAtStr: yiigo_util.TimeToStr(v.CreatedAt, time.DateTime),
+			CreatedAtStr: yiigo.TimeToStr(v.CreatedAt, time.DateTime),
 		}
 
 		if v.LoginAt != 0 {
-			data.LoginAtStr = yiigo_util.TimeToStr(v.LoginAt, time.DateTime)
+			data.LoginAtStr = yiigo.TimeToStr(v.LoginAt, time.DateTime)
 		}
 
 		resp.List = append(resp.List, data)

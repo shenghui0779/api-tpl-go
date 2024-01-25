@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/shenghui0779/yiigo"
 	yiigo_http "github.com/shenghui0779/yiigo/http"
-	yiigo_util "github.com/shenghui0779/yiigo/util"
 	"github.com/shenghui0779/yiigo/validator"
 )
 
@@ -24,7 +24,7 @@ func BindJSON(r *http.Request, obj any) error {
 
 // BindForm 解析Form表单并校验
 func BindForm(r *http.Request, obj any) error {
-	switch yiigo_util.ContentType(r) {
+	switch yiigo.ContentType(r) {
 	case yiigo_http.ContentForm:
 		if err := r.ParseForm(); err != nil {
 			return err
@@ -37,7 +37,7 @@ func BindForm(r *http.Request, obj any) error {
 		}
 	}
 
-	if err := yiigo_util.MapForm(obj, r.Form); err != nil {
+	if err := yiigo.MapForm(obj, r.Form); err != nil {
 		return err
 	}
 

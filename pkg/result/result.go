@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/shenghui0779/yiigo"
 	yiigo_http "github.com/shenghui0779/yiigo/http"
-	yiigo_util "github.com/shenghui0779/yiigo/util"
 	"go.uber.org/zap"
 )
 
@@ -19,7 +19,7 @@ type Result interface {
 }
 
 type response struct {
-	x yiigo_util.X
+	x yiigo.X
 }
 
 func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +69,7 @@ func KV(k string, v any) Option {
 // New 返回一个Result
 func New(code int, msg string, options ...Option) Result {
 	resp := &response{
-		x: yiigo_util.X{
+		x: yiigo.X{
 			"code": code,
 			"err":  false,
 			"msg":  msg,

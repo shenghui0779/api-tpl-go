@@ -1,29 +1,27 @@
 package log
 
 import (
-	"github.com/shenghui0779/yiigo/logger"
+	"github.com/shenghui0779/yiigo"
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"
 )
 
-var log = logger.Debug()
+var log = yiigo.DebugLogger()
 
 // Init 初始化日志实例(如有多个实例，在此方法中初始化)
 func Init() {
-	cfg := &logger.Config{
+	cfg := &yiigo.LogConfig{
 		Filename: viper.GetString("log.path"),
 	}
 
 	opts := viper.GetStringMap("log.options")
 	if len(opts) != 0 {
-		cfg.Options = &logger.Options{
-			MaxSize:    cast.ToInt(opts["max_size"]),
-			MaxAge:     cast.ToInt(opts["max_age"]),
-			MaxBackups: cast.ToInt(opts["max_backups"]),
-			Compress:   cast.ToBool(opts["compress"]),
-			Stderr:     cast.ToBool(opts["stderr"]),
-		}
+		cfg.MaxSize = cast.ToInt(opts["max_size"])
+		cfg.MaxAge = cast.ToInt(opts["max_age"])
+		cfg.MaxBackups = cast.ToInt(opts["max_backups"])
+		cfg.Compress = cast.ToBool(opts["compress"])
+		cfg.Stderr = cast.ToBool(opts["stderr"])
 	}
 
-	log = logger.New(cfg)
+	log = yiigo.NewLogger(cfg)
 }

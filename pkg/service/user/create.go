@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/shenghui0779/yiigo"
 	"github.com/shenghui0779/yiigo/hash"
-	yiigo_util "github.com/shenghui0779/yiigo/util"
 	"go.uber.org/zap"
 )
 
@@ -31,7 +31,7 @@ func Create(ctx context.Context, req *ReqCreate) result.Result {
 	}
 
 	now := time.Now().Unix()
-	salt := yiigo_util.Nonce(16)
+	salt := yiigo.Nonce(16)
 
 	_, err = db.Client().User.Create().
 		SetUsername(req.Username).
