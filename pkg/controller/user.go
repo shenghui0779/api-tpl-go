@@ -17,7 +17,7 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 
 	req := new(user.ReqCreate)
 	if err := internal.BindJSON(r, req); err != nil {
-		log.Error(ctx, "err params", zap.Error(err))
+		log.Error(ctx, "Error params", zap.Error(err))
 		result.ErrParams(result.E(errors.WithMessage(err, "参数错误"))).JSON(w, r)
 
 		return

@@ -1,12 +1,12 @@
 package db
 
 import (
-	"api/ent"
-	"api/lib/log"
-	"time"
-
 	"context"
 	"fmt"
+	"time"
+
+	"api/ent"
+	"api/lib/log"
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
@@ -38,7 +38,7 @@ func Init() error {
 		return err
 	}
 
-	driver := entsql.OpenDB(cfg.Driver, db)
+	driver := entsql.OpenDB(dialect.MySQL, db)
 
 	var iDriver dialect.Driver = driver
 	if viper.GetBool("debug") {

@@ -1,13 +1,12 @@
 package user
 
 import (
+	"context"
+
 	"api/ent/user"
 	"api/lib/db"
 	"api/lib/log"
 	"api/pkg/result"
-
-	"context"
-	"time"
 
 	"github.com/pkg/errors"
 	"github.com/shenghui0779/yiigo"
@@ -16,32 +15,31 @@ import (
 )
 
 type ReqCreate struct {
-	Username string `json:"username" valid:"required"`
+	Phone    string `json:"phone" valid:"required"`
+	Nickname string `json:"nickname" valid:"required"`
 	Password string `json:"password" valid:"required"`
 }
 
 func Create(ctx context.Context, req *ReqCreate) result.Result {
-	records, err := db.Client().User.Query().Unique(false).Select(user.FieldID).Where(user.Username(req.Username)).All(ctx)
+	records, err := db.Client().User.Query().Unique(false).Select(user.FieldID).Where(user.Phone(req.Phone)).All(ctx)
 	if err != nil {
-		log.Error(ctx, "error query user", zap.Error(err))
+		log.Error(ctx, "Error query user", zap.Error(err))
 		return result.ErrSystem(result.E(errors.WithMessage(err, "用户查询失败")))
 	}
 	if len(records) != 0 {
-		return result.ErrPerm(result.M("该用户名已被使用"))
+		return result.ErrPerm(result.M("该手机号已被使用"))
 	}
 
-	now := time.Now().Unix()
 	salt := yiigo.Nonce(16)
 
 	_, err = db.Client().User.Create().
-		SetUsername(req.Username).
+		SetPhone(req.Phone).
+		SetNickname(req.Nickname).
 		SetPassword(hash.MD5(req.Password + salt)).
 		SetSalt(salt).
-		SetCreatedAt(now).
-		SetUpdatedAt(now).
 		Save(ctx)
 	if err != nil {
-		log.Error(ctx, "error create user", zap.Error(err))
+		log.Error(ctx, "Error create user", zap.Error(err))
 		return result.ErrSystem(result.E(errors.WithMessage(err, "用户创建失败")))
 	}
 

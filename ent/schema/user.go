@@ -5,6 +5,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 )
 
 // User holds the schema definition for the User entity.
@@ -15,23 +16,35 @@ type User struct {
 // Annotations of the User.
 func (User) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{
-			Table: "user",
-		},
+		entsql.Table("user"),
+		entsql.WithComments(true),
+		schema.Comment("用户表"),
+	}
+}
+
+// Mixin of the User
+func (User) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		CommonMixin{},
 	}
 }
 
 // Fields of the User.
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int64("id"),
-		field.String("username").Default(""),
-		field.String("password").Default(""),
-		field.String("salt").Default(""),
-		field.Int64("login_at").Default(0),
-		field.String("login_token").Default(""),
-		field.Int64("created_at").Immutable().Default(0),
-		field.Int64("updated_at").Default(0),
+		field.String("phone").MaxLen(16).Comment("手机号"),
+		field.String("nickname").MaxLen(32).Default("").Comment("昵称"),
+		field.String("password").MaxLen(32).Default("").Comment("密码"),
+		field.String("salt").MaxLen(16).Default("").Comment("加密盐"),
+		field.Time("login_at").Optional().Comment("登录时间"),
+		field.String("login_token").MaxLen(32).Default("").Comment("登录Token"),
+	}
+}
+
+// Indexes of the User.
+func (User) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("phone").Unique().StorageKey("uniq_phone"),
 	}
 }
 

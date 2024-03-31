@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 )
 
@@ -23,18 +22,17 @@ type RespList struct {
 }
 
 type UserInfo struct {
-	ID           int64  `json:"id"`
-	Username     string `json:"username"`
-	LoginAt      int64  `json:"login_at"`
-	LoginAtStr   string `json:"login_at_str"`
-	CreatedAt    int64  `json:"created_at"`
-	CreatedAtStr string `json:"created_at_str"`
+	ID        int64  `json:"id"`
+	Phone     string `json:"phone"`
+	Nickname  string `json:"nickname"`
+	LoginAt   string `json:"login_at"`
+	CreatedAt string `json:"created_at"`
 }
 
 func List(ctx context.Context, query url.Values) result.Result {
 	builder := db.Client().User.Query()
-	if v, ok := internal.URLQuery(query, "username"); ok && len(v) != 0 {
-		builder.Where(user.UsernameContains(v))
+	if v, ok := internal.URLQuery(query, "phone"); ok && len(v) != 0 {
+		builder.Where(user.Phone(v))
 	}
 
 	total := 0
@@ -46,19 +44,20 @@ func List(ctx context.Context, query url.Values) result.Result {
 
 		total, err = builder.Clone().Unique(false).Count(ctx)
 		if err != nil {
-			log.Error(ctx, "error count user", zap.Error(err))
+			log.Error(ctx, "Error count user", zap.Error(err))
 			return result.ErrSystem(result.E(errors.WithMessage(err, "用户Count失败")))
 		}
 	}
 
 	records, err := builder.Unique(false).Select(
 		user.FieldID,
-		user.FieldUsername,
+		user.FieldPhone,
+		user.FieldNickname,
 		user.FieldLoginAt,
 		user.FieldCreatedAt,
 	).Order(ent.Desc(user.FieldID)).Offset(offset).Limit(limit).All(ctx)
 	if err != nil {
-		log.Error(ctx, "error query user", zap.Error(err))
+		log.Error(ctx, "Error query user", zap.Error(err))
 		return result.ErrSystem(result.E(errors.WithMessage(err, "用户查询失败")))
 	}
 
@@ -69,15 +68,11 @@ func List(ctx context.Context, query url.Values) result.Result {
 
 	for _, v := range records {
 		data := &UserInfo{
-			ID:           v.ID,
-			Username:     v.Username,
-			LoginAt:      v.LoginAt,
-			CreatedAt:    v.CreatedAt,
-			CreatedAtStr: yiigo.TimeToStr(v.CreatedAt, time.DateTime),
-		}
-
-		if v.LoginAt != 0 {
-			data.LoginAtStr = yiigo.TimeToStr(v.LoginAt, time.DateTime)
+			ID:        v.ID,
+			Phone:     v.Phone,
+			Nickname:  v.Nickname,
+			LoginAt:   v.LoginAt.Format(time.DateTime),
+			CreatedAt: v.CreatedAt.Format(time.DateTime),
 		}
 
 		resp.List = append(resp.List, data)

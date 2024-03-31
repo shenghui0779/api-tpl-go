@@ -28,7 +28,7 @@ func URLQueryInt(ctx context.Context, query url.Values, key string) (int64, bool
 
 	i, err := strconv.ParseInt(v, 10, 64)
 	if err != nil {
-		log.Error(ctx, "err URLQueryInt", zap.Error(err), zap.String("key", key), zap.String("value", v))
+		log.Error(ctx, "Error URLQueryInt", zap.Error(err), zap.String("key", key), zap.String("value", v))
 		return 0, false
 	}
 

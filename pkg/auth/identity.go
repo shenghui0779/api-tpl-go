@@ -73,7 +73,7 @@ func (i *identity) Check(ctx context.Context) error {
 			return errors.New("无效的账号")
 		}
 
-		log.Error(ctx, "err auth check", zap.Error(err))
+		log.Error(ctx, "Error auth check", zap.Error(err))
 
 		return errors.New("授权校验失败")
 	}
@@ -124,7 +124,7 @@ func GetIdentity(ctx context.Context) Identity {
 func AuthTokenToIdentity(ctx context.Context, token string) Identity {
 	cipherText, err := base64.StdEncoding.DecodeString(token)
 	if err != nil {
-		log.Error(ctx, "err invalid auth_token", zap.Error(err))
+		log.Error(ctx, "Error invalid auth_token", zap.Error(err))
 		return NewEmptyIdentity()
 	}
 
@@ -132,13 +132,13 @@ func AuthTokenToIdentity(ctx context.Context, token string) Identity {
 
 	plainText, err := crypto.AESDecryptCBC(key, key[:aes.BlockSize], cipherText)
 	if err != nil {
-		log.Error(ctx, "err invalid auth_token", zap.Error(err))
+		log.Error(ctx, "Error invalid auth_token", zap.Error(err))
 		return NewEmptyIdentity()
 	}
 
 	identity := NewEmptyIdentity()
 	if err = json.Unmarshal(plainText, identity); err != nil {
-		log.Error(ctx, "err invalid auth_token", zap.Error(err))
+		log.Error(ctx, "Error invalid auth_token", zap.Error(err))
 		// 此处应返回空Identify，因为若仅部分字段解析失败，Identity可能依然有效
 		return NewEmptyIdentity()
 	}

@@ -16,7 +16,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	req := new(service.ReqLogin)
 	if err := internal.BindJSON(r, req); err != nil {
-		log.Error(ctx, "error params", zap.Error(err))
+		log.Error(ctx, "Error params", zap.Error(err))
 		result.ErrParams(result.E(err)).JSON(w, r)
 
 		return

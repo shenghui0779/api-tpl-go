@@ -18,7 +18,7 @@ import (
 )
 
 type ReqLogin struct {
-	Username string `json:"username" valid:"required"`
+	Phone    string `json:"phone" valid:"required"`
 	Password string `json:"password" valid:"required"`
 }
 
@@ -28,13 +28,13 @@ type RespLogin struct {
 
 // Login 登录
 func Login(ctx context.Context, req *ReqLogin) result.Result {
-	record, err := db.Client().User.Query().Unique(false).Where(user.Username(req.Username)).First(ctx)
+	record, err := db.Client().User.Query().Unique(false).Where(user.Phone(req.Phone)).First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return result.ErrAuth(result.M("用户不存在"))
 		}
 
-		log.Error(ctx, "error query user", zap.Error(err))
+		log.Error(ctx, "Error query user", zap.Error(err))
 		return result.ErrSystem(result.E(err))
 	}
 
@@ -46,13 +46,13 @@ func Login(ctx context.Context, req *ReqLogin) result.Result {
 
 	authToken, err := auth.NewIdentity(record.ID, token).AuthToken()
 	if err != nil {
-		log.Error(ctx, "error auth_token", zap.Error(err))
+		log.Error(ctx, "Error auth_token", zap.Error(err))
 		return result.ErrAuth(result.E(err))
 	}
 
-	_, err = db.Client().User.Update().Where(user.ID(record.ID)).SetLoginAt(time.Now().Unix()).SetLoginToken(token).Save(ctx)
+	_, err = db.Client().User.Update().Where(user.ID(record.ID)).SetLoginAt(time.Now()).SetLoginToken(token).Save(ctx)
 	if err != nil {
-		log.Error(ctx, "error update user", zap.Error(err))
+		log.Error(ctx, "Error update user", zap.Error(err))
 		return result.ErrSystem(result.E(err))
 	}
 
@@ -68,12 +68,9 @@ func Logout(ctx context.Context) result.Result {
 		return result.OK()
 	}
 
-	_, err := db.Client().User.Update().Where(user.ID(identity.ID())).
-		SetLoginToken("").
-		SetUpdatedAt(time.Now().Unix()).
-		Save(ctx)
+	_, err := db.Client().User.Update().Where(user.ID(identity.ID())).SetLoginToken("").Save(ctx)
 	if err != nil {
-		log.Error(ctx, "error update user", zap.Error(err))
+		log.Error(ctx, "Error update user", zap.Error(err))
 		return result.ErrSystem(result.E(err))
 	}
 

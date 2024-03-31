@@ -24,7 +24,7 @@ func URLParamInt(r *http.Request, key string) int64 {
 
 	v, err := strconv.ParseInt(param, 10, 64)
 	if err != nil {
-		log.Error(r.Context(), "err URLParamInt", zap.Error(err), zap.String("key", key), zap.String("value", param))
+		log.Error(r.Context(), "Error URLParamInt", zap.Error(err), zap.String("key", key), zap.String("value", param))
 		return 0
 	}
 
