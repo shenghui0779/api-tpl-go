@@ -2,15 +2,30 @@ package internal
 
 import (
 	"context"
+	"net/http"
 	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
+
 	"api/lib/log"
 
 	"go.uber.org/zap"
 )
+
+func URLParamInt(r *http.Request, key string) int64 {
+	param := chi.URLParam(r, key)
+
+	v, err := strconv.ParseInt(param, 10, 64)
+	if err != nil {
+		log.Error(r.Context(), "Error URLParamInt", zap.Error(err), zap.String("key", key), zap.String("value", param))
+		return 0
+	}
+
+	return v
+}
 
 func URLQuery(query url.Values, key string) (string, bool) {
 	if !query.Has(key) {
