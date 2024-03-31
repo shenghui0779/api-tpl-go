@@ -5,7 +5,6 @@ debug = true
 secret = "9c7695a0635e80a9ed1e8c13428fffd7"
 
 [db]
-driver = "mysql"
 dsn = "username:password@tcp(localhost:3306)/dbname?timeout=10s&charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=True&loc=Local"
 options = { max_open_conns = 20, max_idle_conns = 10, conn_max_lifetime = 600, conn_max_idle_time = 300 }
 

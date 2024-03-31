@@ -21,7 +21,7 @@ var cli *ent.Client
 // Init 初始化Ent实例(如有多个实例，在此方法中初始化)
 func Init() error {
 	cfg := &yiigo.DBConfig{
-		Driver: viper.GetString("db.driver"),
+		Driver: "mysql",
 		DSN:    viper.GetString("db.dsn"),
 	}
 
