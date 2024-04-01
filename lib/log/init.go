@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var log = yiigo.DebugLogger()
+var logger = yiigo.DebugLogger()
 
 // Init 初始化日志实例(如有多个实例，在此方法中初始化)
 func Init() {
@@ -23,5 +23,5 @@ func Init() {
 		cfg.Stderr = cast.ToBool(opts["stderr"])
 	}
 
-	log = yiigo.NewLogger(cfg)
+	logger = yiigo.NewLogger(cfg)
 }

@@ -1,11 +1,12 @@
 package result
 
 import (
-	"api/lib/log"
-
 	"encoding/json"
 	"net/http"
 
+	"api/lib/log"
+
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/shenghui0779/yiigo"
 	yiigo_http "github.com/shenghui0779/yiigo/http"
 	"go.uber.org/zap"
@@ -25,8 +26,7 @@ type response struct {
 func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	resp.x["req_id"] = log.GetReqID(ctx)
-
+	w.Header().Set("Request-ID", middleware.GetReqID(ctx))
 	w.Header().Set(yiigo_http.HeaderContentType, yiigo_http.ContentJSON)
 	w.WriteHeader(http.StatusOK)
 
