@@ -41,7 +41,7 @@ func Init() error {
 	driver := entsql.OpenDB(dialect.MySQL, db)
 
 	var iDriver dialect.Driver = driver
-	if viper.GetBool("debug") {
+	if viper.GetBool("app.debug") {
 		iDriver = dialect.DebugWithContext(driver, func(ctx context.Context, v ...any) {
 			log.Info(ctx, "SQL info", zap.String("SQL", fmt.Sprint(v...)))
 		})
