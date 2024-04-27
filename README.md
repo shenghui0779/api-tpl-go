@@ -15,5 +15,6 @@ Go API 快速开发脚手架
 - 命令行使用 [cobra](https://github.com/spf13/cobra)
 - 工具包使用 [yiigo](https://github.com/shenghui0779/yiigo)
 - 包含 认证、请求日志、跨域 中间价
-- 包含文件上传 和 URL访问(图片支持：缩略图、裁切、标注)
+- 包含文件上传(支持分片上传)
+- 图片URL访问(缩略图、裁切、标注)
 - 简单好用的 API Result 统一输出方式
