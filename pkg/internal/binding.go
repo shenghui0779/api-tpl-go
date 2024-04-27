@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/shenghui0779/yiigo"
-	yiigo_http "github.com/shenghui0779/yiigo/http"
+	"github.com/shenghui0779/yiigo/curl"
 	"github.com/shenghui0779/yiigo/validator"
 )
 
@@ -25,12 +25,12 @@ func BindJSON(r *http.Request, obj any) error {
 // BindForm 解析Form表单并校验
 func BindForm(r *http.Request, obj any) error {
 	switch yiigo.ContentType(r) {
-	case yiigo_http.ContentForm:
+	case curl.ContentForm:
 		if err := r.ParseForm(); err != nil {
 			return err
 		}
-	case yiigo_http.ContentFormMultipart:
-		if err := r.ParseMultipartForm(yiigo_http.MaxFormMemory); err != nil {
+	case curl.ContentFormMultipart:
+		if err := r.ParseMultipartForm(curl.MaxFormMemory); err != nil {
 			if err != http.ErrNotMultipart {
 				return err
 			}

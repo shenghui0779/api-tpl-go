@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/shenghui0779/yiigo"
-	yiigo_http "github.com/shenghui0779/yiigo/http"
+	"github.com/shenghui0779/yiigo/curl"
 	"go.uber.org/zap"
 )
 
@@ -27,7 +27,7 @@ func (resp *response) JSON(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	w.Header().Set("Request-ID", middleware.GetReqID(ctx))
-	w.Header().Set(yiigo_http.HeaderContentType, yiigo_http.ContentJSON)
+	w.Header().Set(curl.HeaderContentType, curl.ContentJSON)
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(resp.x); err != nil {
