@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cli *redis.Client
+var Client *redis.Client
 
 // Init 初始化Redis(如有多个实例，在此方法中初始化)
 func Init() error {
@@ -40,20 +40,15 @@ func Init() error {
 		cfg.DisableIndentity = cast.ToBool(opts["disable_indentity"])
 	}
 
-	cli = redis.NewClient(cfg)
+	Client = redis.NewClient(cfg)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	// verify connection
-	if err := cli.Ping(ctx).Err(); err != nil {
-		cli.Close()
+	if err := Client.Ping(ctx).Err(); err != nil {
+		Client.Close()
 		return err
 	}
-
 	return nil
-}
-
-func Client() redis.UniversalClient {
-	return cli
 }

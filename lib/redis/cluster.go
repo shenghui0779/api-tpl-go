@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cluster *redis.ClusterClient
+var Cluster *redis.ClusterClient
 
 // Init 初始化Redis集群
 func InitCluster() error {
@@ -43,20 +43,15 @@ func InitCluster() error {
 		cfg.DisableIndentity = cast.ToBool(opts["disable_indentity"])
 	}
 
-	cluster = redis.NewClusterClient(cfg)
+	Cluster = redis.NewClusterClient(cfg)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	// verify connection
-	if err := cluster.Ping(ctx).Err(); err != nil {
-		cluster.Close()
+	if err := Cluster.Ping(ctx).Err(); err != nil {
+		Cluster.Close()
 		return err
 	}
-
 	return nil
-}
-
-func Cluster() *redis.ClusterClient {
-	return cluster
 }
