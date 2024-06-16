@@ -2,6 +2,7 @@ package lib
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -12,6 +13,7 @@ import (
 	"api/lib/log"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/shenghui0779/yiigo"
 	"go.uber.org/zap"
 )
 
@@ -102,4 +104,16 @@ func ExcelColumnIndex(name string) int {
 	}
 
 	return index
+}
+
+func CheckFields(fields, columns []string) error {
+	if len(fields) == 0 {
+		return nil
+	}
+	for _, v := range fields {
+		if !yiigo.SliceIn(columns, v) {
+			return fmt.Errorf("invalid field: %s", v)
+		}
+	}
+	return nil
 }

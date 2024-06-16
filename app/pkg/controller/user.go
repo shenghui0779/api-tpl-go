@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	ent_user "api/app/ent/user"
 	"api/app/pkg/service/user"
 	"api/lib"
 	"api/lib/log"
@@ -33,6 +34,10 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 		result.ErrParams(result.E(errors.WithMessage(err, "参数错误"))).JSON(w, r)
 		return
 	}
+	if err := lib.CheckFields(req.Fields, ent_user.Columns); err != nil {
+		result.ErrParams(result.E(errors.WithMessage(err, "参数错误"))).JSON(w, r)
+		return
+	}
 	user.List(r.Context(), req).JSON(w, r)
 }
 
@@ -42,6 +47,10 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 	req := new(user.ReqInfo)
 	if err := lib.BindJSON(r, req); err != nil {
 		log.Error(ctx, "Error params", zap.Error(err))
+		result.ErrParams(result.E(errors.WithMessage(err, "参数错误"))).JSON(w, r)
+		return
+	}
+	if err := lib.CheckFields(req.Fields, ent_user.Columns); err != nil {
 		result.ErrParams(result.E(errors.WithMessage(err, "参数错误"))).JSON(w, r)
 		return
 	}
