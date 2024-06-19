@@ -40,8 +40,10 @@ func (File) Fields() []ent.Field {
 		field.String("format").Default("").Comment("文件格式"),
 		field.Int("width").Default(0).Comment("图片宽(X)"),
 		field.Int("height").Default(0).Comment("图片高(X)"),
-		field.Int("orientation").Default(0).Comment("图片方向"),
-		field.Int("duration").Default(0).Comment("视频时长(秒)"),
+		field.String("orientation").Default("").Comment("图片方向"),
+		field.String("duration").Default("").Comment("视频时长(秒)"),
+		field.String("longitude").Default("").Comment("经度"),
+		field.String("latitude").Default("").Comment("纬度"),
 	}
 }
 

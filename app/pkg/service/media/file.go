@@ -8,6 +8,7 @@ import (
 
 	"api/app/ent"
 	"api/app/ent/media"
+	"api/lib"
 	"api/lib/log"
 	"api/lib/result"
 
@@ -26,7 +27,9 @@ type MediaInfo struct {
 	Width       int    `json:"width,omitempty"`       // 图片独有
 	Height      int    `json:"height,omitempty"`      // 图片独有
 	Orientation string `json:"orientation,omitempty"` // 图片独有
-	Duration    int    `json:"duration,omitempty"`    // 视频独有
+	Duration    string `json:"duration,omitempty"`    // 视频时长(秒)
+	Longitude   string `json:"longitude,omitempty"`
+	Latitude    string `json:"latitude,omitempty"`
 	Fingerprint string `json:"fingerprint"`
 	ModTime     string `json:"mod_time"`
 }
@@ -41,19 +44,18 @@ func File(w http.ResponseWriter, r *http.Request) {
 	}).Unique(false).Where(media.MediaID(mediaID)).First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			result.ErrNotFound(result.M("document not found")).JSON(w, r)
+			result.ErrNotFound(result.M("media not found")).JSON(w, r)
 		} else {
-			log.Error(ctx, "Error ent.Media.Query.First", zap.Error(err), zap.String("media_id", mediaID))
+			log.Error(ctx, "Error ent.Media.Query", zap.Error(err), zap.String("media_id", mediaID))
 			result.ErrSystem().JSON(w, r)
 		}
-
 		return
 	}
 
 	// 真实文件
 	file := record.Edges.File
 	if file == nil {
-		result.ErrNotFound(result.M("document not found")).JSON(w, r)
+		result.ErrNotFound(result.M("media not found")).JSON(w, r)
 		return
 	}
 
@@ -69,12 +71,13 @@ func File(w http.ResponseWriter, r *http.Request) {
 			Format:      file.Format,
 			Width:       file.Width,
 			Height:      file.Height,
-			Orientation: Orientation(file.Orientation).String(),
+			Orientation: file.Orientation,
 			Duration:    file.Duration,
+			Longitude:   file.Longitude,
+			Latitude:    file.Latitude,
 			Fingerprint: file.Fingerprint,
 			ModTime:     record.CreatedAt.Format(time.DateTime),
 		})).JSON(w, r)
-
 		return
 	}
 
@@ -85,7 +88,6 @@ func File(w http.ResponseWriter, r *http.Request) {
 	if format < 0 {
 		w.Header().Set("content-disposition", "attachment; filename="+record.FileName)
 		http.ServeFile(w, r, filePath)
-
 		return
 	}
 
@@ -113,7 +115,7 @@ func File(w http.ResponseWriter, r *http.Request) {
 func thumbnail(w http.ResponseWriter, r *http.Request, mediaFile, thumbnail string) {
 	ctx := r.Context()
 
-	rect := new(Rect)
+	rect := new(lib.Rect)
 	quality := 80
 
 	items := strings.Split(thumbnail, "/")
@@ -142,7 +144,7 @@ func thumbnail(w http.ResponseWriter, r *http.Request, mediaFile, thumbnail stri
 		return
 	}
 
-	if err := ImageThumbnail(w, mediaFile, rect, imaging.JPEGQuality(quality)); err != nil {
+	if err := lib.ImageThumbnail(w, mediaFile, rect, imaging.JPEGQuality(quality)); err != nil {
 		log.Error(ctx, "Error image thumbnail", zap.Error(err), zap.String("file", mediaFile))
 		result.ErrSystem().JSON(w, r)
 	}
@@ -151,13 +153,13 @@ func thumbnail(w http.ResponseWriter, r *http.Request, mediaFile, thumbnail stri
 func label(w http.ResponseWriter, r *http.Request, mediaFile string, labels []string) {
 	ctx := r.Context()
 
-	rects := make([]*Rect, 0, len(labels))
+	rects := make([]*lib.Rect, 0, len(labels))
 
 	for _, v := range labels {
 		items := strings.Split(v, "/")
 		count := len(items)
 
-		rect := new(Rect)
+		rect := new(lib.Rect)
 
 		for i := 0; i < count; i++ {
 			next := i + 1
@@ -181,11 +183,10 @@ func label(w http.ResponseWriter, r *http.Request, mediaFile string, labels []st
 			result.ErrParams(result.M("Error label params")).JSON(w, r)
 			return
 		}
-
 		rects = append(rects, rect)
 	}
 
-	if err := ImageLabel(w, mediaFile, rects, imaging.JPEGQuality(100)); err != nil {
+	if err := lib.ImageLabel(w, mediaFile, rects, imaging.JPEGQuality(100)); err != nil {
 		log.Error(ctx, "Error label image", zap.Error(err), zap.String("file", mediaFile))
 		result.ErrSystem().JSON(w, r)
 	}
@@ -194,7 +195,7 @@ func label(w http.ResponseWriter, r *http.Request, mediaFile string, labels []st
 func crop(w http.ResponseWriter, r *http.Request, mediaFile, crop string) {
 	ctx := r.Context()
 
-	rect := new(Rect)
+	rect := new(lib.Rect)
 
 	items := strings.Split(crop, "/")
 	count := len(items)
@@ -222,7 +223,7 @@ func crop(w http.ResponseWriter, r *http.Request, mediaFile, crop string) {
 		return
 	}
 
-	if err := ImageCrop(w, mediaFile, rect, imaging.JPEGQuality(100)); err != nil {
+	if err := lib.ImageCrop(w, mediaFile, rect, imaging.JPEGQuality(100)); err != nil {
 		log.Error(ctx, "Error crop image", zap.Error(err), zap.String("file", mediaFile))
 		result.ErrSystem().JSON(w, r)
 	}

@@ -40,9 +40,9 @@ func Chunk(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	record, err := ent.DB.File.Query().Unique(false).Select(file.FieldID, file.FieldSize).Where(file.Fingerprint(form.FileMD5)).First(ctx)
+	record, err := ent.DB.File.Query().Unique(false).Select(file.FieldID, file.FieldSize, file.FieldFormat, file.FieldDuration).Where(file.Fingerprint(form.FileMD5)).First(ctx)
 	if err != nil && !ent.IsNotFound(err) {
-		log.Error(ctx, "Error ent.File.Query.First", zap.String("fingerprint", form.FileMD5), zap.Error(err))
+		log.Error(ctx, "Error ent.File.Query", zap.String("fingerprint", form.FileMD5), zap.Error(err))
 		result.ErrSystem().JSON(w, r)
 		return
 	}
@@ -69,7 +69,7 @@ func Chunk(w http.ResponseWriter, r *http.Request) {
 			FileName:   form.FileName,
 			FileSize:   record.Size,
 			FileFormat: record.Format,
-			Duration:   int64(record.Duration),
+			Duration:   record.Duration,
 		})).JSON(w, r)
 
 		return
@@ -148,35 +148,15 @@ func merge(ctx context.Context, form *FormChunk) result.Result {
 	}
 
 	// 如果是图片，则获取图片宽高
-	exif, err := ParseMediaEXIF(mediaPath)
+	exif, err := lib.ParseMediaEXIF(mediaPath)
 	if err != nil {
 		log.Error(ctx, "Error ParseMediaEXIF", zap.String("path", mediaPath), zap.Error(err))
 		return result.ErrSystem()
 	}
 
-	stat, _ := f.Stat()
-
-	// 创建文件
-	record, err := ent.DB.File.Create().
-		SetFingerprint(fingerprint).
-		SetSize(stat.Size()).
-		SetFormat(exif.Format).
-		SetWidth(exif.Width).
-		SetHeight(exif.Height).
-		SetOrientation(exif.Orientation).
-		Save(ctx)
+	err = createMedia(ctx, mediaID, mediaPath, form.FileName, fingerprint, exif)
 	if err != nil {
-		// DB失败，删除文件
-		os.RemoveAll(mediaPath)
-		log.Error(ctx, "Error ent.File.Create", zap.Error(err))
-
-		return result.ErrSystem()
-	}
-
-	// 创建Media
-	_, err = ent.DB.Media.Create().SetMediaID(mediaID).SetFileName(form.FileName).SetFileID(record.ID).Save(ctx)
-	if err != nil {
-		log.Error(ctx, "Error ent.Media.Create", zap.Error(err))
+		log.Error(ctx, "Error createMedia", zap.Error(err))
 		return result.ErrSystem()
 	}
 
@@ -184,7 +164,8 @@ func merge(ctx context.Context, form *FormChunk) result.Result {
 		MediaID:    mediaID,
 		MediaURL:   MediaURL(mediaID),
 		FileName:   form.FileName,
-		FileSize:   stat.Size(),
+		FileSize:   exif.Size,
 		FileFormat: exif.Format,
+		Duration:   exif.Duration,
 	}))
 }

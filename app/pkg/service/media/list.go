@@ -75,8 +75,10 @@ func List(ctx context.Context, req *ReqList) result.Result {
 			info.Format = ef.Format
 			info.Width = ef.Width
 			info.Height = ef.Height
-			info.Orientation = Orientation(ef.Orientation).String()
+			info.Orientation = ef.Orientation
 			info.Duration = ef.Duration
+			info.Longitude = ef.Longitude
+			info.Latitude = ef.Latitude
 			info.Fingerprint = ef.Fingerprint
 		}
 		resp.List = append(resp.List, info)

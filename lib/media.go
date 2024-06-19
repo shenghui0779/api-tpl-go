@@ -1,6 +1,7 @@
-package media
+package lib
 
 import (
+	"fmt"
 	"image"
 	"io"
 	"os"
@@ -12,6 +13,48 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rwcarlsen/goexif/exif"
 	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
+	ffmpeg "github.com/u2takey/ffmpeg-go"
+)
+
+const MediaThumbnailWidth = 200
+
+type Orientation int
+
+func (o Orientation) String() string {
+	s := ""
+
+	switch o {
+	case TopLeft:
+		s = "Top-Left"
+	case TopRight:
+		s = "Top-Right"
+	case BottomRight:
+		s = "Bottom-Right"
+	case BottomLeft:
+		s = "Bottom-Left"
+	case LeftTop:
+		s = "Left-Top"
+	case RightTop:
+		s = "Right-Top"
+	case RightBottom:
+		s = "Right-Bottom"
+	case LeftBottom:
+		s = "Left-Bottom"
+	}
+
+	return s
+}
+
+const (
+	TopLeft     Orientation = 1
+	TopRight    Orientation = 2
+	BottomRight Orientation = 3
+	BottomLeft  Orientation = 4
+	LeftTop     Orientation = 5
+	RightTop    Orientation = 6
+	RightBottom Orientation = 7
+	LeftBottom  Orientation = 8
 )
 
 type MediaEXIF struct {
@@ -19,34 +62,40 @@ type MediaEXIF struct {
 	Format      string
 	Width       int
 	Height      int
-	Orientation int
+	Orientation string
 	Longitude   decimal.Decimal
 	Latitude    decimal.Decimal
+	Duration    string
 }
 
 func ParseMediaEXIF(filename string) (*MediaEXIF, error) {
-	// 非图片格式，不处理
-	format, _ := imaging.FormatFromFilename(filename)
-	if format < 0 {
-		ext := filepath.Ext(filename)
-		return &MediaEXIF{Format: strings.ToUpper(strings.TrimPrefix(ext, "."))}, nil
-	}
-
 	f, err := os.Open(filename)
 	if err != nil {
-		return nil, errors.Wrap(err, "open file")
+		return nil, fmt.Errorf("os.Open: %w", err)
 	}
 	defer f.Close()
 
 	stat, err := f.Stat()
 	if err != nil {
-		return nil, errors.Wrap(err, "stat file")
+		return nil, fmt.Errorf("os.File.Stat: %w", err)
+	}
+	data := &MediaEXIF{
+		Size: stat.Size(),
 	}
 
-	data := &MediaEXIF{
-		Size:   stat.Size(),
-		Format: format.String(),
+	format, _ := imaging.FormatFromFilename(filename)
+	if format < 0 {
+		data.Format = strings.ToUpper(strings.TrimPrefix(filepath.Ext(filename), "."))
+		output, err := ffmpeg.Probe(filename)
+		if err == nil {
+			data.Duration = gjson.Get(output, "format.duration").String()
+		}
+		return data, nil
 	}
+
+	// 图片格式
+	data.Format = format.String()
+
 	if x, err := exif.Decode(f); err == nil {
 		if lat, lng, err := x.LatLong(); err == nil {
 			data.Longitude = decimal.NewFromFloat(lng)
@@ -64,7 +113,7 @@ func ParseMediaEXIF(filename string) (*MediaEXIF, error) {
 		}
 		if tag, err := x.Get(exif.Orientation); err == nil {
 			if v, err := tag.Int(0); err == nil {
-				data.Orientation = v
+				data.Orientation = Orientation(v).String()
 			}
 		}
 	}
