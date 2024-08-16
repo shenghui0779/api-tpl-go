@@ -34,7 +34,7 @@ var rootCmd = &cobra.Command{
 			log.Panic(context.Background(), "配置读取失败", zap.Error(err))
 		}
 		viper.WatchConfig()
-
+		// 初始化
 		preInit(context.Background())
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -43,7 +43,6 @@ var rootCmd = &cobra.Command{
 		if err := os.MkdirAll(os.TempDir(), 0o775); err != nil {
 			log.Error(context.Background(), "Error create temp dir", zap.Error(err))
 		}
-
 		serving()
 	},
 }

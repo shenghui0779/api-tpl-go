@@ -47,7 +47,7 @@ func Init() error {
 
 	// verify connection
 	if err := Client.Ping(ctx).Err(); err != nil {
-		Client.Close()
+		_ = Client.Close()
 		return err
 	}
 	return nil

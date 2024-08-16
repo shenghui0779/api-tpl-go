@@ -50,7 +50,7 @@ func InitCluster() error {
 
 	// verify connection
 	if err := Cluster.Ping(ctx).Err(); err != nil {
-		Cluster.Close()
+		_ = Cluster.Close()
 		return err
 	}
 	return nil

@@ -15,14 +15,14 @@ func main() {
 func clean() {
 	// 关闭数据库连接
 	if ent.DB != nil {
-		ent.DB.Close()
+		_ = ent.DB.Close()
 	}
 	// 关闭Redis连接
 	if redis.Client != nil {
-		redis.Client.Close()
+		_ = redis.Client.Close()
 	}
 	// 关闭Redis集群连接
 	if redis.Cluster != nil {
-		redis.Cluster.Close()
+		_ = redis.Cluster.Close()
 	}
 }
